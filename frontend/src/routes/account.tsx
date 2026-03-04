@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PageLayout } from '@/shared/components/layout/page-layout'
 import { Section } from '@/shared/components/custom-ui/section'
-import { AccountInteractive } from '@/routes/account/account-interactive'
+import { AccountInteractive } from '@/routes/account/-account-interactive'
 import { useTranslation } from 'react-i18next'
 
 function AccountPage() {

@@ -1,278 +1,86 @@
 /**
- * Centralized Environment Variable Access
+ * Centralized Environment Variable Access (Frontend / Vite)
  *
- * Provides type-safe, validated access to all environment variables.
- * All process.env usage should go through this file for consistency and validation.
+ * All environment variables for the frontend must be prefixed with VITE_
+ * and accessed via import.meta.env — NOT process.env.
+ *
+ * Server-only variables (DB, Stripe secret, Firebase Admin, etc.) are in
+ * backend/src/utils/config/envUtil.ts and must never appear here.
  */
 
-function getEnvVar(
-  name: string,
-  required = true,
-  defaultValue?: string,
-  value?: string
-): string {
-  const envValue = value !== undefined ? value : process.env[name];
+function getEnvVar(name: string, defaultValue = ""): string {
+  const value = (import.meta.env as Record<string, string>)[name];
+  return value ?? defaultValue;
+}
 
-  // Check if we are on the client side
-  const isClient = typeof window !== "undefined";
-  const isPublicVar = name.startsWith("NEXT_PUBLIC_");
-
-  // If on client and not a public var, it's a server secret that won't be available.
-  // We shouldn't throw an error in this case.
-  if (isClient && !isPublicVar) {
-    return envValue || defaultValue || "";
+function getEnvVarRequired(name: string): string {
+  const value = (import.meta.env as Record<string, string>)[name];
+  if (!value) {
+    console.warn(`[envUtil] Missing required env var: ${name}`);
   }
-
-  if (required && (!envValue || envValue.length === 0)) {
-    if (defaultValue !== undefined) {
-      return defaultValue;
-    }
-    throw new Error(`Environment variable ${name} is required but not set.`);
-  }
-  return envValue || defaultValue || "";
+  return value ?? "";
 }
 
-function getEnvVarAsBoolean(
-  name: string,
-  defaultValue = false,
-  value?: string
-): boolean {
-  const envValue = value !== undefined ? value : process.env[name];
-  if (!envValue) return defaultValue;
-  return envValue.toLowerCase() === "true" || envValue === "1";
-}
-
-function _getEnvVarAsNumber(
-  name: string,
-  defaultValue?: number,
-  value?: string
-): number | undefined {
-  const envValue = value !== undefined ? value : process.env[name];
-  if (!envValue) return defaultValue;
-  const parsed = parseInt(envValue, 10);
-  return isNaN(parsed) ? defaultValue : parsed;
-}
-
-function getEnvVarAsArray(
-  name: string,
-  defaultValue: string[] = [],
-  value?: string
-): string[] {
-  const envValue = value !== undefined ? value : process.env[name];
-  if (!envValue) return defaultValue;
-  return envValue
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+function getEnvVarAsBoolean(name: string, defaultValue = false): boolean {
+  const value = (import.meta.env as Record<string, string>)[name];
+  if (!value) return defaultValue;
+  return value.toLowerCase() === "true" || value === "1";
 }
 
 // ============================================================================
 // App & Environment
 // ============================================================================
-export const APP_ENV = getEnvVar("APP_ENV", false) || "development";
+export const APP_ENV = getEnvVar("VITE_APP_ENV", "development");
 export const IS_PRODUCTION = APP_ENV === "production";
 export const IS_DEVELOPMENT = APP_ENV === "development";
 export const IS_TEST = APP_ENV === "test";
 
 // ============================================================================
-// Database
+// Firebase Client
 // ============================================================================
-export const DATABASE_URL = getEnvVar("DATABASE_URL", false);
-export const ENABLE_DB_HEALTH_CHECKS = getEnvVarAsBoolean(
-  "ENABLE_DB_HEALTH_CHECKS",
-  false
+export const FIREBASE_API_KEY = getEnvVarRequired("VITE_FIREBASE_API_KEY");
+export const FIREBASE_AUTH_DOMAIN = getEnvVarRequired(
+  "VITE_FIREBASE_AUTH_DOMAIN"
+);
+export const FIREBASE_PROJECT_ID = getEnvVarRequired(
+  "VITE_FIREBASE_PROJECT_ID"
+);
+export const FIREBASE_STORAGE_BUCKET = getEnvVarRequired(
+  "VITE_FIREBASE_STORAGE_BUCKET"
+);
+export const FIREBASE_MESSAGING_SENDER_ID = getEnvVarRequired(
+  "VITE_FIREBASE_MESSAGING_SENDER_ID"
+);
+export const FIREBASE_APP_ID = getEnvVarRequired("VITE_FIREBASE_APP_ID");
+export const FIREBASE_MEASUREMENT_ID = getEnvVar(
+  "VITE_FIREBASE_MEASUREMENT_ID"
 );
 
 // ============================================================================
-// Redis
+// Stripe (public key only — secret key lives in backend)
 // ============================================================================
-export const REDIS_URL = getEnvVar("REDIS_URL", false);
-
-// ============================================================================
-// Firebase Client (NEXT_PUBLIC_*)
-// ============================================================================
-export const FIREBASE_API_KEY = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_API_KEY",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY
-);
-export const FIREBASE_AUTH_DOMAIN = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-);
-export const FIREBASE_PROJECT_ID = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-);
-export const FIREBASE_STORAGE_BUCKET = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-);
-export const FIREBASE_MESSAGING_SENDER_ID = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-);
-export const FIREBASE_APP_ID = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_APP_ID",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+export const STRIPE_PUBLISHABLE_KEY = getEnvVarRequired(
+  "VITE_STRIPE_PUBLISHABLE_KEY"
 );
 
 // ============================================================================
-// Firebase Admin (Server-side only)
+// API
 // ============================================================================
-export const FIREBASE_CLIENT_EMAIL = getEnvVar("FIREBASE_CLIENT_EMAIL", true);
-export const FIREBASE_PRIVATE_KEY = getEnvVar("FIREBASE_PRIVATE_KEY", true);
-
-// ============================================================================
-// Security
-// ============================================================================
-export const CSRF_SECRET = getEnvVar("CSRF_SECRET", true);
-export const ENCRYPTION_KEY = getEnvVar("ENCRYPTION_KEY", false);
-export const ADMIN_SPECIAL_CODE_HASH = getEnvVar(
-  "ADMIN_SPECIAL_CODE_HASH",
-  false
-);
-
-// ============================================================================
-// Stripe
-// ============================================================================
-export const STRIPE_WEBHOOK_SECRET = getEnvVar("STRIPE_WEBHOOK_SECRET", false);
-
-// ============================================================================
-// Email (Resend)
-// ============================================================================
-export const RESEND_API_KEY = getEnvVar("RESEND_API_KEY", false);
-export const RESEND_FROM_EMAIL = getEnvVar(
-  "RESEND_FROM_EMAIL",
-  false,
-  "[FROM_EMAIL]"
-);
-export const RESEND_REPLY_TO_EMAIL = getEnvVar(
-  "RESEND_REPLY_TO_EMAIL",
-  false,
-  "[REPLY_TO_EMAIL]"
-);
-
-// ============================================================================
-// Storage (Cloudflare R2)
-// ============================================================================
-export const R2_ACCOUNT_ID = getEnvVar("R2_ACCOUNT_ID", false);
-export const R2_ACCESS_KEY_ID = getEnvVar("R2_ACCESS_KEY_ID", false);
-export const R2_SECRET_ACCESS_KEY = getEnvVar("R2_SECRET_ACCESS_KEY", false);
-export const R2_BUCKET_NAME = getEnvVar("R2_BUCKET_NAME", false);
-export const R2_PUBLIC_URL = getEnvVar("R2_PUBLIC_URL", false);
-
-// ============================================================================
-// CORS
-// ============================================================================
-export const CORS_ALLOWED_ORIGINS = getEnvVarAsArray("CORS_ALLOWED_ORIGINS", [
-  "http://localhost:3000",
-  "https://example.com",
-]);
-
-// ============================================================================
-// Observability (Metrics for Grafana Cloud / Prometheus)
-// ============================================================================
-/** Enable Prometheus metrics collection and /api/metrics endpoint. Default: true in production. */
-export const METRICS_ENABLED = getEnvVarAsBoolean(
-  "METRICS_ENABLED",
-  !IS_DEVELOPMENT
-);
-/** Optional bearer token required to access GET /api/metrics. Set in production for Grafana Cloud scraper. */
-export const METRICS_SECRET = getEnvVar("METRICS_SECRET", false);
-
-// ============================================================================
-// Debug & Logging
-// ============================================================================
-export const DEBUG_ENABLED = getEnvVarAsBoolean(
-  "NEXT_PUBLIC_DEBUG",
-  false,
-  process.env.NEXT_PUBLIC_DEBUG
-);
-export const LOG_LEVEL = getEnvVar(
-  "NEXT_PUBLIC_LOG_LEVEL",
-  false,
-  "debug",
-  process.env.NEXT_PUBLIC_LOG_LEVEL
-) as "debug" | "info" | "warn" | "error";
+/** Backend API base URL, e.g. http://localhost:3001 or https://api.yourdomain.com */
+export const API_URL = getEnvVar("VITE_API_URL", "http://localhost:3001");
 
 // ============================================================================
 // SEO & Metadata
 // ============================================================================
-export const BASE_URL = getEnvVar(
-  "NEXT_PUBLIC_BASE_URL",
-  false,
-  "[BASE_URL]",
-  process.env.NEXT_PUBLIC_BASE_URL
-);
+export const BASE_URL = getEnvVar("VITE_APP_URL", "http://localhost:3000");
+export const APP_NAME = getEnvVar("VITE_APP_NAME", "App");
 
 // ============================================================================
-// Package Info
+// Debug & Logging
 // ============================================================================
-export const PACKAGE_VERSION = getEnvVar(
-  "npm_package_version",
-  false,
-  "unknown"
-);
-
-// ============================================================================
-// Deployment platform (for request IP parsing)
-// ============================================================================
-/** Set by Railway; used to choose rightmost X-Forwarded-For segment (Railway appends client IP). */
-export const IS_RAILWAY = !!getEnvVar("RAILWAY_PUBLIC_DOMAIN", false);
-
-// ============================================================================
-// Testing & CI
-// ============================================================================
-export const IS_CI = getEnvVarAsBoolean("CI", false);
-export const E2E_BASE_URL = getEnvVar(
-  "E2E_BASE_URL",
-  false,
-  "http://localhost:3000"
-);
-
-// ============================================================================
-// Firebase Server-side (for Cloud Functions)
-// ============================================================================
-export const FIREBASE_PROJECT_ID_SERVER = getEnvVar(
-  "FIREBASE_PROJECT_ID",
-  false,
-  FIREBASE_PROJECT_ID // Fallback to client-side project ID
-);
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-/**
- * Get allowed CORS origins based on environment
- */
-export function getAllowedCorsOrigins(): string[] {
-  if (IS_DEVELOPMENT || APP_ENV === "development") {
-    return [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3001",
-    ];
-  }
-  return CORS_ALLOWED_ORIGINS;
-}
-
-/**
- * Check if secure cookies should be used (production only)
- */
-export function shouldUseSecureCookies(): boolean {
-  return IS_PRODUCTION;
-}
+export const DEBUG_ENABLED = getEnvVarAsBoolean("VITE_DEBUG", false);
+export const LOG_LEVEL = getEnvVar("VITE_LOG_LEVEL", "warn") as
+  | "debug"
+  | "info"
+  | "warn"
+  | "error";

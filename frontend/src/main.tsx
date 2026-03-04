@@ -4,7 +4,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider } from "@tanstack/react-router";
+import { I18nextProvider } from "react-i18next";
 import { router } from "./router";
+import i18n from "@/shared/lib/i18n";
+import { ThemeProvider } from "@/shared/providers/theme-provider";
+import { AppProvider } from "@/shared/contexts/app-context";
 
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
@@ -29,12 +33,18 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      <HelmetProvider>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </HelmetProvider>
+      <I18nextProvider i18n={i18n}>
+        <HelmetProvider>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+              <AppProvider>
+                <RouterProvider router={router} />
+                <ReactQueryDevtools initialIsOpen={false} />
+              </AppProvider>
+            </ThemeProvider>
+          </QueryClientProvider>
+        </HelmetProvider>
+      </I18nextProvider>
     </React.StrictMode>
   );
 }

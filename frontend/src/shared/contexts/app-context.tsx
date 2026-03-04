@@ -5,8 +5,6 @@
  * Consolidates Firebase auth with user profile data from the API.
  */
 
-"use client";
-
 import {
   createContext,
   useContext,

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { PaymentSuccessInteractive } from '@/routes/payment/success/payment-success-interactive'
+import { PaymentSuccessInteractive } from '@/routes/payment/success/-payment-success-interactive'
 import { PageLayout } from '@/shared/components/layout/page-layout'
 
 function PaymentSuccessPage() {

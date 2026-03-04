@@ -1,34 +1,15 @@
 /**
- * Global Error Handler for Production Stability
- * Handles unhandled promise rejections and uncaught exceptions
- * to prevent process crashes and ensure reliable operation
+ * Global Error Handler
+ * Client-side error utilities: structured error reporting, timeouts, error wrapping.
+ * Server-side process handlers (unhandledRejection, uncaughtException) live in the backend.
  */
 
 import debugLog from "@/shared/utils/debug/debug";
-import { APP_ENV } from "@/shared/utils/config/envUtil";
 
-// metrics.ts uses prom-client which requires Node.js built-ins (fs, v8, cluster).
-// We must NOT statically import it here because this file is transitively
-// imported by client components (safe-fetch → authenticated-fetch → app-context).
-// Dynamic imports are tree-shaken from the browser bundle by Next.js/Turbopack.
-async function recordErrorMetric(category: string, severity: string) {
-  if (typeof window !== "undefined") return;
-  const { recordError } =
-    await import("@/shared/services/observability/metrics");
-  recordError(category, severity);
-}
-async function recordUnhandledRejectionMetric() {
-  if (typeof window !== "undefined") return;
-  const { recordUnhandledRejection } =
-    await import("@/shared/services/observability/metrics");
-  recordUnhandledRejection();
-}
-async function recordUncaughtExceptionMetric() {
-  if (typeof window !== "undefined") return;
-  const { recordUncaughtException } =
-    await import("@/shared/services/observability/metrics");
-  recordUncaughtException();
-}
+// No-ops replacing the removed server-side metric recording
+function recordErrorMetric(_category: string, _severity: string) {}
+function recordUnhandledRejectionMetric() {}
+function recordUncaughtExceptionMetric() {}
 
 // Error severity levels
 export enum ErrorSeverity {
@@ -296,134 +277,6 @@ function logStructuredError(structuredError: StructuredError, source: string) {
   );
 }
 
-/**
- * Handles unhandled promise rejections
- */
-function handleUnhandledRejection(reason: any, promise: Promise<any>) {
-  errorMetrics.unhandledRejections++;
-  recordUnhandledRejectionMetric();
-
-  // Convert reason to Error if it's not already
-  const error = reason instanceof Error ? reason : new Error(String(reason));
-
-  const structuredError = structureError(error, {
-    additionalData: { promise: promise.toString() },
-  });
-
-  logStructuredError(structuredError, "unhandledRejection");
-
-  // For critical errors, we might need to restart the process
-  if (
-    structuredError.severity === ErrorSeverity.CRITICAL &&
-    !structuredError.isRecoverable
-  ) {
-    debugLog.error(
-      "Critical unrecoverable error detected, initiating graceful shutdown",
-      {
-        service: "global-error-handler",
-        operation: "critical-error-shutdown",
-      },
-      { errorId: structuredError.id }
-    );
-
-    // Give some time for logging before shutdown
-    setTimeout(() => {
-      process.exit(1);
-    }, 5000);
-  }
-}
-
-/**
- * Handles uncaught exceptions
- */
-function handleUncaughtException(error: Error) {
-  errorMetrics.uncaughtExceptions++;
-  recordUncaughtExceptionMetric();
-
-  const structuredError = structureError(error);
-  logStructuredError(structuredError, "uncaughtException");
-
-  // Uncaught exceptions are always serious - we should exit gracefully
-  debugLog.error(
-    "Uncaught exception detected, initiating graceful shutdown",
-    {
-      service: "global-error-handler",
-      operation: "uncaught-exception-shutdown",
-    },
-    { errorId: structuredError.id }
-  );
-
-  // Give some time for cleanup and logging
-  setTimeout(() => {
-    process.exit(1);
-  }, 5000);
-}
-
-/**
- * Handles process warning events
- */
-function handleProcessWarning(warning: any) {
-  debugLog.warn(
-    "Process warning detected",
-    {
-      service: "global-error-handler",
-      operation: "process-warning",
-    },
-    {
-      name: warning.name,
-      message: warning.message,
-      stack: warning.stack,
-    }
-  );
-}
-
-/**
- * Installs global error handlers
- */
-/**
- * Installs global error handlers
- */
-export function installGlobalErrorHandlers() {
-  // Server-side only check
-  if (typeof window !== "undefined") {
-    return;
-  }
-
-  // Only install once
-  if (
-    process.listenerCount &&
-    process.listenerCount("unhandledRejection") > 0
-  ) {
-    return;
-  }
-
-  process.on("unhandledRejection", handleUnhandledRejection);
-  process.on("uncaughtException", handleUncaughtException);
-  process.on("warning", handleProcessWarning);
-
-  debugLog.info("Global error handlers installed", {
-    service: "global-error-handler",
-    operation: "install",
-  });
-}
-
-/**
- * Removes global error handlers (for testing)
- */
-export function removeGlobalErrorHandlers() {
-  if (typeof window !== "undefined") {
-    return;
-  }
-
-  process.removeListener("unhandledRejection", handleUnhandledRejection);
-  process.removeListener("uncaughtException", handleUncaughtException);
-  process.removeListener("warning", handleProcessWarning);
-
-  debugLog.info("Global error handlers removed", {
-    service: "global-error-handler",
-    operation: "remove",
-  });
-}
 
 /**
  * Manual error reporting for custom error handling
@@ -513,7 +366,3 @@ export function withTimeout<T>(
   });
 }
 
-// Auto-install handlers in production (server-side only)
-if (APP_ENV === "production" && typeof window === "undefined") {
-  installGlobalErrorHandlers();
-}

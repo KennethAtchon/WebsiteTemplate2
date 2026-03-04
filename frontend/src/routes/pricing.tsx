@@ -5,7 +5,7 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { PricingInteractive } from './pricing/pricing-interactive'
+import { PricingInteractive } from './pricing/-pricing-interactive'
 import { PageLayout } from '@/shared/components/layout/page-layout'
 import { HeroSection } from '@/shared/components/layout/hero-section'
 import { Section } from '@/shared/components/custom-ui/section'
