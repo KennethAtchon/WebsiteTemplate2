@@ -1,0 +1,438 @@
+/home/kenneth/Documents/Workplace/WebsiteTemplate2/frontend
+├── scripts
+│   ├── fix-imports.ts
+│   ├── reorganize-frontend.sh
+│   └── verify-migration.ts
+├── src
+│   ├── features
+│   │   ├── account
+│   │   │   └── components
+│   │   │       ├── calculator-interface.tsx
+│   │   │       ├── order-detail-modal.tsx
+│   │   │       ├── profile-editor.tsx
+│   │   │       ├── subscription-management.tsx
+│   │   │       └── usage-dashboard.tsx
+│   │   ├── admin
+│   │   │   └── components
+│   │   │       ├── customers
+│   │   │       │   ├── customers-list.tsx
+│   │   │       │   ├── customers-view.tsx
+│   │   │       │   └── edit-customer-modal.tsx
+│   │   │       ├── dashboard
+│   │   │       │   ├── dashboard-layout.tsx
+│   │   │       │   ├── dashboard-view.tsx
+│   │   │       │   └── help-modal.tsx
+│   │   │       ├── orders
+│   │   │       │   ├── helper
+│   │   │       │   │   ├── order-products-button.tsx
+│   │   │       │   │   └── order-products-modal.tsx
+│   │   │       │   ├── order-form.tsx
+│   │   │       │   ├── orders-list.tsx
+│   │   │       │   ├── orders-view.tsx
+│   │   │       │   └── recent-orders-list.tsx
+│   │   │       └── subscriptions
+│   │   │           ├── subscription-analytics.tsx
+│   │   │           ├── subscriptions-list.tsx
+│   │   │           └── subscriptions-view.tsx
+│   │   ├── auth
+│   │   │   ├── components
+│   │   │   │   ├── auth-guard.tsx
+│   │   │   │   └── user-button.tsx
+│   │   │   ├── hooks
+│   │   │   │   └── use-authenticated-fetch.ts
+│   │   │   ├── services
+│   │   │   └── types
+│   │   │       └── auth.types.ts
+│   │   ├── calculator
+│   │   │   ├── components
+│   │   │   │   ├── calculator-component-map.tsx
+│   │   │   │   ├── calculator-input.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── investment-calculator.tsx
+│   │   │   │   ├── loan-calculator.tsx
+│   │   │   │   ├── mortgage-calculator.tsx
+│   │   │   │   ├── retirement-calculator.tsx
+│   │   │   │   └── SimpleCalculator.tsx
+│   │   │   ├── constants
+│   │   │   │   └── calculator.constants.ts
+│   │   │   ├── hooks
+│   │   │   │   └── use-calculator.ts
+│   │   │   ├── services
+│   │   │   │   ├── calculator-service.ts
+│   │   │   │   └── usage-service.ts
+│   │   │   └── types
+│   │   │       ├── calculator.types.ts
+│   │   │       └── calculator-validation.ts
+│   │   ├── contact
+│   │   │   └── components
+│   │   │       ├── contact-form.tsx
+│   │   │       ├── contact-info.tsx
+│   │   │       ├── contact-page-client.tsx
+│   │   │       ├── SimpleContactForm.tsx
+│   │   │       └── thank-you-dialog.tsx
+│   │   ├── customers
+│   │   │   └── types
+│   │   │       └── customer.types.ts
+│   │   ├── faq
+│   │   │   ├── components
+│   │   │   │   ├── faq-accordion.tsx
+│   │   │   │   ├── faq-categories.tsx
+│   │   │   │   ├── faq-hero.tsx
+│   │   │   │   ├── faq-page-client.tsx
+│   │   │   │   └── faq-search.tsx
+│   │   │   └── data
+│   │   │       └── faq-data.ts
+│   │   ├── orders
+│   │   │   └── types
+│   │   │       └── order.types.ts
+│   │   ├── payments
+│   │   │   ├── components
+│   │   │   │   ├── checkout
+│   │   │   │   │   ├── order-checkout.tsx
+│   │   │   │   │   └── subscription-checkout.tsx
+│   │   │   │   ├── success
+│   │   │   │   │   ├── order-confirmation.tsx
+│   │   │   │   │   ├── order-creator.tsx
+│   │   │   │   │   ├── order-success.tsx
+│   │   │   │   │   └── subscription-success.tsx
+│   │   │   │   └── stripe-payment-fallback.tsx
+│   │   │   ├── services
+│   │   │   │   ├── payment-service.ts
+│   │   │   │   └── stripe-checkout.ts
+│   │   │   └── types
+│   │   │       └── payment.types.ts
+│   │   └── subscriptions
+│   │       ├── components
+│   │       │   ├── feature-gate.tsx
+│   │       │   ├── manage-subscription-button.tsx
+│   │       │   └── upgrade-prompt.tsx
+│   │       ├── hooks
+│   │       │   └── use-subscription.ts
+│   │       └── types
+│   │           └── subscription.types.ts
+│   ├── routes
+│   │   ├── account
+│   │   │   └── -account-interactive.tsx
+│   │   ├── admin
+│   │   │   ├── contactmessages.tsx
+│   │   │   ├── customers.tsx
+│   │   │   ├── dashboard.tsx
+│   │   │   ├── developer.tsx
+│   │   │   ├── index.tsx
+│   │   │   ├── orders.tsx
+│   │   │   ├── settings.tsx
+│   │   │   └── subscriptions.tsx
+│   │   ├── calculator
+│   │   │   └── -calculator-interactive.tsx
+│   │   ├── checkout
+│   │   │   └── -checkout-interactive.tsx
+│   │   ├── payment
+│   │   │   ├── success
+│   │   │   │   └── -payment-success-interactive.tsx
+│   │   │   ├── cancel.tsx
+│   │   │   ├── index.tsx
+│   │   │   └── success.tsx
+│   │   ├── pricing
+│   │   │   └── -pricing-interactive.tsx
+│   │   ├── about.tsx
+│   │   ├── accessibility.tsx
+│   │   ├── account.tsx
+│   │   ├── api-documentation.tsx
+│   │   ├── calculator.tsx
+│   │   ├── checkout.tsx
+│   │   ├── contact.tsx
+│   │   ├── cookies.tsx
+│   │   ├── faq.tsx
+│   │   ├── features.tsx
+│   │   ├── index.tsx
+│   │   ├── pricing.tsx
+│   │   ├── privacy.tsx
+│   │   ├── __root.tsx
+│   │   ├── router.tsx
+│   │   ├── sign-in.tsx
+│   │   ├── sign-up.tsx
+│   │   ├── support.tsx
+│   │   └── terms.tsx
+│   ├── shared
+│   │   ├── components
+│   │   │   ├── analytics
+│   │   │   │   └── web-vitals-reporter.tsx
+│   │   │   ├── custom-ui
+│   │   │   │   ├── empty-state.tsx
+│   │   │   │   ├── error-alert.tsx
+│   │   │   │   ├── feature-card.tsx
+│   │   │   │   └── section.tsx
+│   │   │   ├── forms
+│   │   │   │   └── form-error.tsx
+│   │   │   ├── layout
+│   │   │   │   ├── animated-section.tsx
+│   │   │   │   ├── error-boundary.tsx
+│   │   │   │   ├── footer-custom.tsx
+│   │   │   │   ├── hero-section.tsx
+│   │   │   │   ├── navbar.tsx
+│   │   │   │   ├── page-layout.tsx
+│   │   │   │   └── theme-provider-wrapper.tsx
+│   │   │   ├── marketing
+│   │   │   │   ├── cookie-consent-banner.tsx
+│   │   │   │   └── structured-data.tsx
+│   │   │   ├── navigation
+│   │   │   │   └── breadcrumb.tsx
+│   │   │   ├── saas
+│   │   │   │   ├── FeatureComparison.tsx
+│   │   │   │   ├── PricingCard.tsx
+│   │   │   │   ├── TierBadge.tsx
+│   │   │   │   ├── UpgradePrompt.tsx
+│   │   │   │   └── UsageMeter.tsx
+│   │   │   ├── ui
+│   │   │   │   ├── accordion.tsx
+│   │   │   │   ├── alert-dialog.tsx
+│   │   │   │   ├── alert.tsx
+│   │   │   │   ├── aspect-ratio.tsx
+│   │   │   │   ├── avatar.tsx
+│   │   │   │   ├── badge.tsx
+│   │   │   │   ├── breadcrumb.tsx
+│   │   │   │   ├── button-group.tsx
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── calendar.tsx
+│   │   │   │   ├── card.tsx
+│   │   │   │   ├── carousel.tsx
+│   │   │   │   ├── chart.tsx
+│   │   │   │   ├── checkbox.tsx
+│   │   │   │   ├── collapsible.tsx
+│   │   │   │   ├── command.tsx
+│   │   │   │   ├── context-menu.tsx
+│   │   │   │   ├── dialog.tsx
+│   │   │   │   ├── drawer.tsx
+│   │   │   │   ├── dropdown-menu.tsx
+│   │   │   │   ├── empty.tsx
+│   │   │   │   ├── field.tsx
+│   │   │   │   ├── form.tsx
+│   │   │   │   ├── hover-card.tsx
+│   │   │   │   ├── input-group.tsx
+│   │   │   │   ├── input-otp.tsx
+│   │   │   │   ├── input.tsx
+│   │   │   │   ├── item.tsx
+│   │   │   │   ├── kbd.tsx
+│   │   │   │   ├── label.tsx
+│   │   │   │   ├── menubar.tsx
+│   │   │   │   ├── navigation-menu.tsx
+│   │   │   │   ├── pagination.tsx
+│   │   │   │   ├── popover.tsx
+│   │   │   │   ├── progress.tsx
+│   │   │   │   ├── radio-group.tsx
+│   │   │   │   ├── resizable.tsx
+│   │   │   │   ├── scroll-area.tsx
+│   │   │   │   ├── select.tsx
+│   │   │   │   ├── separator.tsx
+│   │   │   │   ├── sheet.tsx
+│   │   │   │   ├── sidebar.tsx
+│   │   │   │   ├── skeleton.tsx
+│   │   │   │   ├── slider.tsx
+│   │   │   │   ├── sonner.tsx
+│   │   │   │   ├── spinner.tsx
+│   │   │   │   ├── switch.tsx
+│   │   │   │   ├── table.tsx
+│   │   │   │   ├── tabs.tsx
+│   │   │   │   ├── textarea.tsx
+│   │   │   │   ├── toggle-group.tsx
+│   │   │   │   ├── toggle.tsx
+│   │   │   │   └── tooltip.tsx
+│   │   │   ├── language-switcher.tsx
+│   │   │   └── query-provider.tsx
+│   │   ├── constants
+│   │   │   ├── app.constants.ts
+│   │   │   ├── order.constants.ts
+│   │   │   ├── rate-limit.config.ts
+│   │   │   ├── stripe.constants.ts
+│   │   │   └── subscription.constants.ts
+│   │   ├── contexts
+│   │   │   └── app-context.tsx
+│   │   ├── hooks
+│   │   │   ├── use-mobile.ts
+│   │   │   ├── use-paginated-data.ts
+│   │   │   ├── use-portal-link.ts
+│   │   │   └── use-query-fetcher.ts
+│   │   ├── i18n
+│   │   │   └── config.ts
+│   │   ├── lib
+│   │   │   ├── api.ts
+│   │   │   ├── firebase.ts
+│   │   │   ├── i18n.ts
+│   │   │   ├── query-client.ts
+│   │   │   └── query-keys.ts
+│   │   ├── providers
+│   │   │   ├── auth-provider.tsx
+│   │   │   └── theme-provider.tsx
+│   │   ├── services
+│   │   │   ├── api
+│   │   │   │   ├── authenticated-fetch.ts
+│   │   │   │   └── safe-fetch.ts
+│   │   │   ├── csrf
+│   │   │   ├── email
+│   │   │   ├── firebase
+│   │   │   │   ├── config.ts
+│   │   │   │   ├── stripe-payments.ts
+│   │   │   │   ├── subscription-helpers.ts
+│   │   │   │   └── sync.ts
+│   │   │   ├── observability
+│   │   │   ├── rate-limit
+│   │   │   ├── request-identity
+│   │   │   ├── seo
+│   │   │   │   ├── metadata.ts
+│   │   │   │   ├── page-metadata.ts
+│   │   │   │   └── structured-data.ts
+│   │   │   ├── storage
+│   │   │   └── timezone
+│   │   │       └── TimeService.ts
+│   │   ├── types
+│   │   │   ├── api.types.ts
+│   │   │   └── index.ts
+│   │   └── utils
+│   │       ├── api
+│   │       │   └── add-timezone-header.ts
+│   │       ├── config
+│   │       │   ├── cors-constants.ts
+│   │       │   ├── envUtil.ts
+│   │       │   ├── index.ts
+│   │       │   └── mock.ts
+│   │       ├── debug
+│   │       │   ├── debug.ts
+│   │       │   └── index.ts
+│   │       ├── error-handling
+│   │       │   ├── auth-error-handler.ts
+│   │       │   └── global-error-handler.ts
+│   │       ├── helpers
+│   │       │   ├── date.ts
+│   │       │   ├── order-helpers.ts
+│   │       │   ├── pagination.ts
+│   │       │   └── utils.ts
+│   │       ├── permissions
+│   │       │   ├── calculator-permissions.ts
+│   │       │   └── core-feature-permissions.ts
+│   │       ├── security
+│   │       │   └── pii-sanitization.ts
+│   │       ├── system
+│   │       │   ├── app-initialization.ts
+│   │       │   ├── prisma-introspection.ts
+│   │       │   ├── system-logger.ts
+│   │       │   └── web-vitals.ts
+│   │       ├── type-guards
+│   │       │   └── subscription-type-guards.ts
+│   │       ├── validation
+│   │       │   ├── api-validation.ts
+│   │       │   ├── auth-validation.ts
+│   │       │   ├── checkout-validation.ts
+│   │       │   ├── contact-validation.ts
+│   │       │   ├── data-validation.ts
+│   │       │   ├── file-validation.ts
+│   │       │   ├── README.md
+│   │       │   └── search-validation.ts
+│   │       └── stripe-map-loader.ts
+│   ├── styles
+│   │   └── globals.css
+│   ├── translations
+│   │   └── en.json
+│   ├── App.tsx
+│   ├── main.tsx
+│   ├── router.tsx
+│   ├── routeTree.gen.ts
+│   └── vite-env.d.ts
+├── __tests__
+│   ├── helpers
+│   │   ├── auth-helpers.ts
+│   │   ├── e2e-seed.ts
+│   │   ├── fixtures.ts
+│   │   ├── global-setup.ts
+│   │   └── global-teardown.ts
+│   ├── setup
+│   │   └── bun-preload.ts
+│   └── unit
+│       ├── components
+│       │   └── query-provider.test.tsx
+│       ├── config
+│       │   ├── envUtil.test.ts
+│       │   └── mock.test.ts
+│       ├── constants
+│       │   └── subscription-constants.test.ts
+│       ├── error-handling
+│       │   ├── api-error-wrapper.test.ts
+│       │   ├── auth-error-handler.test.ts
+│       │   └── global-error-handler.test.ts
+│       ├── features
+│       │   ├── calculator
+│       │   │   ├── calculator-constants.test.ts
+│       │   │   ├── calculator-service.test.ts
+│       │   │   └── calculator-validation.test.ts
+│       │   └── payments
+│       │       └── payment-service.test.ts
+│       ├── hooks
+│       │   └── use-query-fetcher.test.tsx
+│       ├── lib
+│       │   ├── query-client.test.ts
+│       │   └── query-keys.test.ts
+│       ├── middleware
+│       │   ├── api-route-protection.test.ts
+│       │   └── helper.test.ts
+│       ├── permissions
+│       │   ├── calculator-permissions.test.ts
+│       │   └── core-feature-permissions.test.ts
+│       ├── services
+│       │   ├── api
+│       │   │   ├── 00-authenticated-fetch.test.ts
+│       │   │   └── safe-fetch.test.ts
+│       │   ├── csrf
+│       │   │   └── csrf-protection.test.ts
+│       │   ├── db
+│       │   │   ├── performance-monitor.test.ts
+│       │   │   └── prisma.test.ts
+│       │   ├── email
+│       │   │   └── resend.test.ts
+│       │   ├── observability
+│       │   │   └── metrics.test.ts
+│       │   ├── rate-limit
+│       │   │   └── rate-limit-config.test.ts
+│       │   ├── request-identity
+│       │   │   └── request-identity.test.ts
+│       │   └── seo
+│       │       ├── metadata.test.ts
+│       │       ├── page-metadata.test.ts
+│       │       └── structured-data.test.ts
+│       ├── utils
+│       │   ├── security
+│       │   │   └── pii-sanitization.test.ts
+│       │   ├── system
+│       │   │   └── system-logger.test.ts
+│       │   ├── add-timezone-header.test.ts
+│       │   ├── cn.test.ts
+│       │   ├── data-validation.test.ts
+│       │   ├── date.test.ts
+│       │   ├── encryption-key-length.test.ts
+│       │   ├── encryption-key-validation.test.ts
+│       │   ├── encryption.test.ts
+│       │   ├── pagination.test.ts
+│       │   ├── response-helpers.test.ts
+│       │   ├── stripe-map-loader.test.ts
+│       │   └── subscription-type-guards.test.ts
+│       └── validation
+│           ├── api-validation.test.ts
+│           ├── auth-validation.test.ts
+│           ├── checkout-validation.test.ts
+│           ├── contact-validation.test.ts
+│           ├── file-validation.test.ts
+│           ├── input-validation.test.ts
+│           └── search-validation.test.ts
+├── bun.lock
+├── components.json
+├── eslint.config.mjs
+├── index.html
+├── MIGRATION_PROGRESS.md
+├── package.json
+├── package-lock.json
+├── postcss.config.mjs
+├── README.md
+├── tailwind.config.ts
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+
+120 directories, 316 files

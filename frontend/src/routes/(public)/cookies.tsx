@@ -125,6 +125,6 @@ function CookiesPage() {
   )
 }
 
-export const Route = createFileRoute('/cookies')({
+export const Route = createFileRoute('/(public)/cookies')({
   component: CookiesPage,
 })

@@ -109,6 +109,6 @@ function ContactPage() {
   )
 }
 
-export const Route = createFileRoute('/contact')({
+export const Route = createFileRoute('/(public)/contact')({
   component: ContactPage,
 })

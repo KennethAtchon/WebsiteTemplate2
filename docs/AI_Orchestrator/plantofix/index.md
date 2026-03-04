@@ -20,3 +20,4 @@ This directory contains comprehensive plans for major refactors and fixes that n
 
 *Last Updated: March 2026*
 
+I want you to verify if project has been successfully broken up into frontend and backend respectively, research any files that were missed, any files that were included in either backend or frontend but dont belong, things like that. 

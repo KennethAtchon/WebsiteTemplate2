@@ -121,6 +121,6 @@ function TermsPage() {
   )
 }
 
-export const Route = createFileRoute('/terms')({
+export const Route = createFileRoute('/(public)/terms')({
   component: TermsPage,
 })

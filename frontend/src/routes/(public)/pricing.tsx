@@ -146,6 +146,6 @@ function PricingPage() {
   )
 }
 
-export const Route = createFileRoute('/pricing')({
+export const Route = createFileRoute('/(public)/pricing')({
   component: PricingPage,
 })

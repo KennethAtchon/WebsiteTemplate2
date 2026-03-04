@@ -107,6 +107,6 @@ function FaqPage() {
   )
 }
 
-export const Route = createFileRoute('/faq')({
+export const Route = createFileRoute('/(public)/faq')({
   component: FaqPage,
 })

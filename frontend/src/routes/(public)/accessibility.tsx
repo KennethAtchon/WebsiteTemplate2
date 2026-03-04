@@ -139,6 +139,6 @@ function AccessibilityPage() {
   )
 }
 
-export const Route = createFileRoute('/accessibility')({
+export const Route = createFileRoute('/(public)/accessibility')({
   component: AccessibilityPage,
 })

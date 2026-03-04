@@ -175,6 +175,6 @@ function AboutPage() {
   )
 }
 
-export const Route = createFileRoute('/about')({
+export const Route = createFileRoute('/(public)/about')({
   component: AboutPage,
 })

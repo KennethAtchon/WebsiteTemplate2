@@ -290,6 +290,6 @@ function FeaturesPage() {
   )
 }
 
-export const Route = createFileRoute('/features')({
+export const Route = createFileRoute('/(public)/features')({
   component: FeaturesPage,
 })

@@ -1,0 +1,2055 @@
+--- /home/kenneth/Documents/Workplace/WebsiteTemplate2/docs/frontend-mirroring-analysis/project-full-tree.txt	2026-03-03 23:17:20.271498129 -0800
++++ /home/kenneth/Documents/Workplace/WebsiteTemplate2/docs/frontend-mirroring-analysis/frontend-full-tree.txt	2026-03-03 23:17:21.840111427 -0800
+@@ -1,1690 +1,349 @@
+-/home/kenneth/Documents/Workplace/WebsiteTemplate2/project
+-├── app
+-│   ├── admin
+-│   │   ├── contactmessages
+-│   │   │   ├── contact-messages-interactive.tsx
+-│   │   │   └── page.tsx
+-│   │   ├── customers
+-│   │   │   └── page.tsx
+-│   │   ├── dashboard
+-│   │   │   └── page.tsx
+-│   │   ├── developer
+-│   │   │   ├── developer-interactive.tsx
+-│   │   │   └── page.tsx
+-│   │   ├── orders
+-│   │   │   └── page.tsx
+-│   │   ├── settings
+-│   │   │   ├── page.tsx
+-│   │   │   └── settings-interactive.tsx
+-│   │   ├── subscriptions
+-│   │   │   └── page.tsx
+-│   │   └── layout.tsx
+-│   ├── api
++/home/kenneth/Documents/Workplace/WebsiteTemplate2/frontend
++├── scripts
++│   ├── fix-imports.ts
++│   ├── reorganize-frontend.sh
++│   └── verify-migration.ts
++├── src
++│   ├── features
++│   │   ├── account
++│   │   │   └── components
++│   │   │       ├── calculator-interface.tsx
++│   │   │       ├── order-detail-modal.tsx
++│   │   │       ├── profile-editor.tsx
++│   │   │       ├── subscription-management.tsx
++│   │   │       └── usage-dashboard.tsx
+ │   │   ├── admin
+-│   │   │   ├── analytics
+-│   │   │   │   └── route.ts
+-│   │   │   ├── customers
+-│   │   │   │   └── route.ts
+-│   │   │   ├── database
+-│   │   │   │   └── health
+-│   │   │   │       └── route.ts
+-│   │   │   ├── orders
+-│   │   │   │   ├── [id]
+-│   │   │   │   │   └── route.ts
+-│   │   │   │   └── route.ts
+-│   │   │   ├── schema
+-│   │   │   │   └── route.ts
+-│   │   │   ├── subscriptions
+-│   │   │   │   ├── analytics
+-│   │   │   │   │   └── route.ts
+-│   │   │   │   ├── [id]
+-│   │   │   │   │   └── route.ts
+-│   │   │   │   └── route.ts
+-│   │   │   ├── sync-firebase
+-│   │   │   │   └── route.ts
+-│   │   │   └── verify
+-│   │   │       └── route.ts
+-│   │   ├── analytics
+-│   │   │   ├── form-completion
+-│   │   │   │   └── route.ts
+-│   │   │   ├── form-progress
+-│   │   │   │   └── route.ts
+-│   │   │   ├── search-performance
+-│   │   │   │   └── route.ts
+-│   │   │   └── web-vitals
+-│   │   │       └── route.ts
++│   │   │   └── components
++│   │   │       ├── customers
++│   │   │       │   ├── customers-list.tsx
++│   │   │       │   ├── customers-view.tsx
++│   │   │       │   └── edit-customer-modal.tsx
++│   │   │       ├── dashboard
++│   │   │       │   ├── dashboard-layout.tsx
++│   │   │       │   ├── dashboard-view.tsx
++│   │   │       │   └── help-modal.tsx
++│   │   │       ├── orders
++│   │   │       │   ├── helper
++│   │   │       │   │   ├── order-products-button.tsx
++│   │   │       │   │   └── order-products-modal.tsx
++│   │   │       │   ├── order-form.tsx
++│   │   │       │   ├── orders-list.tsx
++│   │   │       │   ├── orders-view.tsx
++│   │   │       │   └── recent-orders-list.tsx
++│   │   │       └── subscriptions
++│   │   │           ├── subscription-analytics.tsx
++│   │   │           ├── subscriptions-list.tsx
++│   │   │           └── subscriptions-view.tsx
++│   │   ├── auth
++│   │   │   ├── components
++│   │   │   │   ├── auth-guard.tsx
++│   │   │   │   └── user-button.tsx
++│   │   │   ├── hooks
++│   │   │   │   └── use-authenticated-fetch.ts
++│   │   │   ├── services
++│   │   │   └── types
++│   │   │       └── auth.types.ts
+ │   │   ├── calculator
+-│   │   │   ├── calculate
+-│   │   │   │   └── route.ts
+-│   │   │   ├── export
+-│   │   │   │   └── route.ts
+-│   │   │   ├── history
+-│   │   │   │   └── route.ts
+-│   │   │   ├── types
+-│   │   │   │   └── route.ts
+-│   │   │   └── usage
+-│   │   │       └── route.ts
+-│   │   ├── csrf
+-│   │   │   └── route.ts
+-│   │   ├── customer
+-│   │   │   ├── orders
+-│   │   │   │   ├── by-session
+-│   │   │   │   │   └── route.ts
+-│   │   │   │   ├── create
+-│   │   │   │   │   └── route.ts
+-│   │   │   │   ├── [orderId]
+-│   │   │   │   │   └── route.ts
+-│   │   │   │   ├── total-revenue
+-│   │   │   │   │   └── route.ts
+-│   │   │   │   └── route.ts
+-│   │   │   └── profile
+-│   │   │       └── route.ts
+-│   │   ├── health
+-│   │   │   ├── error-monitoring
+-│   │   │   │   └── route.ts
+-│   │   │   └── route.ts
+-│   │   ├── live
+-│   │   │   └── route.ts
+-│   │   ├── metrics
+-│   │   │   └── route.ts
+-│   │   ├── ready
+-│   │   │   └── route.ts
+-│   │   ├── shared
+-│   │   │   ├── contact-messages
+-│   │   │   │   └── route.ts
+-│   │   │   ├── emails
+-│   │   │   │   └── route.ts
+-│   │   │   └── upload
+-│   │   │       └── route.ts
+-│   │   ├── subscriptions
+-│   │   │   ├── current
+-│   │   │   │   └── route.ts
+-│   │   │   ├── portal-link
+-│   │   │   │   └── route.ts
+-│   │   │   └── trial-eligibility
+-│   │   │       └── route.ts
+-│   │   └── users
+-│   │       ├── customers-count
+-│   │       │   └── route.ts
+-│   │       ├── delete-account
+-│   │       │   └── route.ts
+-│   │       ├── export-data
+-│   │       │   └── route.ts
+-│   │       ├── object-to-processing
+-│   │       │   └── route.ts
+-│   │       └── route.ts
+-│   ├── (customer)
+-│   │   ├── (auth)
+-│   │   │   ├── sign-in
+-│   │   │   │   └── page.tsx
+-│   │   │   ├── sign-up
+-│   │   │   │   └── page.tsx
+-│   │   │   └── layout.tsx
+-│   │   ├── (main)
+-│   │   │   ├── account
+-│   │   │   │   ├── account-interactive.tsx
+-│   │   │   │   └── page.tsx
+-│   │   │   ├── calculator
+-│   │   │   │   ├── calculator-interactive.tsx
+-│   │   │   │   └── page.tsx
+-│   │   │   ├── checkout
+-│   │   │   │   ├── checkout-interactive.tsx
+-│   │   │   │   └── page.tsx
+-│   │   │   ├── payment
+-│   │   │   │   ├── cancel
+-│   │   │   │   │   └── page.tsx
+-│   │   │   │   ├── success
+-│   │   │   │   │   ├── page.tsx
+-│   │   │   │   │   └── payment-success-interactive.tsx
+-│   │   │   │   └── page.tsx
+-│   │   │   └── layout.tsx
+-│   │   └── layout.tsx
+-│   ├── (public)
+-│   │   ├── about
+-│   │   │   └── page.tsx
+-│   │   ├── accessibility
+-│   │   │   └── page.tsx
+-│   │   ├── api-documentation
+-│   │   │   └── page.tsx
+-│   │   ├── contact
+-│   │   │   └── page.tsx
+-│   │   ├── cookies
+-│   │   │   └── page.tsx
+-│   │   ├── faq
+-│   │   │   └── page.tsx
+-│   │   ├── features
+-│   │   │   └── page.tsx
+-│   │   ├── pricing
+-│   │   │   ├── page.tsx
+-│   │   │   └── pricing-interactive.tsx
+-│   │   ├── privacy
+-│   │   │   └── page.tsx
+-│   │   ├── support
+-│   │   │   └── page.tsx
+-│   │   └── terms
+-│   │       └── page.tsx
+-│   ├── apple-icon.tsx
+-│   ├── favicon.ico
+-│   ├── globals.css
+-│   ├── layout.tsx
+-│   ├── manifest.ts
+-│   ├── not-found.tsx
+-│   ├── page.tsx
+-│   ├── robots.ts
+-│   └── sitemap.ts
+-├── coverage
+-│   ├── lcov-report
+-│   │   ├── app
+-│   │   │   ├── admin
+-│   │   │   │   ├── contactmessages
+-│   │   │   │   │   ├── contact-messages-interactive.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── customers
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── dashboard
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── developer
+-│   │   │   │   │   ├── developer-interactive.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── orders
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── settings
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── page.tsx.html
+-│   │   │   │   │   └── settings-interactive.tsx.html
+-│   │   │   │   ├── subscriptions
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── index.html
+-│   │   │   │   └── layout.tsx.html
+-│   │   │   ├── api
+-│   │   │   │   ├── admin
+-│   │   │   │   │   ├── analytics
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── customers
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── database
+-│   │   │   │   │   │   └── health
+-│   │   │   │   │   │       ├── index.html
+-│   │   │   │   │   │       └── route.ts.html
+-│   │   │   │   │   ├── orders
+-│   │   │   │   │   │   ├── [id]
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── schema
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── subscriptions
+-│   │   │   │   │   │   ├── analytics
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   │   ├── [id]
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── sync-firebase
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   └── verify
+-│   │   │   │   │       ├── index.html
+-│   │   │   │   │       └── route.ts.html
+-│   │   │   │   ├── analytics
+-│   │   │   │   │   ├── form-completion
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── form-progress
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── search-performance
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   └── web-vitals
+-│   │   │   │   │       ├── index.html
+-│   │   │   │   │       └── route.ts.html
+-│   │   │   │   ├── calculator
+-│   │   │   │   │   ├── calculate
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── export
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── history
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── types
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   └── usage
+-│   │   │   │   │       ├── index.html
+-│   │   │   │   │       └── route.ts.html
+-│   │   │   │   ├── csrf
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── route.ts.html
+-│   │   │   │   ├── customer
+-│   │   │   │   │   ├── orders
+-│   │   │   │   │   │   ├── by-session
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   │   ├── create
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   │   ├── [orderId]
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   │   ├── total-revenue
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   └── profile
+-│   │   │   │   │       ├── index.html
+-│   │   │   │   │       └── route.ts.html
+-│   │   │   │   ├── health
+-│   │   │   │   │   ├── error-monitoring
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── route.ts.html
+-│   │   │   │   ├── live
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── route.ts.html
+-│   │   │   │   ├── metrics
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── route.ts.html
+-│   │   │   │   ├── ready
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── route.ts.html
+-│   │   │   │   ├── shared
+-│   │   │   │   │   ├── contact-messages
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── emails
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   └── upload
+-│   │   │   │   │       ├── index.html
+-│   │   │   │   │       └── route.ts.html
+-│   │   │   │   ├── subscriptions
+-│   │   │   │   │   ├── current
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   ├── portal-link
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── route.ts.html
+-│   │   │   │   │   └── trial-eligibility
+-│   │   │   │   │       ├── index.html
+-│   │   │   │   │       └── route.ts.html
+-│   │   │   │   └── users
+-│   │   │   │       ├── customers-count
+-│   │   │   │       │   ├── index.html
+-│   │   │   │       │   └── route.ts.html
+-│   │   │   │       ├── delete-account
+-│   │   │   │       │   ├── index.html
+-│   │   │   │       │   └── route.ts.html
+-│   │   │   │       ├── index.html
+-│   │   │   │       └── route.ts.html
+-│   │   │   ├── (customer)
+-│   │   │   │   ├── (auth)
+-│   │   │   │   │   ├── sign-in
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── page.tsx.html
+-│   │   │   │   │   ├── sign-up
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── page.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── layout.tsx.html
+-│   │   │   │   ├── (main)
+-│   │   │   │   │   ├── account
+-│   │   │   │   │   │   ├── account-interactive.tsx.html
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── page.tsx.html
+-│   │   │   │   │   ├── calculator
+-│   │   │   │   │   │   ├── calculator-interactive.tsx.html
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── page.tsx.html
+-│   │   │   │   │   ├── checkout
+-│   │   │   │   │   │   ├── checkout-interactive.tsx.html
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── page.tsx.html
+-│   │   │   │   │   ├── payment
+-│   │   │   │   │   │   ├── cancel
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   └── page.tsx.html
+-│   │   │   │   │   │   ├── success
+-│   │   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   │   ├── page.tsx.html
+-│   │   │   │   │   │   │   └── payment-success-interactive.tsx.html
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   └── page.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── layout.tsx.html
+-│   │   │   │   ├── index.html
+-│   │   │   │   └── layout.tsx.html
+-│   │   │   ├── (public)
+-│   │   │   │   ├── about
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── api-documentation
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── contact
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── faq
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── features
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── pricing
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── page.tsx.html
+-│   │   │   │   │   └── pricing-interactive.tsx.html
+-│   │   │   │   ├── privacy
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   ├── support
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── page.tsx.html
+-│   │   │   │   └── terms
+-│   │   │   │       ├── index.html
+-│   │   │   │       └── page.tsx.html
+-│   │   │   ├── apple-icon.tsx.html
+-│   │   │   ├── index.html
+-│   │   │   ├── layout.tsx.html
+-│   │   │   ├── manifest.ts.html
+-│   │   │   ├── not-found.tsx.html
+-│   │   │   ├── page.tsx.html
+-│   │   │   ├── robots.ts.html
+-│   │   │   └── sitemap.ts.html
+-│   │   ├── features
+-│   │   │   ├── account
+-│   │   │   │   └── components
+-│   │   │   │       ├── calculator-interface.tsx.html
+-│   │   │   │       ├── index.html
+-│   │   │   │       ├── order-detail-modal.tsx.html
+-│   │   │   │       ├── profile-editor.tsx.html
+-│   │   │   │       ├── subscription-management.tsx.html
+-│   │   │   │       └── usage-dashboard.tsx.html
+-│   │   │   ├── admin
+-│   │   │   │   └── components
+-│   │   │   │       ├── customers
+-│   │   │   │       │   ├── customers-list.tsx.html
+-│   │   │   │       │   ├── customers-view.tsx.html
+-│   │   │   │       │   ├── edit-customer-modal.tsx.html
+-│   │   │   │       │   └── index.html
+-│   │   │   │       ├── dashboard
+-│   │   │   │       │   ├── dashboard-layout.tsx.html
+-│   │   │   │       │   ├── dashboard-view.tsx.html
+-│   │   │   │       │   ├── help-modal.tsx.html
+-│   │   │   │       │   └── index.html
+-│   │   │   │       ├── orders
+-│   │   │   │       │   ├── helper
+-│   │   │   │       │   │   ├── index.html
+-│   │   │   │       │   │   ├── order-products-button.tsx.html
+-│   │   │   │       │   │   └── order-products-modal.tsx.html
+-│   │   │   │       │   ├── index.html
+-│   │   │   │       │   ├── order-form.tsx.html
+-│   │   │   │       │   ├── orders-list.tsx.html
+-│   │   │   │       │   ├── orders-view.tsx.html
+-│   │   │   │       │   └── recent-orders-list.tsx.html
+-│   │   │   │       └── subscriptions
+-│   │   │   │           ├── index.html
+-│   │   │   │           ├── subscription-analytics.tsx.html
+-│   │   │   │           ├── subscriptions-list.tsx.html
+-│   │   │   │           └── subscriptions-view.tsx.html
+-│   │   │   ├── auth
+-│   │   │   │   ├── components
+-│   │   │   │   │   ├── auth-guard.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── user-button.tsx.html
+-│   │   │   │   ├── hooks
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── use-authenticated-fetch.ts.html
+-│   │   │   │   └── services
+-│   │   │   │       ├── firebase-middleware.ts.html
+-│   │   │   │       └── index.html
+-│   │   │   ├── calculator
+-│   │   │   │   ├── components
+-│   │   │   │   │   ├── calculator-component-map.tsx.html
+-│   │   │   │   │   ├── calculator-input.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── index.ts.html
+-│   │   │   │   │   ├── investment-calculator.tsx.html
+-│   │   │   │   │   ├── loan-calculator.tsx.html
+-│   │   │   │   │   ├── mortgage-calculator.tsx.html
+-│   │   │   │   │   └── retirement-calculator.tsx.html
+-│   │   │   │   ├── constants
+-│   │   │   │   │   ├── calculator.constants.ts.html
+-│   │   │   │   │   └── index.html
+-│   │   │   │   ├── hooks
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── use-calculator.ts.html
+-│   │   │   │   ├── services
+-│   │   │   │   │   ├── calculator-service.ts.html
+-│   │   │   │   │   └── index.html
+-│   │   │   │   └── types
+-│   │   │   │       ├── calculator.types.ts.html
+-│   │   │   │       ├── calculator-validation.ts.html
+-│   │   │   │       └── index.html
+-│   │   │   ├── contact
+-│   │   │   │   └── components
+-│   │   │   │       ├── contact-form.tsx.html
+-│   │   │   │       ├── contact-info.tsx.html
+-│   │   │   │       ├── contact-page-client.tsx.html
+-│   │   │   │       ├── index.html
+-│   │   │   │       └── thank-you-dialog.tsx.html
+-│   │   │   ├── faq
+-│   │   │   │   ├── components
+-│   │   │   │   │   ├── faq-accordion.tsx.html
+-│   │   │   │   │   ├── faq-categories.tsx.html
+-│   │   │   │   │   ├── faq-hero.tsx.html
+-│   │   │   │   │   ├── faq-page-client.tsx.html
+-│   │   │   │   │   ├── faq-search.tsx.html
+-│   │   │   │   │   └── index.html
+-│   │   │   │   └── data
+-│   │   │   │       ├── faq-data.ts.html
+-│   │   │   │       └── index.html
+-│   │   │   ├── payments
+-│   │   │   │   ├── components
+-│   │   │   │   │   ├── checkout
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   ├── order-checkout.tsx.html
+-│   │   │   │   │   │   └── subscription-checkout.tsx.html
+-│   │   │   │   │   ├── success
+-│   │   │   │   │   │   ├── index.html
+-│   │   │   │   │   │   ├── order-confirmation.tsx.html
+-│   │   │   │   │   │   ├── order-creator.tsx.html
+-│   │   │   │   │   │   ├── order-success.tsx.html
+-│   │   │   │   │   │   └── subscription-success.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── stripe-payment-fallback.tsx.html
+-│   │   │   │   └── services
+-│   │   │   │       ├── index.html
+-│   │   │   │       ├── payment-service.ts.html
+-│   │   │   │       └── stripe-checkout.ts.html
+-│   │   │   └── subscriptions
+-│   │   │       ├── components
+-│   │   │       │   ├── feature-gate.tsx.html
+-│   │   │       │   ├── index.html
+-│   │   │       │   ├── manage-subscription-button.tsx.html
+-│   │   │       │   └── upgrade-prompt.tsx.html
+-│   │   │       └── hooks
+-│   │   │           ├── index.html
+-│   │   │           └── use-subscription.ts.html
+-│   │   ├── shared
+ │   │   │   ├── components
+-│   │   │   │   ├── analytics
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── web-vitals-reporter.tsx.html
+-│   │   │   │   ├── custom-ui
+-│   │   │   │   │   ├── empty-state.tsx.html
+-│   │   │   │   │   ├── error-alert.tsx.html
+-│   │   │   │   │   ├── feature-card.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── section.tsx.html
+-│   │   │   │   ├── forms
+-│   │   │   │   │   ├── form-error.tsx.html
+-│   │   │   │   │   └── index.html
+-│   │   │   │   ├── layout
+-│   │   │   │   │   ├── animated-section.tsx.html
+-│   │   │   │   │   ├── error-boundary.tsx.html
+-│   │   │   │   │   ├── footer-custom.tsx.html
+-│   │   │   │   │   ├── hero-section.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── navbar.tsx.html
+-│   │   │   │   │   ├── page-layout.tsx.html
+-│   │   │   │   │   └── theme-provider-wrapper.tsx.html
+-│   │   │   │   ├── marketing
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── structured-data.tsx.html
+-│   │   │   │   ├── navigation
+-│   │   │   │   │   ├── breadcrumb.tsx.html
+-│   │   │   │   │   └── index.html
+-│   │   │   │   ├── saas
+-│   │   │   │   │   ├── FeatureComparison.tsx.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── PricingCard.tsx.html
+-│   │   │   │   │   ├── TierBadge.tsx.html
+-│   │   │   │   │   ├── UpgradePrompt.tsx.html
+-│   │   │   │   │   └── UsageMeter.tsx.html
+-│   │   │   │   ├── index.html
+-│   │   │   │   └── language-switcher.tsx.html
++│   │   │   │   ├── calculator-component-map.tsx
++│   │   │   │   ├── calculator-input.tsx
++│   │   │   │   ├── index.ts
++│   │   │   │   ├── investment-calculator.tsx
++│   │   │   │   ├── loan-calculator.tsx
++│   │   │   │   ├── mortgage-calculator.tsx
++│   │   │   │   ├── retirement-calculator.tsx
++│   │   │   │   └── SimpleCalculator.tsx
+ │   │   │   ├── constants
+-│   │   │   │   ├── app.constants.ts.html
+-│   │   │   │   ├── index.html
+-│   │   │   │   ├── order.constants.ts.html
+-│   │   │   │   ├── rate-limit.config.ts.html
+-│   │   │   │   ├── stripe.constants.ts.html
+-│   │   │   │   └── subscription.constants.ts.html
+-│   │   │   ├── contexts
+-│   │   │   │   ├── app-context.tsx.html
+-│   │   │   │   └── index.html
++│   │   │   │   └── calculator.constants.ts
+ │   │   │   ├── hooks
+-│   │   │   │   ├── index.html
+-│   │   │   │   ├── use-mobile.ts.html
+-│   │   │   │   ├── use-paginated-data.ts.html
+-│   │   │   │   ├── use-portal-link.ts.html
+-│   │   │   │   └── use-query-fetcher.ts.html
+-│   │   │   ├── i18n
+-│   │   │   │   ├── config.ts.html
+-│   │   │   │   ├── index.html
+-│   │   │   │   └── navigation.ts.html
+-│   │   │   ├── lib
+-│   │   │   │   ├── index.html
+-│   │   │   │   ├── query-client.ts.html
+-│   │   │   │   └── query-keys.ts.html
+-│   │   │   ├── middleware
+-│   │   │   │   ├── api-route-protection.ts.html
+-│   │   │   │   ├── helper.ts.html
+-│   │   │   │   └── index.html
+-│   │   │   ├── providers
+-│   │   │   │   ├── index.html
+-│   │   │   │   └── query-provider.tsx.html
++│   │   │   │   └── use-calculator.ts
+ │   │   │   ├── services
+-│   │   │   │   ├── api
+-│   │   │   │   │   ├── authenticated-fetch.ts.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── safe-fetch.ts.html
+-│   │   │   │   ├── csrf
+-│   │   │   │   │   ├── csrf-protection.ts.html
+-│   │   │   │   │   └── index.html
+-│   │   │   │   ├── db
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── performance-monitor.ts.html
+-│   │   │   │   │   ├── prisma.ts.html
+-│   │   │   │   │   └── redis.ts.html
+-│   │   │   │   ├── email
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── resend.ts.html
+-│   │   │   │   ├── firebase
+-│   │   │   │   │   ├── admin.ts.html
+-│   │   │   │   │   ├── config.ts.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── stripe-payments.ts.html
+-│   │   │   │   │   └── sync.ts.html
+-│   │   │   │   ├── observability
+-│   │   │   │   │   ├── firebase-logging.ts.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── metrics.ts.html
+-│   │   │   │   ├── rate-limit
+-│   │   │   │   │   ├── comprehensive-rate-limiter.ts.html
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   └── rate-limit-redis.ts.html
+-│   │   │   │   ├── request-identity
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── index.ts.html
+-│   │   │   │   │   └── request-identity.ts.html
+-│   │   │   │   ├── seo
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── metadata.ts.html
+-│   │   │   │   │   ├── page-metadata.ts.html
+-│   │   │   │   │   └── structured-data.ts.html
+-│   │   │   │   ├── storage
+-│   │   │   │   │   ├── index.html
+-│   │   │   │   │   ├── index.ts.html
+-│   │   │   │   │   └── r2.ts.html
+-│   │   │   │   └── timezone
+-│   │   │   │       ├── index.html
+-│   │   │   │       └── TimeService.ts.html
+-│   │   │   ├── types
+-│   │   │   │   ├── index.html
+-│   │   │   │   └── index.ts.html
+-│   │   │   └── utils
+-│   │   │       ├── api
+-│   │   │       │   ├── add-timezone-header.ts.html
+-│   │   │       │   ├── index.html
+-│   │   │       │   └── response-helpers.ts.html
+-│   │   │       ├── config
+-│   │   │       │   ├── envUtil.ts.html
+-│   │   │       │   ├── index.html
+-│   │   │       │   ├── index.ts.html
+-│   │   │       │   └── mock.ts.html
+-│   │   │       ├── debug
+-│   │   │       │   ├── debug.ts.html
+-│   │   │       │   ├── index.html
+-│   │   │       │   └── index.ts.html
+-│   │   │       ├── error-handling
+-│   │   │       │   ├── api-error-wrapper.ts.html
+-│   │   │       │   ├── auth-error-handler.ts.html
+-│   │   │       │   ├── global-error-handler.ts.html
+-│   │   │       │   └── index.html
+-│   │   │       ├── helpers
+-│   │   │       │   ├── date.ts.html
+-│   │   │       │   ├── index.html
+-│   │   │       │   ├── pagination.ts.html
+-│   │   │       │   └── utils.ts.html
+-│   │   │       ├── permissions
+-│   │   │       │   ├── calculator-permissions.ts.html
+-│   │   │       │   ├── core-feature-permissions.ts.html
+-│   │   │       │   └── index.html
+-│   │   │       ├── security
+-│   │   │       │   ├── encryption.ts.html
+-│   │   │       │   ├── index.html
+-│   │   │       │   └── pii-sanitization.ts.html
+-│   │   │       ├── system
+-│   │   │       │   ├── app-initialization.ts.html
+-│   │   │       │   ├── index.html
+-│   │   │       │   ├── prisma-introspection.ts.html
+-│   │   │       │   ├── system-logger.ts.html
+-│   │   │       │   └── web-vitals.ts.html
+-│   │   │       ├── type-guards
+-│   │   │       │   ├── index.html
+-│   │   │       │   └── subscription-type-guards.ts.html
+-│   │   │       ├── validation
+-│   │   │       │   ├── api-validation.ts.html
+-│   │   │       │   ├── auth-validation.ts.html
+-│   │   │       │   ├── checkout-validation.ts.html
+-│   │   │       │   ├── contact-validation.ts.html
+-│   │   │       │   ├── data-validation.ts.html
+-│   │   │       │   ├── file-validation.ts.html
+-│   │   │       │   ├── index.html
+-│   │   │       │   └── search-validation.ts.html
+-│   │   │       ├── index.html
+-│   │   │       └── stripe-map-loader.ts.html
+-│   │   ├── base.css
+-│   │   ├── block-navigation.js
+-│   │   ├── favicon.png
+-│   │   ├── index.html
+-│   │   ├── prettify.css
+-│   │   ├── prettify.js
+-│   │   ├── sort-arrow-sprite.png
+-│   │   └── sorter.js
+-│   ├── clover.xml
+-│   ├── coverage-final.json
+-│   └── lcov.info
+-├── features
+-│   ├── account
+-│   │   └── components
+-│   │       ├── calculator-interface.tsx
+-│   │       ├── order-detail-modal.tsx
+-│   │       ├── profile-editor.tsx
+-│   │       ├── subscription-management.tsx
+-│   │       └── usage-dashboard.tsx
+-│   ├── admin
+-│   │   └── components
+-│   │       ├── customers
+-│   │       │   ├── customers-list.tsx
+-│   │       │   ├── customers-view.tsx
+-│   │       │   └── edit-customer-modal.tsx
+-│   │       ├── dashboard
+-│   │       │   ├── dashboard-layout.tsx
+-│   │       │   ├── dashboard-view.tsx
+-│   │       │   └── help-modal.tsx
+-│   │       ├── orders
+-│   │       │   ├── helper
+-│   │       │   │   ├── order-products-button.tsx
+-│   │       │   │   └── order-products-modal.tsx
+-│   │       │   ├── order-form.tsx
+-│   │       │   ├── orders-list.tsx
+-│   │       │   ├── orders-view.tsx
+-│   │       │   └── recent-orders-list.tsx
+-│   │       └── subscriptions
+-│   │           ├── subscription-analytics.tsx
+-│   │           ├── subscriptions-list.tsx
+-│   │           └── subscriptions-view.tsx
+-│   ├── auth
+-│   │   ├── components
+-│   │   │   ├── auth-guard.tsx
+-│   │   │   └── user-button.tsx
+-│   │   ├── hooks
+-│   │   │   └── use-authenticated-fetch.ts
+-│   │   ├── services
+-│   │   │   └── firebase-middleware.ts
+-│   │   └── types
+-│   │       └── auth.types.ts
+-│   ├── calculator
++│   │   │   │   ├── calculator-service.ts
++│   │   │   │   └── usage-service.ts
++│   │   │   └── types
++│   │   │       ├── calculator.types.ts
++│   │   │       └── calculator-validation.ts
++│   │   ├── contact
++│   │   │   └── components
++│   │   │       ├── contact-form.tsx
++│   │   │       ├── contact-info.tsx
++│   │   │       ├── contact-page-client.tsx
++│   │   │       ├── SimpleContactForm.tsx
++│   │   │       └── thank-you-dialog.tsx
++│   │   ├── customers
++│   │   │   └── types
++│   │   │       └── customer.types.ts
++│   │   ├── faq
++│   │   │   ├── components
++│   │   │   │   ├── faq-accordion.tsx
++│   │   │   │   ├── faq-categories.tsx
++│   │   │   │   ├── faq-hero.tsx
++│   │   │   │   ├── faq-page-client.tsx
++│   │   │   │   └── faq-search.tsx
++│   │   │   └── data
++│   │   │       └── faq-data.ts
++│   │   ├── orders
++│   │   │   └── types
++│   │   │       └── order.types.ts
++│   │   ├── payments
++│   │   │   ├── components
++│   │   │   │   ├── checkout
++│   │   │   │   │   ├── order-checkout.tsx
++│   │   │   │   │   └── subscription-checkout.tsx
++│   │   │   │   ├── success
++│   │   │   │   │   ├── order-confirmation.tsx
++│   │   │   │   │   ├── order-creator.tsx
++│   │   │   │   │   ├── order-success.tsx
++│   │   │   │   │   └── subscription-success.tsx
++│   │   │   │   └── stripe-payment-fallback.tsx
++│   │   │   ├── services
++│   │   │   │   ├── payment-service.ts
++│   │   │   │   └── stripe-checkout.ts
++│   │   │   └── types
++│   │   │       └── payment.types.ts
++│   │   └── subscriptions
++│   │       ├── components
++│   │       │   ├── feature-gate.tsx
++│   │       │   ├── manage-subscription-button.tsx
++│   │       │   └── upgrade-prompt.tsx
++│   │       ├── hooks
++│   │       │   └── use-subscription.ts
++│   │       └── types
++│   │           └── subscription.types.ts
++│   ├── routes
++│   │   ├── account
++│   │   │   └── -account-interactive.tsx
++│   │   ├── admin
++│   │   │   ├── contactmessages.tsx
++│   │   │   ├── customers.tsx
++│   │   │   ├── dashboard.tsx
++│   │   │   ├── developer.tsx
++│   │   │   ├── index.tsx
++│   │   │   ├── orders.tsx
++│   │   │   ├── settings.tsx
++│   │   │   └── subscriptions.tsx
++│   │   ├── calculator
++│   │   │   └── -calculator-interactive.tsx
++│   │   ├── checkout
++│   │   │   └── -checkout-interactive.tsx
++│   │   ├── payment
++│   │   │   ├── success
++│   │   │   │   └── -payment-success-interactive.tsx
++│   │   │   ├── cancel.tsx
++│   │   │   ├── index.tsx
++│   │   │   └── success.tsx
++│   │   ├── pricing
++│   │   │   └── -pricing-interactive.tsx
++│   │   ├── about.tsx
++│   │   ├── accessibility.tsx
++│   │   ├── account.tsx
++│   │   ├── api-documentation.tsx
++│   │   ├── calculator.tsx
++│   │   ├── checkout.tsx
++│   │   ├── contact.tsx
++│   │   ├── cookies.tsx
++│   │   ├── faq.tsx
++│   │   ├── features.tsx
++│   │   ├── index.tsx
++│   │   ├── pricing.tsx
++│   │   ├── privacy.tsx
++│   │   ├── __root.tsx
++│   │   ├── router.tsx
++│   │   ├── sign-in.tsx
++│   │   ├── sign-up.tsx
++│   │   ├── support.tsx
++│   │   └── terms.tsx
++│   ├── shared
+ │   │   ├── components
+-│   │   │   ├── calculator-component-map.tsx
+-│   │   │   ├── calculator-input.tsx
+-│   │   │   ├── index.ts
+-│   │   │   ├── investment-calculator.tsx
+-│   │   │   ├── loan-calculator.tsx
+-│   │   │   ├── mortgage-calculator.tsx
+-│   │   │   └── retirement-calculator.tsx
++│   │   │   ├── analytics
++│   │   │   │   └── web-vitals-reporter.tsx
++│   │   │   ├── custom-ui
++│   │   │   │   ├── empty-state.tsx
++│   │   │   │   ├── error-alert.tsx
++│   │   │   │   ├── feature-card.tsx
++│   │   │   │   └── section.tsx
++│   │   │   ├── forms
++│   │   │   │   └── form-error.tsx
++│   │   │   ├── layout
++│   │   │   │   ├── animated-section.tsx
++│   │   │   │   ├── error-boundary.tsx
++│   │   │   │   ├── footer-custom.tsx
++│   │   │   │   ├── hero-section.tsx
++│   │   │   │   ├── navbar.tsx
++│   │   │   │   ├── page-layout.tsx
++│   │   │   │   └── theme-provider-wrapper.tsx
++│   │   │   ├── marketing
++│   │   │   │   ├── cookie-consent-banner.tsx
++│   │   │   │   └── structured-data.tsx
++│   │   │   ├── navigation
++│   │   │   │   └── breadcrumb.tsx
++│   │   │   ├── saas
++│   │   │   │   ├── FeatureComparison.tsx
++│   │   │   │   ├── PricingCard.tsx
++│   │   │   │   ├── TierBadge.tsx
++│   │   │   │   ├── UpgradePrompt.tsx
++│   │   │   │   └── UsageMeter.tsx
++│   │   │   ├── ui
++│   │   │   │   ├── accordion.tsx
++│   │   │   │   ├── alert-dialog.tsx
++│   │   │   │   ├── alert.tsx
++│   │   │   │   ├── aspect-ratio.tsx
++│   │   │   │   ├── avatar.tsx
++│   │   │   │   ├── badge.tsx
++│   │   │   │   ├── breadcrumb.tsx
++│   │   │   │   ├── button-group.tsx
++│   │   │   │   ├── button.tsx
++│   │   │   │   ├── calendar.tsx
++│   │   │   │   ├── card.tsx
++│   │   │   │   ├── carousel.tsx
++│   │   │   │   ├── chart.tsx
++│   │   │   │   ├── checkbox.tsx
++│   │   │   │   ├── collapsible.tsx
++│   │   │   │   ├── command.tsx
++│   │   │   │   ├── context-menu.tsx
++│   │   │   │   ├── dialog.tsx
++│   │   │   │   ├── drawer.tsx
++│   │   │   │   ├── dropdown-menu.tsx
++│   │   │   │   ├── empty.tsx
++│   │   │   │   ├── field.tsx
++│   │   │   │   ├── form.tsx
++│   │   │   │   ├── hover-card.tsx
++│   │   │   │   ├── input-group.tsx
++│   │   │   │   ├── input-otp.tsx
++│   │   │   │   ├── input.tsx
++│   │   │   │   ├── item.tsx
++│   │   │   │   ├── kbd.tsx
++│   │   │   │   ├── label.tsx
++│   │   │   │   ├── menubar.tsx
++│   │   │   │   ├── navigation-menu.tsx
++│   │   │   │   ├── pagination.tsx
++│   │   │   │   ├── popover.tsx
++│   │   │   │   ├── progress.tsx
++│   │   │   │   ├── radio-group.tsx
++│   │   │   │   ├── resizable.tsx
++│   │   │   │   ├── scroll-area.tsx
++│   │   │   │   ├── select.tsx
++│   │   │   │   ├── separator.tsx
++│   │   │   │   ├── sheet.tsx
++│   │   │   │   ├── sidebar.tsx
++│   │   │   │   ├── skeleton.tsx
++│   │   │   │   ├── slider.tsx
++│   │   │   │   ├── sonner.tsx
++│   │   │   │   ├── spinner.tsx
++│   │   │   │   ├── switch.tsx
++│   │   │   │   ├── table.tsx
++│   │   │   │   ├── tabs.tsx
++│   │   │   │   ├── textarea.tsx
++│   │   │   │   ├── toggle-group.tsx
++│   │   │   │   ├── toggle.tsx
++│   │   │   │   └── tooltip.tsx
++│   │   │   ├── language-switcher.tsx
++│   │   │   └── query-provider.tsx
+ │   │   ├── constants
+-│   │   │   └── calculator.constants.ts
++│   │   │   ├── app.constants.ts
++│   │   │   ├── order.constants.ts
++│   │   │   ├── rate-limit.config.ts
++│   │   │   ├── stripe.constants.ts
++│   │   │   └── subscription.constants.ts
++│   │   ├── contexts
++│   │   │   └── app-context.tsx
+ │   │   ├── hooks
+-│   │   │   └── use-calculator.ts
+-│   │   ├── services
+-│   │   │   ├── calculator-service.ts
+-│   │   │   └── usage-service.ts
+-│   │   └── types
+-│   │       ├── calculator.types.ts
+-│   │       └── calculator-validation.ts
+-│   ├── contact
+-│   │   └── components
+-│   │       ├── contact-form.tsx
+-│   │       ├── contact-info.tsx
+-│   │       ├── contact-page-client.tsx
+-│   │       └── thank-you-dialog.tsx
+-│   ├── customers
+-│   │   └── types
+-│   │       └── customer.types.ts
+-│   ├── faq
+-│   │   ├── components
+-│   │   │   ├── faq-accordion.tsx
+-│   │   │   ├── faq-categories.tsx
+-│   │   │   ├── faq-hero.tsx
+-│   │   │   ├── faq-page-client.tsx
+-│   │   │   └── faq-search.tsx
+-│   │   └── data
+-│   │       └── faq-data.ts
+-│   ├── orders
+-│   │   └── types
+-│   │       └── order.types.ts
+-│   ├── payments
+-│   │   ├── components
+-│   │   │   ├── checkout
+-│   │   │   │   ├── order-checkout.tsx
+-│   │   │   │   └── subscription-checkout.tsx
+-│   │   │   ├── success
+-│   │   │   │   ├── order-confirmation.tsx
+-│   │   │   │   ├── order-creator.tsx
+-│   │   │   │   ├── order-success.tsx
+-│   │   │   │   └── subscription-success.tsx
+-│   │   │   └── stripe-payment-fallback.tsx
++│   │   │   ├── use-mobile.ts
++│   │   │   ├── use-paginated-data.ts
++│   │   │   ├── use-portal-link.ts
++│   │   │   └── use-query-fetcher.ts
++│   │   ├── i18n
++│   │   │   └── config.ts
++│   │   ├── lib
++│   │   │   ├── api.ts
++│   │   │   ├── firebase.ts
++│   │   │   ├── i18n.ts
++│   │   │   ├── query-client.ts
++│   │   │   └── query-keys.ts
++│   │   ├── providers
++│   │   │   ├── auth-provider.tsx
++│   │   │   └── theme-provider.tsx
+ │   │   ├── services
+-│   │   │   ├── payment-service.ts
+-│   │   │   └── stripe-checkout.ts
+-│   │   └── types
+-│   │       └── payment.types.ts
+-│   └── subscriptions
+-│       ├── components
+-│       │   ├── feature-gate.tsx
+-│       │   ├── manage-subscription-button.tsx
+-│       │   └── upgrade-prompt.tsx
+-│       ├── hooks
+-│       │   └── use-subscription.ts
+-│       └── types
+-│           └── subscription.types.ts
+-├── infrastructure
+-│   └── database
+-│       ├── lib
+-│       │   └── generated
+-│       │       └── prisma
+-│       │           ├── runtime
+-│       │           │   ├── binary.d.ts
+-│       │           │   ├── binary.js
+-│       │           │   ├── edge-esm.js
+-│       │           │   ├── edge.js
+-│       │           │   ├── index-browser.d.ts
+-│       │           │   ├── index-browser.js
+-│       │           │   ├── library.d.ts
+-│       │           │   ├── react-native.js
+-│       │           │   ├── wasm-compiler-edge.js
+-│       │           │   └── wasm-engine-edge.js
+-│       │           ├── client.d.ts
+-│       │           ├── client.js
+-│       │           ├── default.d.ts
+-│       │           ├── default.js
+-│       │           ├── edge.d.ts
+-│       │           ├── edge.js
+-│       │           ├── index-browser.js
+-│       │           ├── index.d.ts
+-│       │           ├── index.js
+-│       │           ├── package.json
+-│       │           ├── query_engine_bg.js
+-│       │           ├── query_engine_bg.wasm
+-│       │           ├── query-engine-debian-openssl-1.1.x
+-│       │           ├── query-engine-debian-openssl-3.0.x
+-│       │           ├── query-engine-rhel-openssl-3.0.x
+-│       │           ├── schema.prisma
+-│       │           ├── wasm.d.ts
+-│       │           ├── wasm-edge-light-loader.mjs
+-│       │           ├── wasm.js
+-│       │           └── wasm-worker-loader.mjs
+-│       └── prisma
+-│           ├── migrations
+-│           │   ├── 20260215194708_init
+-│           │   │   └── migration.sql
+-│           │   ├── 20260221000001_add_performance_indexes
+-│           │   │   └── migration.sql
+-│           │   └── migration_lock.toml
+-│           └── schema.prisma
+-├── playwright-report
+-│   ├── data
+-│   │   ├── 00bbfc448806ddc14625c223f8ee3516a6d5ff14.zip
+-│   │   ├── 00f0201384d89f119f3365eed797ec0de7d643ff.zip
+-│   │   ├── 05c97ab5fa582cb910354bcbf5ed4ec7aef112a3.zip
+-│   │   ├── 05e47e2049dcc01ab398a7d6552b3bcf24fc6631.zip
+-│   │   ├── 062c7589a1e2554360f0faceb68b84cc20009407.zip
+-│   │   ├── 06e88c3dcf04cd23339224871520dec85f564c20.zip
+-│   │   ├── 09cc2cbcf975ddf5d82c77ac47e4f6f14ad94030.zip
+-│   │   ├── 10d52e2a930f2d643092cef3c4e7b504e0cedb50.zip
+-│   │   ├── 10fe566b09b3d9a445518db09185ad93098f03ba.zip
+-│   │   ├── 11aa9fff2f0f949b845770332693b36ad4a25a9a.zip
+-│   │   ├── 11c5ea1983af1e2ee3f213199f56a6d310cc59d0.zip
+-│   │   ├── 12b717777712c849538910efaff17d0a3706a1ba.zip
+-│   │   ├── 1444c915e45e805d9676db1976a14a4535f9155b.zip
+-│   │   ├── 147398276c02bf9999ed55b21051551960d2da90.zip
+-│   │   ├── 16cc2dc09beaf8d00dc7dd6e6312d3a547c24d03.zip
+-│   │   ├── 17295e680fffa778389a183df61f93ad4aaaa08a.zip
+-│   │   ├── 17701d9de0d283f65341dd42bf9b163b53c8bcf6.zip
+-│   │   ├── 1849740a759e95503cad47e93786a8c581956a4f.zip
+-│   │   ├── 194089ae5e75de2af3a9ccf216a26a04dbf5f736.zip
+-│   │   ├── 1b22c92247b01c5c40d8e2d9224ad5d80bb55cea.zip
+-│   │   ├── 1e8efd1c9120c6988e28a7bc22368ffc57548eef.zip
+-│   │   ├── 1ecde93a526c5815c00837c73a1c284f1bae9818.zip
+-│   │   ├── 21386393c09b8fdbc6b8d5fa9efeb40ce260aa19.zip
+-│   │   ├── 21f6066c7f485ebeee8f0352285befa4a4bf90ec.zip
+-│   │   ├── 2391ae1c3ec559a0435bf1074c1173e32a5b6df0.zip
+-│   │   ├── 24a2ed67b0d4d70a1df7e53ca5f18b8cc1d06ccb.zip
+-│   │   ├── 255f66297c7988dde463887569de5c3d508ca1ee.zip
+-│   │   ├── 2591529d8123c3b8f4a7adb9d0ea06a143c9ea16.zip
+-│   │   ├── 25c8db0e4284debec597d19dc795c7180119c481.zip
+-│   │   ├── 26065aaf7164d25d3c417878490149e5df3eef6d.zip
+-│   │   ├── 26f0854404bf40e60ed5038d4b4614bd0ef1a2ec.zip
+-│   │   ├── 2a1837f5c8b5561046b3bcffabb2d16c6fd3374c.zip
+-│   │   ├── 2a4e551f20ecc9bb8e31331fe20b3bb4f8dfd8b6.zip
+-│   │   ├── 2b04a691e435ac3f4eb0c5b1fa67651acd5fb042.zip
+-│   │   ├── 2bbfdd5475d21d92d149737d5e9a545b165268b3.zip
+-│   │   ├── 2c92147bc44308c1fe183f64094940ff28d5749c.zip
+-│   │   ├── 2d06008e03af58558995f75f9764bf6c876d6eec.zip
+-│   │   ├── 2d146c392fd77443334d825b8d3394470a34aaf1.zip
+-│   │   ├── 2e8bcd79dbc9f982f3c5fa3025562197cfaff265.zip
+-│   │   ├── 2f0c4b021021542499d0773999800ac0566bd984.zip
+-│   │   ├── 338a797b424cb6ad4526fff9ff736b3d5bb73f6c.zip
+-│   │   ├── 34b81721208c44fd3cd99a303be37913d8ad586a.zip
+-│   │   ├── 3591d4459291594c4f77327e332f88508967e133.zip
+-│   │   ├── 3757ec4bcee5a9fa73419f27f542de1782ff3e87.zip
+-│   │   ├── 3855e953e7e33caf91a60306f8518cc8b76fad07.zip
+-│   │   ├── 38b0d964807af6e493a1d7a2116569d3366226c2.zip
+-│   │   ├── 3a1cfbf97a36e7eeb3c2a57f006212eec6575a5f.zip
+-│   │   ├── 3b986871f98f35aa3f0cc370f0f21ee024c1e608.zip
+-│   │   ├── 3bb8a178cb9219813263df046ae21106d389c4b1.zip
+-│   │   ├── 3cb04972930aa2a90aa6de2667b926c8ce5ac375.zip
+-│   │   ├── 3d6fa78ed784f9844cc14f94be44f83f193a4eb4.zip
+-│   │   ├── 3e35b7dccd49a6a92c50b0b831cbab1290b2bdf2.zip
+-│   │   ├── 3ef5619856472b2edf72fe992da6070ce0a5f5e9.zip
+-│   │   ├── 41e49f42cbc5f69999f49901bf38d07ef97e08e7.zip
+-│   │   ├── 4243522dea5335c58de198347b57b1469951b8b3.zip
+-│   │   ├── 42a88f430bb44e3ef6cc3da4bc2a263559060984.zip
+-│   │   ├── 44aac17693dbb1d7d6add4cd284adfd64ed134ad.zip
+-│   │   ├── 45e267b6be554d5069fb77a69f0a3d7db89474a8.zip
+-│   │   ├── 4794ef76231800f90aa424ad05c25f9d72606215.zip
+-│   │   ├── 4bb6d25ae865f87f4201bbdd55a3ea98cac4f2e6.zip
+-│   │   ├── 4c46112e15c0f36499b796aebd33e2ff5b59d1db.zip
+-│   │   ├── 4d282df761998968bddbdc3eea948bc90e2807be.zip
+-│   │   ├── 52148d1fe837187be370b7e38b86d1af8ac378b3.zip
+-│   │   ├── 5249b9d85c105127c898f1fa6c0c408a4ef826db.zip
+-│   │   ├── 5450ecf7fdcea377bf7f2ffef054cd5c5ed24443.zip
+-│   │   ├── 5667c97a89c70d132577bccb9be02f3654d4faaa.zip
+-│   │   ├── 57c76fca082a98acf40b69522564f1ec4eb2b271.zip
+-│   │   ├── 59b06254b70a672ea0da02f3c395072a4d2b9b20.zip
+-│   │   ├── 59d7e47c77b322171664a597311dec68ae06e97e.zip
+-│   │   ├── 5a2752301dc1b934245751e6128d66471ce02dc6.zip
+-│   │   ├── 5b453911391739dd472d0f42ab2f4c58c91fe06b.zip
+-│   │   ├── 5c3af0e35dee91b379827e32f98d8d523b581030.zip
+-│   │   ├── 5dee3d94cb05b89c534caa91900032882975e7ab.zip
+-│   │   ├── 5f059bb921df239dea56b6738b9fa0edfcf1d9b8.zip
+-│   │   ├── 5f2491744a7b3ca18147091162c0a6b40048f201.zip
+-│   │   ├── 5f865b97e09a459247d050fb453796a59b327f42.zip
+-│   │   ├── 63015e0236ff635d84b0321e5799f29cc5c0d4d3.zip
+-│   │   ├── 63404cd011fe7609a1470de9aa54b98d0d6b0f26.zip
+-│   │   ├── 6363cb132b24a60f8c3be81d9f764a331b993cdd.zip
+-│   │   ├── 63b9563ff949bca7a8815f3f6ecd705a3dfabf63.zip
+-│   │   ├── 64248c5477bbdc110609591d2e3335f4c1ea24b0.zip
+-│   │   ├── 654b2927c75de5951ada7519e8e784b65795dc29.zip
+-│   │   ├── 658b69609f0cdb9f1d7934755f4078e4a3fdd1dc.zip
+-│   │   ├── 65b1573098e3dfc2e192196e7725dbc67e4bae70.zip
+-│   │   ├── 662e38d658502c5c94fe326810e2e7f512cc5c73.zip
+-│   │   ├── 66995cecf43bf8d10b3c0f41bbcff388efc6a614.zip
+-│   │   ├── 68b393b7b58cf0d9ac203782d888650218afe2ef.zip
+-│   │   ├── 6911cc81bb27930f29ec499121e673f1aad713c3.zip
+-│   │   ├── 6a422012ed32eeb13b8f8ba88f93eb04da70c979.zip
+-│   │   ├── 6c47da46c69a9c9e4e0d4ec6f70ddccc7acd2f81.zip
+-│   │   ├── 6ceffde723f90ac1fcc20ae683ef96edcb5c8e10.zip
+-│   │   ├── 6cf4236b15a89f840218dc88155b4cf7c94fb1d7.zip
+-│   │   ├── 6de0c6e94ff151767bef8e2770b94c9c84f9caa7.zip
+-│   │   ├── 6e8604ad9b08b4a66d0455dcc7840f9229897928.zip
+-│   │   ├── 74fb03fa675abd1bc440da77fa524bcd524fb25c.zip
+-│   │   ├── 76568881bad6603729de9fb4905f53a66f9c2bda.zip
+-│   │   ├── 7b2ec20e20708ba198b05b952f9a1ed469afc106.zip
+-│   │   ├── 7b2ef1e48befcce6075d222b9ae728c831a5af74.zip
+-│   │   ├── 7d6762a3c4f6339769cfb82a23b1b5d7ba866f2f.zip
+-│   │   ├── 7dba9fccfd3e29121cd7cc76b505adaa13bfdf64.zip
+-│   │   ├── 7e46b3581aecd77c04ec9ef32679aa29bd82c3f9.zip
+-│   │   ├── 7e8773121dc8029240625d475cc2321efc53a475.zip
+-│   │   ├── 8124c3e618bc456201121a7e797b4597fe9d23b6.zip
+-│   │   ├── 822eb5660b6d185ddfbefc51c7779e4a18bfc5c8.zip
+-│   │   ├── 82345cee2cf487d929bf507565fd019287f1a30f.zip
+-│   │   ├── 82e6948a1e6303e43cda92a1676d34addfb49741.zip
+-│   │   ├── 83433a1d523c1526e804f58d83da31402e26856c.zip
+-│   │   ├── 872a278e62ef96c0994a67cdfa7e01b2afe9b26a.zip
+-│   │   ├── 8863f94f6d88752fa233be6447ad653f936b44fa.zip
+-│   │   ├── 894c99302000675138461ff62bc859c05319055b.zip
+-│   │   ├── 8a2fbbb7a885d4bbbf3e27e2cabe1f1cf6b2fdb0.zip
+-│   │   ├── 8b97162768f7cb5bb7f311952164d52bfbe08f0d.zip
+-│   │   ├── 8c200983a8ed735f497e3892856f6b28ab548e5a.zip
+-│   │   ├── 8de568e1ec571b0397634f33794c61b69079214b.zip
+-│   │   ├── 918e3599024537330f87318d94269ba4aac5c711.zip
+-│   │   ├── 961a1dbbff3de799c85df7972f949ac6e2a7c76e.zip
+-│   │   ├── 98523f1b8d3f8b4bf312f2aaa451031367d9d7a6.zip
+-│   │   ├── 9d3b388cd0353a0a5a821da3c7d678e29b865ae3.zip
+-│   │   ├── 9e61bd079692c78422d476662c76c8f3ca50ddb6.zip
+-│   │   ├── 9e73a394c8d5a28fa464867506b422222fcdadfa.zip
+-│   │   ├── a1de4b4608bf89cf5586a444a522e73e2a5e68bf.zip
+-│   │   ├── a2cc3a06490e859edf6eb78799cdeb8b78ed2c31.zip
+-│   │   ├── a3b42ec112b389ce80074bfa03f7bc875d527ce0.zip
+-│   │   ├── a541a62a48ae3926cbffe0bb5850e888eee9f0f3.zip
+-│   │   ├── a5f4e6bea5110757f1ea6793aa493f07367fd9e3.zip
+-│   │   ├── a731d400c464e4fe6bad9abe1e1d5ab870aaf49b.zip
+-│   │   ├── a76d3e430bf503a19a944aec412d1c214f47ebbb.zip
+-│   │   ├── a8f485d2f5fd28b5dfd64244f2502aecc95aba15.zip
+-│   │   ├── a9dff03668522247fa468a4cd6540fbde6d4b548.zip
+-│   │   ├── acd446e06bb8ea65d7940001ca21a29ba55494d5.zip
+-│   │   ├── af4c1d0d51f9e6e91201c23a54d412cfd7282144.zip
+-│   │   ├── b0efa010d642b538e43a10017529c4aba8cc402f.zip
+-│   │   ├── b2ef5c782ad3de82bed9adcd6439e1636f90effc.zip
+-│   │   ├── b31f04eda95f9e3ed91d6a2c6574edef9d73a5dd.zip
+-│   │   ├── b8c91737d1fe21bdccb87d15fd2066cf20273900.zip
+-│   │   ├── b8c9a8ed5d208bf56f3c923aba4524d752184f19.zip
+-│   │   ├── bc1a9dff38a51d7cd53b66bbd7f8835b907cb5c7.zip
+-│   │   ├── c01e45c79b6410ae109666f2b8bd9e5dbe64c765.zip
+-│   │   ├── c06705be146d4c71a2cfdc221fbd8667b112b00c.zip
+-│   │   ├── c17b9796a4475e01e85368ef638245f77bea9b10.zip
+-│   │   ├── c3520bbf71a43e90ed2b4a734feba7e9b3a436c6.zip
+-│   │   ├── c61684e7a7130c3a4225d2ff091488076d69d8b3.zip
+-│   │   ├── c6467089a2d7d5a46ba3066accccc045eb001421.zip
+-│   │   ├── c7733ea387082d9c58b0fd2103717a0ff1968d44.zip
+-│   │   ├── c7b19f74042fb28a75ee85a10fc730c79012ebea.zip
+-│   │   ├── c91cd007a535cbac04affc12c13bed8b52188f53.zip
+-│   │   ├── c94133cdc3ef4a23843cc87e56b762a2c9ca7a32.zip
+-│   │   ├── cb78084091750800872530d12621663219b0d0e3.zip
+-│   │   ├── cc20cce4c256bed1ce82e6c5fd56b1db51097ad3.zip
+-│   │   ├── cdf41dde8f8a407a3c182c2a463ca16d3345de30.zip
+-│   │   ├── ceb992a934c4880c571580dda315d5a3983b69e6.zip
+-│   │   ├── d157240df6904c57af535bc35630af952833b2c4.zip
+-│   │   ├── d1b442f9ad86a8153aaa3a1b2dfbe58c5554bfff.zip
+-│   │   ├── d20881c9889085fe7d4c987e3e6e68efe68e6e38.zip
+-│   │   ├── d351e3f8a871c93e101f75eb6de3bd2433f4975d.zip
+-│   │   ├── d598a6fb673a109631236126769f0c93aca7856c.zip
+-│   │   ├── d699ccca6248ff9309b1d5dc01a967119d253614.zip
+-│   │   ├── d6b5c2fb840f85faed01d735fd94b77831ce5dec.zip
+-│   │   ├── d6b9fdc0cebdfe6dbf08a4891ee3b5f2d9550d8f.zip
+-│   │   ├── e3d1fcb3fd06e6e243ebc43c6bb5071ede8c6303.zip
+-│   │   ├── e5cd64a22ab372d46af0a22e039c49b8bd5c198e.zip
+-│   │   ├── e6011fbcd04f8a8094efe5ab5e1ec5eb459b5cf0.zip
+-│   │   ├── e75b244d2d80ad0c9542c5e96bddf797421761f0.zip
+-│   │   ├── e79db92b816fb147957deac522d589e3b6c5b760.zip
+-│   │   ├── e88e114a2f0f7ed128248abe8a533ed53f6ec0d1.zip
+-│   │   ├── e9590c2267a813d8b055f8c97225757100570941.zip
+-│   │   ├── ea8431bc39c4ba436a30c8781322885910a24de2.zip
+-│   │   ├── ea9ef038e3aa8644cd212d47f01ceea0695cf8f8.zip
+-│   │   ├── eb616ba4a594d24fde90d3b119c5c1be046edc1a.zip
+-│   │   ├── efd0744a760ebd2a60e0d4d95a4c37eb305385be.zip
+-│   │   ├── f0db636390b23e127cd3a9e82f076a1b4ba1940a.zip
+-│   │   ├── f28467377881248df14710feb05c0e317e9ba3c9.zip
+-│   │   ├── f393287554ca41d91e1b5fd399f7fa36f2ff26c4.zip
+-│   │   ├── f4b30bc3f8d03374ad0771b72a8716fd16c501ef.zip
+-│   │   ├── f7c1c610a3e247c14b6049b1e846495d447141b7.zip
+-│   │   ├── f8096b540e4bf1db021f561b77f2d3cec4a896bc.zip
+-│   │   ├── f8124c496c05609707cb0bd5a5a4274900b1233c.zip
+-│   │   ├── f822ed321df53b95a0c800dc158506347e817ce4.zip
+-│   │   ├── f897e567a7708a5872077fb257219fc7956a2c3f.zip
+-│   │   ├── f928ae1834f281fc922645d58f338158ae96d263.zip
+-│   │   ├── fb68b8a19170aaa9557a4349fc710dfe26eb09ac.zip
+-│   │   ├── fbe694e3b8deade715bb3f23eb68c2087e04c9f8.zip
+-│   │   ├── fd56d0791c9bbf55f3fe732afc7c74c342d56cef.zip
+-│   │   ├── ff7c216b4896e764951cb050d05efaeee26bc3b6.zip
+-│   │   └── ff8e9f1b232cae6293044d91c03ba02d781c123b.zip
+-│   ├── trace
+-│   │   ├── assets
+-│   │   │   ├── codeMirrorModule-a5XoALAZ.js
+-│   │   │   └── defaultSettingsView-CJSZINFr.js
+-│   │   ├── codeMirrorModule.DYBRYzYX.css
+-│   │   ├── codicon.DCmgc-ay.ttf
+-│   │   ├── defaultSettingsView.7ch9cixO.css
+-│   │   ├── index.Bk2uYQRV.js
+-│   │   ├── index.BVu7tZDe.css
+-│   │   ├── index.html
+-│   │   ├── manifest.webmanifest
+-│   │   ├── playwright-logo.svg
+-│   │   ├── snapshot.html
+-│   │   ├── sw.bundle.js
+-│   │   ├── uiMode.Btcz36p_.css
+-│   │   ├── uiMode.CQJ9SCIQ.js
+-│   │   ├── uiMode.html
+-│   │   └── xtermModule.DYP7pi_n.css
+-│   └── index.html
+-├── public
+-│   ├── templates
+-│   │   └── order-confirmation.html
+-│   ├── green.png
+-│   ├── icon.svg
+-│   ├── logo.png
+-│   ├── placeholder.jpg
+-│   ├── placeholder-logo.png
+-│   ├── placeholder-logo.svg
+-│   ├── placeholder.svg
+-│   └── placeholder-user.jpg
+-├── scripts
+-│   ├── db-reset-and-migrate.sh
+-│   ├── gdpr-data-purge.ts
+-│   ├── load-test.js
+-│   └── README.md
+-├── shared
+-│   ├── components
+-│   │   ├── analytics
+-│   │   │   └── web-vitals-reporter.tsx
+-│   │   ├── custom-ui
+-│   │   │   ├── empty-state.tsx
+-│   │   │   ├── error-alert.tsx
+-│   │   │   ├── feature-card.tsx
+-│   │   │   └── section.tsx
+-│   │   ├── forms
+-│   │   │   └── form-error.tsx
+-│   │   ├── layout
+-│   │   │   ├── animated-section.tsx
+-│   │   │   ├── error-boundary.tsx
+-│   │   │   ├── footer-custom.tsx
+-│   │   │   ├── hero-section.tsx
+-│   │   │   ├── navbar.tsx
+-│   │   │   ├── page-layout.tsx
+-│   │   │   └── theme-provider-wrapper.tsx
+-│   │   ├── marketing
+-│   │   │   ├── cookie-consent-banner.tsx
+-│   │   │   └── structured-data.tsx
+-│   │   ├── navigation
+-│   │   │   └── breadcrumb.tsx
+-│   │   ├── saas
+-│   │   │   ├── FeatureComparison.tsx
+-│   │   │   ├── PricingCard.tsx
+-│   │   │   ├── TierBadge.tsx
+-│   │   │   ├── UpgradePrompt.tsx
+-│   │   │   └── UsageMeter.tsx
+-│   │   ├── ui
+-│   │   │   ├── accordion.tsx
+-│   │   │   ├── alert-dialog.tsx
+-│   │   │   ├── alert.tsx
+-│   │   │   ├── aspect-ratio.tsx
+-│   │   │   ├── avatar.tsx
+-│   │   │   ├── badge.tsx
+-│   │   │   ├── breadcrumb.tsx
+-│   │   │   ├── button-group.tsx
+-│   │   │   ├── button.tsx
+-│   │   │   ├── calendar.tsx
+-│   │   │   ├── card.tsx
+-│   │   │   ├── carousel.tsx
+-│   │   │   ├── chart.tsx
+-│   │   │   ├── checkbox.tsx
+-│   │   │   ├── collapsible.tsx
+-│   │   │   ├── command.tsx
+-│   │   │   ├── context-menu.tsx
+-│   │   │   ├── dialog.tsx
+-│   │   │   ├── drawer.tsx
+-│   │   │   ├── dropdown-menu.tsx
+-│   │   │   ├── empty.tsx
+-│   │   │   ├── field.tsx
+-│   │   │   ├── form.tsx
+-│   │   │   ├── hover-card.tsx
+-│   │   │   ├── input-group.tsx
+-│   │   │   ├── input-otp.tsx
+-│   │   │   ├── input.tsx
+-│   │   │   ├── item.tsx
+-│   │   │   ├── kbd.tsx
+-│   │   │   ├── label.tsx
+-│   │   │   ├── menubar.tsx
+-│   │   │   ├── navigation-menu.tsx
+-│   │   │   ├── pagination.tsx
+-│   │   │   ├── popover.tsx
+-│   │   │   ├── progress.tsx
+-│   │   │   ├── radio-group.tsx
+-│   │   │   ├── resizable.tsx
+-│   │   │   ├── scroll-area.tsx
+-│   │   │   ├── select.tsx
+-│   │   │   ├── separator.tsx
+-│   │   │   ├── sheet.tsx
+-│   │   │   ├── sidebar.tsx
+-│   │   │   ├── skeleton.tsx
+-│   │   │   ├── slider.tsx
+-│   │   │   ├── sonner.tsx
+-│   │   │   ├── spinner.tsx
+-│   │   │   ├── switch.tsx
+-│   │   │   ├── table.tsx
+-│   │   │   ├── tabs.tsx
+-│   │   │   ├── textarea.tsx
+-│   │   │   ├── toggle-group.tsx
+-│   │   │   ├── toggle.tsx
+-│   │   │   └── tooltip.tsx
+-│   │   └── language-switcher.tsx
+-│   ├── constants
+-│   │   ├── app.constants.ts
+-│   │   ├── order.constants.ts
+-│   │   ├── rate-limit.config.ts
+-│   │   ├── stripe.constants.ts
+-│   │   └── subscription.constants.ts
+-│   ├── contexts
+-│   │   └── app-context.tsx
+-│   ├── hooks
+-│   │   ├── use-mobile.ts
+-│   │   ├── use-paginated-data.ts
+-│   │   ├── use-portal-link.ts
+-│   │   └── use-query-fetcher.ts
+-│   ├── i18n
+-│   │   ├── config.ts
+-│   │   └── navigation.ts
+-│   ├── lib
+-│   │   ├── query-client.ts
+-│   │   └── query-keys.ts
+-│   ├── middleware
+-│   │   ├── api-route-protection.ts
+-│   │   └── helper.ts
+-│   ├── providers
+-│   │   └── query-provider.tsx
+-│   ├── services
+-│   │   ├── api
+-│   │   │   ├── authenticated-fetch.ts
+-│   │   │   └── safe-fetch.ts
+-│   │   ├── csrf
+-│   │   │   └── csrf-protection.ts
+-│   │   ├── db
+-│   │   │   ├── performance-monitor.ts
+-│   │   │   ├── prisma.ts
+-│   │   │   └── redis.ts
+-│   │   ├── email
+-│   │   │   └── resend.ts
+-│   │   ├── firebase
+-│   │   │   ├── admin.ts
+-│   │   │   ├── config.ts
+-│   │   │   ├── stripe-payments.ts
+-│   │   │   ├── subscription-helpers.ts
+-│   │   │   └── sync.ts
+-│   │   ├── observability
+-│   │   │   ├── firebase-logging.ts
+-│   │   │   └── metrics.ts
+-│   │   ├── rate-limit
+-│   │   │   ├── comprehensive-rate-limiter.ts
+-│   │   │   └── rate-limit-redis.ts
+-│   │   ├── request-identity
+-│   │   │   ├── index.ts
+-│   │   │   └── request-identity.ts
+-│   │   ├── seo
+-│   │   │   ├── metadata.ts
+-│   │   │   ├── page-metadata.ts
+-│   │   │   └── structured-data.ts
+-│   │   ├── storage
+-│   │   │   ├── index.ts
+-│   │   │   └── r2.ts
+-│   │   └── timezone
+-│   │       └── TimeService.ts
+-│   ├── types
+-│   │   ├── api.types.ts
+-│   │   └── index.ts
+-│   └── utils
+-│       ├── api
+-│       │   ├── add-timezone-header.ts
+-│       │   └── response-helpers.ts
+-│       ├── config
+-│       │   ├── cors-constants.ts
+-│       │   ├── envUtil.ts
+-│       │   ├── index.ts
+-│       │   └── mock.ts
+-│       ├── debug
+-│       │   ├── debug.ts
+-│       │   └── index.ts
+-│       ├── error-handling
+-│       │   ├── api-error-wrapper.ts
+-│       │   ├── auth-error-handler.ts
+-│       │   └── global-error-handler.ts
+-│       ├── helpers
+-│       │   ├── date.ts
+-│       │   ├── order-helpers.ts
+-│       │   ├── pagination.ts
+-│       │   └── utils.ts
+-│       ├── permissions
+-│       │   ├── calculator-permissions.ts
+-│       │   └── core-feature-permissions.ts
+-│       ├── security
+-│       │   ├── encryption.ts
+-│       │   └── pii-sanitization.ts
+-│       ├── system
+-│       │   ├── app-initialization.ts
+-│       │   ├── prisma-introspection.ts
+-│       │   ├── system-logger.ts
+-│       │   └── web-vitals.ts
+-│       ├── type-guards
+-│       │   └── subscription-type-guards.ts
+-│       ├── validation
+-│       │   ├── api-validation.ts
+-│       │   ├── auth-validation.ts
+-│       │   ├── checkout-validation.ts
+-│       │   ├── contact-validation.ts
+-│       │   ├── data-validation.ts
+-│       │   ├── file-validation.ts
+-│       │   ├── README.md
+-│       │   └── search-validation.ts
+-│       └── stripe-map-loader.ts
+-├── test-results
+-│   ├── admin-customers-Admin-Cust-155b7-ers-search-input-is-present-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-customers-Admin-Cust-28de3-rs-table-or-list-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-customers-Admin-Cust-710ad-stomer-email-or-name-column-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-customers-Admin-Cust-b0a76-tomers-customers-page-loads-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-dashboard-Admin-acce-bbe91-nnot-access-admin-dashboard-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-dashboard-Admin-Dash-7bc12-debar-navigation-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-dashboard-Admin-Dash-99ff7-links-to-key-admin-sections-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-dashboard-Admin-Dash-a0571-or-metric-cards-are-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-dashboard-Admin-Dash-dc999-hboard-loads-for-admin-user-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-orders-Admin-Orders--62fd6-rs-table-or-list-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-orders-Admin-Orders--8dade-e-present-if-results-exist--Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-orders-Admin-Orders-admin-orders-orders-page-loads-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-orders-Admin-Orders--b8f47--or-filter-input-is-present-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-orders-Admin-Orders--daf82-rs-table-has-column-headers-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-subscriptions-Admin--4fbaa-ns-subscriptions-page-loads-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-subscriptions-Admin--981ec-er-information-is-displayed-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── admin-subscriptions-Admin--b4ab8-ns-table-or-list-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth
+-│   │   ├── admin-idb-state.json
+-│   │   ├── admin-storage-state.json
+-│   │   ├── user-idb-state.json
+-│   │   └── user-storage-state.json
+-│   ├── auth-protected-redirect-Si-6ecb3--route-redirects-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Si-6ecb3--route-redirects-to-sign-in-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-2ab4c-to-sign-in-unauthenticated--Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-2ab4c-to-sign-in-unauthenticated--Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-4c04f-to-sign-in-unauthenticated--Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-4c04f-to-sign-in-unauthenticated--Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-67b4a-ccount-redirects-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-9360a-to-sign-in-unauthenticated--Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-9360a-to-sign-in-unauthenticated--Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-c4340-to-sign-in-unauthenticated--Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-c4340-to-sign-in-unauthenticated--Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-ca48a-eckout-redirects-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-ca48a-eckout-redirects-to-sign-in-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-de4aa-ayment-redirects-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-de4aa-ayment-redirects-to-sign-in-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-protected-redirect-Un-fd23a-ulator-redirects-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign--0833e--error-when-submitted-empty-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign--0833e--error-when-submitted-empty-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign--6df3f-password-fields-are-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign--6df3f-password-fields-are-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign--84a0f-error-for-wrong-credentials-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign--84a0f-error-for-wrong-credentials-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign-in-has-a-forgot-password-link-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign-in-has-a-forgot-password-link-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign-in-has-a-link-to-sign-up-page-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign-in-has-a-link-to-sign-up-page-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign-in-sign-in-button-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign-in-sign-in-button-is-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign-in-sign-in-page-loads-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-in-Sign-In-sign-in-sign-in-page-loads-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign--23202--error-when-submitted-empty-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign--23202--error-when-submitted-empty-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign--36970-up-submit-button-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign--36970-up-submit-button-is-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign--7bdb1-red-form-fields-are-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign--7bdb1-red-form-fields-are-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign--96c26-or-for-mismatched-passwords-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign--96c26-or-for-mismatched-passwords-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign-up-has-a-confirm-password-field-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign-up-has-a-confirm-password-field-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign-up-has-a-link-back-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign-up-has-a-link-back-to-sign-in-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign-up-sign-up-page-loads-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── auth-sign-up-Sign-Up-sign-up-sign-up-page-loads-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-account-Account-a-311e8-r-billing-button-is-present-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-account-Account-a-311e8-r-billing-button-is-present-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-account-Account-a-b4a2f-oads-for-authenticated-user-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-account-Account-a-b4a2f-oads-for-authenticated-user-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-account-Account-a-b6584-cription-section-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-account-Account-a-b6584-cription-section-is-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-account-Account-a-d8d1d-le-information-is-displayed-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-account-Account-a-d8d1d-le-information-is-displayed-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-44b67-or-type-selector-is-present-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-44b67-or-type-selector-is-present-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-5874d-puts-and-submit-calculation-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-5874d-puts-and-submit-calculation-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-627ac-ab-or-section-is-accessible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-627ac-ab-or-section-is-accessible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-70600-or-for-empty-invalid-inputs-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-70600-or-for-empty-invalid-inputs-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-8100b-oads-for-authenticated-user-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-8100b-oads-for-authenticated-user-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-8a383--calculator-form-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-calculator-Calcul-8a383--calculator-form-is-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Checkout--924b9-ated-→-redirect-to-sign-in--Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Checkout--924b9-ated-→-redirect-to-sign-in--Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Payment-r-76e4e-henticated-users-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Payment-r-76e4e-henticated-users-to-sign-in-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Payment-r-cc823-henticated-users-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Payment-r-cc823-henticated-users-to-sign-in-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Pricing-→-948c9-out-or-redirects-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Pricing-→-948c9-out-or-redirects-to-sign-in-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Pricing-→-9a87e-has-upgrade-get-started-CTA-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── customer-payment-Pricing-→-9a87e-has-upgrade-get-started-CTA-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-503d9-act-form-fields-are-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-503d9-act-form-fields-are-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-7b964-r-for-invalid-email-on-blur-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-7b964-r-for-invalid-email-on-blur-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-87a38-ct-submit-button-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-87a38-ct-submit-button-is-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-8ce09-a-response-toast-or-dialog--Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-8ce09-a-response-toast-or-dialog--Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-8f2d1-en-fields-are-blurred-empty-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contac-8f2d1-en-fields-are-blurred-empty-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contact-Form-contact-contact-page-loads-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-contact-form-Contact-Form-contact-contact-page-loads-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-c-233c1-n-navigates-to-sign-in-page-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-c-233c1-n-navigates-to-sign-in-page-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-h-cf69f-nting-to-sign-up-or-pricing-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-h-cf69f-nting-to-sign-up-or-pricing-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-loads-with-a-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-loads-with-a-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-navigation-bar-is-visible-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-navigation-bar-is-visible-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-sign-in-link-is-present-in-nav-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-homepage-Homepage-sign-in-link-is-present-in-nav-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Abo-6805f-about-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Abo-6805f-about-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Abo-aa721-about-loads-with-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Abo-aa721-about-loads-with-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-About-page-about-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-About-page-about-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-API-10e53-ation-loads-with-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-API-10e53-ation-loads-with-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-API-1a503-mentation-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-API-1a503-mentation-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-API-99f1d-ation-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-API-99f1d-ation-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-FAQ-fac98-ifics-FAQ-items-are-present-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-FAQ-fac98-ifics-FAQ-items-are-present-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-FAQ-page-faq-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-FAQ-page-faq-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-FAQ-page-faq-loads-with-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-FAQ-page-faq-loads-with-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-FAQ-page-faq-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-FAQ-page-faq-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Fea-7bcd0--features-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Fea-7bcd0--features-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Fea-84829-tures-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Fea-84829-tures-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Fea-a7ad1-tures-loads-with-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Fea-a7ad1-tures-loads-with-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-4b337-e-pricing-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-4b337-e-pricing-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-7124e-ecifics-shows-pricing-plans-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-7124e-ecifics-shows-pricing-plans-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-72141--sign-up-or-get-started-CTA-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-72141--sign-up-or-get-started-CTA-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-79d5c-ivacy-loads-with-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-79d5c-ivacy-loads-with-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-999e0-icing-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-999e0-icing-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-a0de9-icing-loads-with-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-a0de9-icing-loads-with-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-dc198-e-privacy-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-dc198-e-privacy-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-dc982-ivacy-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Pri-dc982-ivacy-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Sup-1093c-pport-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Sup-1093c-pport-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Sup-19026-pport-loads-with-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Sup-19026-pport-loads-with-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Sup-a28cc-e-support-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Sup-a28cc-e-support-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Ter-2e4a2-terms-loads-with-200-status-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Ter-2e4a2-terms-loads-with-200-status-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Ter-9abcf-terms-has-a-visible-heading-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Ter-9abcf-terms-has-a-visible-heading-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Terms-page-terms-page-title-is-set-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── public-marketing-pages-Terms-page-terms-page-title-is-set-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-39627-ggle-is-present-on-homepage-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-39627-ggle-is-present-on-homepage-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-54333-e-has-link-back-to-homepage-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-54333-e-has-link-back-to-homepage-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-604d6-ges-load-on-mobile-viewport-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-604d6-ges-load-on-mobile-viewport-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-64ac3-e-renders-for-unknown-route-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-64ac3-e-renders-for-unknown-route-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-726ff-ge-has-link-back-to-sign-in-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-726ff-ge-has-link-back-to-sign-in-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-ca44c-nks-are-present-on-homepage-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-ca44c-nks-are-present-on-homepage-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-cedda-lic-nav-links-are-reachable-Microsoft-Edge-retry1
+-│   │   └── trace.zip
+-│   ├── shared-navigation-Navigati-cedda-lic-nav-links-are-reachable-Mobile-Safari-retry1
+-│   │   └── trace.zip
+-│   └── results.json
++│   │   │   ├── api
++│   │   │   │   ├── authenticated-fetch.ts
++│   │   │   │   └── safe-fetch.ts
++│   │   │   ├── csrf
++│   │   │   ├── email
++│   │   │   ├── firebase
++│   │   │   │   ├── config.ts
++│   │   │   │   ├── stripe-payments.ts
++│   │   │   │   ├── subscription-helpers.ts
++│   │   │   │   └── sync.ts
++│   │   │   ├── observability
++│   │   │   ├── rate-limit
++│   │   │   ├── request-identity
++│   │   │   ├── seo
++│   │   │   │   ├── metadata.ts
++│   │   │   │   ├── page-metadata.ts
++│   │   │   │   └── structured-data.ts
++│   │   │   ├── storage
++│   │   │   └── timezone
++│   │   │       └── TimeService.ts
++│   │   ├── types
++│   │   │   ├── api.types.ts
++│   │   │   └── index.ts
++│   │   └── utils
++│   │       ├── api
++│   │       │   └── add-timezone-header.ts
++│   │       ├── config
++│   │       │   ├── cors-constants.ts
++│   │       │   ├── envUtil.ts
++│   │       │   ├── index.ts
++│   │       │   └── mock.ts
++│   │       ├── debug
++│   │       │   ├── debug.ts
++│   │       │   └── index.ts
++│   │       ├── error-handling
++│   │       │   ├── auth-error-handler.ts
++│   │       │   └── global-error-handler.ts
++│   │       ├── helpers
++│   │       │   ├── date.ts
++│   │       │   ├── order-helpers.ts
++│   │       │   ├── pagination.ts
++│   │       │   └── utils.ts
++│   │       ├── permissions
++│   │       │   ├── calculator-permissions.ts
++│   │       │   └── core-feature-permissions.ts
++│   │       ├── security
++│   │       │   └── pii-sanitization.ts
++│   │       ├── system
++│   │       │   ├── app-initialization.ts
++│   │       │   ├── prisma-introspection.ts
++│   │       │   ├── system-logger.ts
++│   │       │   └── web-vitals.ts
++│   │       ├── type-guards
++│   │       │   └── subscription-type-guards.ts
++│   │       ├── validation
++│   │       │   ├── api-validation.ts
++│   │       │   ├── auth-validation.ts
++│   │       │   ├── checkout-validation.ts
++│   │       │   ├── contact-validation.ts
++│   │       │   ├── data-validation.ts
++│   │       │   ├── file-validation.ts
++│   │       │   ├── README.md
++│   │       │   └── search-validation.ts
++│   │       └── stripe-map-loader.ts
++│   ├── styles
++│   │   └── globals.css
++│   ├── translations
++│   │   └── en.json
++│   ├── App.tsx
++│   ├── main.tsx
++│   ├── router.tsx
++│   ├── routeTree.gen.ts
++│   └── vite-env.d.ts
+ ├── __tests__
+-│   ├── e2e
+-│   │   ├── admin
+-│   │   │   ├── customers.spec.ts
+-│   │   │   ├── dashboard.spec.ts
+-│   │   │   ├── orders.spec.ts
+-│   │   │   └── subscriptions.spec.ts
+-│   │   ├── auth
+-│   │   │   ├── protected-redirect.spec.ts
+-│   │   │   ├── sign-in.spec.ts
+-│   │   │   └── sign-up.spec.ts
+-│   │   ├── customer
+-│   │   │   ├── account.spec.ts
+-│   │   │   ├── calculator.spec.ts
+-│   │   │   └── payment.spec.ts
+-│   │   ├── public
+-│   │   │   ├── contact-form.spec.ts
+-│   │   │   ├── homepage.spec.ts
+-│   │   │   └── marketing-pages.spec.ts
+-│   │   └── shared
+-│   │       └── navigation.spec.ts
+ │   ├── helpers
+ │   │   ├── auth-helpers.ts
+ │   │   ├── e2e-seed.ts
+ │   │   ├── fixtures.ts
+ │   │   ├── global-setup.ts
+ │   │   └── global-teardown.ts
+-│   ├── integration
+-│   │   ├── 00-middleware-production.test.ts
+-│   │   ├── api-admin.test.ts
+-│   │   ├── api-analytics.test.ts
+-│   │   ├── api-calculator.test.ts
+-│   │   ├── api-csrf.test.ts
+-│   │   ├── api-customer-orders.test.ts
+-│   │   ├── api-health-and-calculator.test.ts
+-│   │   ├── api-health-ready.test.ts
+-│   │   ├── api-security.test.ts
+-│   │   ├── api-shared.test.ts
+-│   │   ├── api-subscriptions.test.ts
+-│   │   ├── api-users.test.ts
+-│   │   ├── middleware.test.ts
+-│   │   └── README.md
+ │   ├── setup
+ │   │   └── bun-preload.ts
+ │   └── unit
+@@ -1762,26 +421,18 @@
+ │           ├── file-validation.test.ts
+ │           ├── input-validation.test.ts
+ │           └── search-validation.test.ts
+-├── translations
+-│   └── en.json
+-├── bunfig.toml
+ ├── bun.lock
+ ├── components.json
+-├── docker-compose.yml
+-├── Dockerfile
+ ├── eslint.config.mjs
+-├── example.env
+-├── middleware.ts
+-├── next.config.ts
+-├── next-env.d.ts
++├── index.html
++├── MIGRATION_PROGRESS.md
+ ├── package.json
+-├── playwright.config.ts
+-├── pnpm-workspace.yaml
++├── package-lock.json
+ ├── postcss.config.mjs
+-├── railway.toml
+ ├── README.md
+ ├── tailwind.config.ts
+ ├── tsconfig.json
+-└── tsconfig.tsbuildinfo
++├── tsconfig.node.json
++└── vite.config.ts
+ 
+-559 directories, 1226 files
++120 directories, 316 files

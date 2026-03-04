@@ -132,6 +132,6 @@ function PrivacyPage() {
   )
 }
 
-export const Route = createFileRoute('/privacy')({
+export const Route = createFileRoute('/(public)/privacy')({
   component: PrivacyPage,
 })

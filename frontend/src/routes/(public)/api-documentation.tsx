@@ -169,6 +169,6 @@ function ApiDocumentationPage() {
   )
 }
 
-export const Route = createFileRoute('/api-documentation')({
+export const Route = createFileRoute('/(public)/api-documentation')({
   component: ApiDocumentationPage,
 })

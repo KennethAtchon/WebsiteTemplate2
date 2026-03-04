@@ -198,6 +198,6 @@ function SupportPage() {
   )
 }
 
-export const Route = createFileRoute('/support')({
+export const Route = createFileRoute('/(public)/support')({
   component: SupportPage,
 })
