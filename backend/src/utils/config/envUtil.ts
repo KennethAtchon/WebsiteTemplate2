@@ -147,6 +147,7 @@ export const ADMIN_SPECIAL_CODE_HASH = getEnvVar(
 // ============================================================================
 // Stripe
 // ============================================================================
+export const STRIPE_SECRET_KEY = getEnvVar("STRIPE_SECRET_KEY", false);
 export const STRIPE_WEBHOOK_SECRET = getEnvVar("STRIPE_WEBHOOK_SECRET", false);
 
 // ============================================================================

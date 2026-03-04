@@ -14,6 +14,7 @@ import publicRoutes from "./routes/public";
 import analyticsRoutes from "./routes/analytics";
 import userRoutes from "./routes/users";
 import csrfRoutes from "./routes/csrf";
+import webhookRoutes from "./routes/webhooks";
 
 const app = new Hono();
 
@@ -64,6 +65,7 @@ app.route("/api/shared", publicRoutes);
 app.route("/api/analytics", analyticsRoutes);
 app.route("/api/users", userRoutes);
 app.route("/api/csrf", csrfRoutes);
+app.route("/api/webhooks", webhookRoutes);
 
 // Standalone routes
 app.get("/api/live", (c) => c.json({ status: "ok" }));
