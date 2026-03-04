@@ -5,8 +5,8 @@ import { Toaster } from './shared/components/ui/sonner';
 import ThemeProvider from './shared/components/layout/theme-provider-wrapper';
 
 // Import simple components
-import SimpleCalculator from './components/SimpleCalculator';
-import SimpleContactForm from './components/SimpleContactForm';
+import SimpleCalculator from './features/calculator/components/SimpleCalculator';
+import SimpleContactForm from './features/contact/components/SimpleContactForm';
 
 // Create a client
 const queryClient = new QueryClient();
