@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -49,7 +49,7 @@ export function EditCustomerModal({
   onFormChange,
   onSave,
 }: EditCustomerModalProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
 
   /**
    * Handle form submission

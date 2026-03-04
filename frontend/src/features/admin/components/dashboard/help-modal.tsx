@@ -7,7 +7,7 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   DialogContent,
   DialogDescription,
@@ -48,7 +48,7 @@ function HelpListItem({ section, description, icon: Icon }: HelpItem) {
 }
 
 export function HelpModal() {
-  const t = useTranslations();
+  const { t } = useTranslation();
 
   const helpItems: HelpItem[] = [
     {

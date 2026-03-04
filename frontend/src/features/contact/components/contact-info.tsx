@@ -7,7 +7,7 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { Clock, Mail, Phone } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
 import {
@@ -31,7 +31,7 @@ const CONTACT_INFO = {
 } as const;
 
 export default function ContactInfo() {
-  const t = useTranslations();
+  const { t } = useTranslation();
 
   const CONTACT_CARDS = [
     {

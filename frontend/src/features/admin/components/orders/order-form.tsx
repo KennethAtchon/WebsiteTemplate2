@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -92,7 +92,7 @@ interface OrderFormProps {
  * Order form component for creating and editing orders
  */
 export function OrderForm({ order, onSubmit, onClose }: OrderFormProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const fetcher = useQueryFetcher<{ users: User[]; pagination?: unknown }>();
 

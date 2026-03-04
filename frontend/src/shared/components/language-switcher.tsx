@@ -1,8 +1,7 @@
 "use client";
 
-import { useLocale } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
 import { useTransition } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
@@ -13,19 +12,16 @@ import {
 import { localeMetadata, type Locale } from "@/shared/i18n/config";
 
 export function LanguageSwitcher() {
-  const locale = useLocale() as Locale;
-  const _router = useRouter();
-  const _pathname = usePathname();
+  const { i18n } = useTranslation();
+  const locale = i18n.language as Locale;
   const [_isPending] = useTransition();
 
   const handleLocaleChange = (newLocale: string) => {
-    // Set cookie with new locale preference
-    // next-intl uses 'NEXT_LOCALE' as the default cookie name
-    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
-
-    // Reload the page to apply new locale
-    // The middleware will detect the cookie and use the new locale
-    window.location.reload();
+    // Change language using i18next
+    i18n.changeLanguage(newLocale);
+    
+    // Store preference in localStorage
+    localStorage.setItem('i18nextLng', newLocale);
   };
 
   return (

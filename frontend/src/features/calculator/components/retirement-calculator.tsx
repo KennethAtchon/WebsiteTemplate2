@@ -22,10 +22,10 @@ import { RetirementInputs, RetirementResult } from "../types/calculator.types";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, Target } from "lucide-react";
 import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 export function RetirementCalculator() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { role } = useSubscription();
   const {
     calculate,

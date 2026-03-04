@@ -25,7 +25,7 @@ import {
 } from "../types/calculator.types";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, Calculator } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   Table,
   TableBody,
@@ -36,7 +36,7 @@ import {
 } from "@/shared/components/ui/table";
 
 export function LoanCalculator() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { role } = useSubscription();
   const {
     calculate,

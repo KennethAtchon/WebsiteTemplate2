@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { Link, useLocation } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
-import Image from "next/image";
 import UserButton from "@/features/auth/components/user-button";
 import { useApp } from "@/shared/contexts/app-context";
 import { Menu, X } from "lucide-react";
@@ -31,9 +29,10 @@ type NavigationLink = {
  */
 export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   const { user } = useApp();
-  const t = useTranslations();
+  const { t } = useTranslation();
 
   // Navigation configuration - SaaS Calculator App
   const PUBLIC_NAVIGATION_LINKS: NavigationLink[] = [

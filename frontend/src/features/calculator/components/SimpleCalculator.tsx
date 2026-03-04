@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function SimpleCalculator() {
   const [result, setResult] = useState(0);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
 
   const handleCalculate = () => {
     try {
       // Simple evaluation - in real app this would be more sophisticated
-      const evalResult = Function('"use strict"; return (' + input + ')')();
+      const evalResult = Function('"use strict"; return (' + input + ")")();
       setResult(evalResult);
     } catch (error) {
       setResult(0);

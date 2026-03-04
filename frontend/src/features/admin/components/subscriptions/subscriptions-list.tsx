@@ -7,7 +7,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -41,7 +41,7 @@ import { ErrorAlert } from "@/shared/components/custom-ui/error-alert";
 import { EmptyState } from "@/shared/components/custom-ui/empty-state";
 import { Subscription } from "@/features/subscriptions/types/subscription.types";
 import { Search, Package, Loader2, Copy, Check } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import {
   Tooltip,
   TooltipContent,
@@ -83,7 +83,7 @@ function UserIdCell({ userId }: { userId: string }) {
 }
 
 export function SubscriptionsList() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [tierFilter, setTierFilter] = useState<string>("all");
@@ -308,7 +308,7 @@ export function SubscriptionsList() {
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/customers?userId=${sub.userId}`}>
+                        <Link to={`/admin/customers?userId=${sub.userId}`}>
                           View Customer
                         </Link>
                       </Button>

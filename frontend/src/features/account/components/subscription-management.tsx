@@ -28,8 +28,8 @@ import { ErrorAlert } from "@/shared/components/custom-ui/error-alert";
 import { ManageSubscriptionButton } from "@/features/subscriptions/components/manage-subscription-button";
 import { TrendingUp, CheckCircle2 } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
+import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 import { CORE_FEATURE_API_PREFIX } from "@/shared/constants/app.constants";
 
 interface UsageStats {
@@ -41,7 +41,7 @@ interface UsageStats {
 }
 
 export function SubscriptionManagement() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { user } = useApp();
   const { role, isLoading: subscriptionLoading } = useSubscription();
   const fetcher = useQueryFetcher<UsageStats>();

@@ -15,7 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import { debugLog } from "@/shared/utils/debug";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { publicFetch } from "@/shared/services/api/safe-fetch";
 import {
   validateContactField,
@@ -44,7 +44,7 @@ interface ContactFormProps {
 }
 
 export default function ContactForm({ onSuccess }: ContactFormProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const [isMounted, setIsMounted] = useState(false);
   const [formData, setFormData] = useState<ContactFormData>(() => ({
     name: "",

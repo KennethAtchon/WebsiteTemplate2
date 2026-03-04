@@ -12,7 +12,7 @@ import { Package, Phone, Mail, Download } from "lucide-react";
 import { formatDateWithTimezone } from "@/shared/utils/helpers/date";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { debugLog } from "@/shared/utils/debug";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { SUPPORT_EMAIL } from "@/shared/constants/app.constants";
 
 // Constants
@@ -77,7 +77,7 @@ export function OrderDetailModal({
   open,
   onOpenChange,
 }: OrderDetailModalProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
 
   if (!order) return null;
 

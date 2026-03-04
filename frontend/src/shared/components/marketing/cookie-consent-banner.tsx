@@ -8,10 +8,10 @@
  */
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { Cookie, X } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 const COOKIE_CONSENT_KEY = "cookie_consent";
 
@@ -26,7 +26,7 @@ function getInitialVisibility(): boolean {
 }
 
 export function CookieConsentBanner() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(getInitialVisibility);
 
   function saveConsent(value: "all" | "essential") {

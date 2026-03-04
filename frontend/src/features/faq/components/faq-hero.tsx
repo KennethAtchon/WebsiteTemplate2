@@ -6,12 +6,12 @@
 
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { HelpCircle, Search, Clock } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
 
 export default function FAQHero() {
-  const t = useTranslations();
+  const { t } = useTranslation();
 
   const HERO_CONTENT = {
     BADGE_TEXT: t("faq_hero_badge"),

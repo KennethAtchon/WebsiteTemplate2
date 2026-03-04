@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface SimpleContactFormProps {
   onSuccess: () => void;
@@ -6,16 +6,16 @@ interface SimpleContactFormProps {
 
 function SimpleContactForm({ onSuccess }: SimpleContactFormProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
+    name: "",
+    email: "",
+    message: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    console.log("Form submitted:", formData);
     onSuccess();
-    setFormData({ name: '', email: '', message: '' });
+    setFormData({ name: "", email: "", message: "" });
   };
 
   return (
@@ -37,7 +37,9 @@ function SimpleContactForm({ onSuccess }: SimpleContactFormProps) {
           <input
             type="email"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             className="w-full p-2 border rounded"
             required
           />
@@ -46,7 +48,9 @@ function SimpleContactForm({ onSuccess }: SimpleContactFormProps) {
           <label className="block text-sm font-medium mb-1">Message</label>
           <textarea
             value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, message: e.target.value })
+            }
             className="w-full p-2 border rounded"
             rows={4}
             required

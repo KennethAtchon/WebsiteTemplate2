@@ -23,7 +23,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { useApp } from "@/shared/contexts/app-context";
 import { useAuthenticatedFetch } from "@/features/auth/hooks/use-authenticated-fetch";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -36,7 +36,7 @@ interface OrderCreatorProps {
 
 export function OrderCreator({ sessionId }: OrderCreatorProps) {
   const { user } = useApp();
-  const router = useRouter();
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [_isCreating, setIsCreating] = useState(true);
   const [showError, setShowError] = useState(false);
@@ -97,9 +97,10 @@ export function OrderCreator({ sessionId }: OrderCreatorProps) {
         });
 
         // Redirect to the same page but with order_id parameter
-        router.replace(
-          `/payment/success?session_id=${sessionId}&order_id=${orderId}`
-        );
+        navigate({
+          pathname: `/payment/success`,
+          search: `?session_id=${sessionId}&order_id=${orderId}`,
+        });
       } catch (err) {
         debugLog.error(
           "OrderCreator: Order creation failed",

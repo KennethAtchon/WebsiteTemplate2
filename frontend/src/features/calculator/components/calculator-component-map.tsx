@@ -6,83 +6,47 @@
  * Uses dynamic imports for code splitting and performance optimization.
  */
 
-import dynamic from "next/dynamic";
+import { lazy, Suspense, ComponentType } from "react";
 import type { CalculationType } from "../types/calculator.types";
-import type { ComponentType } from "react";
+
+// Loading component for lazy-loaded calculators
+const LoadingCalculator = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="animate-pulse text-muted-foreground">
+      Loading calculator...
+    </div>
+  </div>
+);
 
 // Dynamic imports with loading states for better performance
-const MortgageCalculator = dynamic(
-  () =>
-    import("@/features/calculator/components/mortgage-calculator").then(
-      (mod) => ({
-        default: mod.MortgageCalculator,
-      })
-    ),
-  {
-    loading: () => (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-pulse text-muted-foreground">
-          Loading calculator...
-        </div>
-      </div>
-    ),
-    ssr: false,
-  }
+const MortgageCalculator = lazy(() =>
+  import("@/features/calculator/components/mortgage-calculator").then(
+    (mod) => ({
+      default: mod.MortgageCalculator,
+    })
+  )
 );
 
-const LoanCalculator = dynamic(
-  () =>
-    import("@/features/calculator/components/loan-calculator").then((mod) => ({
-      default: mod.LoanCalculator,
-    })),
-  {
-    loading: () => (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-pulse text-muted-foreground">
-          Loading calculator...
-        </div>
-      </div>
-    ),
-    ssr: false,
-  }
+const LoanCalculator = lazy(() =>
+  import("@/features/calculator/components/loan-calculator").then((mod) => ({
+    default: mod.LoanCalculator,
+  }))
 );
 
-const InvestmentCalculator = dynamic(
-  () =>
-    import("@/features/calculator/components/investment-calculator").then(
-      (mod) => ({
-        default: mod.InvestmentCalculator,
-      })
-    ),
-  {
-    loading: () => (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-pulse text-muted-foreground">
-          Loading calculator...
-        </div>
-      </div>
-    ),
-    ssr: false,
-  }
+const InvestmentCalculator = lazy(() =>
+  import("@/features/calculator/components/investment-calculator").then(
+    (mod) => ({
+      default: mod.InvestmentCalculator,
+    })
+  )
 );
 
-const RetirementCalculator = dynamic(
-  () =>
-    import("@/features/calculator/components/retirement-calculator").then(
-      (mod) => ({
-        default: mod.RetirementCalculator,
-      })
-    ),
-  {
-    loading: () => (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-pulse text-muted-foreground">
-          Loading calculator...
-        </div>
-      </div>
-    ),
-    ssr: false,
-  }
+const RetirementCalculator = lazy(() =>
+  import("@/features/calculator/components/retirement-calculator").then(
+    (mod) => ({
+      default: mod.RetirementCalculator,
+    })
+  )
 );
 
 /**

@@ -7,7 +7,7 @@
 "use client";
 
 import { debugLog } from "@/shared/utils/debug";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { usePortalLink } from "@/shared/hooks/use-portal-link";
 import type { ButtonProps } from "@/shared/components/ui/button";
@@ -27,7 +27,7 @@ export function ManageSubscriptionButton({
   disabled = false,
   ...buttonProps
 }: ManageSubscriptionButtonProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { portalUrl, isLoading, error } = usePortalLink();
   const defaultChildren =
     children || t("account_subscription_manage_subscription");

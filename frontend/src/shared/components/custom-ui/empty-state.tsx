@@ -8,7 +8,7 @@ import { ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 export interface EmptyStateProps {
   /**
@@ -65,7 +65,7 @@ export function EmptyState({
           <>
             {action.href ? (
               <Button asChild>
-                <Link href={action.href}>{action.label}</Link>
+                <Link to={action.href}>{action.label}</Link>
               </Button>
             ) : (
               <Button onClick={action.onClick}>{action.label}</Button>
@@ -91,7 +91,7 @@ export function EmptyState({
             <>
               {action.href ? (
                 <Button asChild>
-                  <Link href={action.href}>{action.label}</Link>
+                  <Link to={action.href}>{action.label}</Link>
                 </Button>
               ) : (
                 <Button onClick={action.onClick}>{action.label}</Button>

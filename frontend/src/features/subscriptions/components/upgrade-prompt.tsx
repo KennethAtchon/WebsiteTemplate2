@@ -4,7 +4,7 @@
  * Standardized upgrade prompt card for FeatureGate fallbacks.
  */
 
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, LucideIcon } from "lucide-react";
 import {
   Card,
@@ -18,7 +18,7 @@ import {
   SubscriptionTier,
   getTierDescription,
 } from "@/shared/constants/subscription.constants";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { useSubscription } from "@/features/subscriptions/hooks/use-subscription";
 import { ManageSubscriptionButton } from "@/features/subscriptions/components/manage-subscription-button";
 
@@ -52,7 +52,7 @@ export function UpgradePrompt({
   icon: Icon,
   className,
 }: UpgradePromptProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { role } = useSubscription();
   const hasSubscription = !!role;
 
@@ -86,7 +86,7 @@ export function UpgradePrompt({
           </ManageSubscriptionButton>
         ) : (
           <Button asChild className="w-full sm:w-auto">
-            <Link href="/pricing">
+            <Link to="/pricing">
               {t("subscription_upgrade_to", { tier: tierName })}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

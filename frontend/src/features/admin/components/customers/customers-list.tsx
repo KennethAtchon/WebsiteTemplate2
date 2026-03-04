@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { MoreHorizontal, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -151,7 +151,7 @@ export function CustomersList({
   search,
   selectedUserId,
 }: CustomersListProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { user } = useApp();
   const fetcher = useQueryFetcher<ApiResponse>();
 

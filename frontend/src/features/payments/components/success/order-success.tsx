@@ -10,7 +10,7 @@
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import { CheckCircle2, ShoppingCart, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 interface OrderSuccessProps {
   sessionId: string | null;

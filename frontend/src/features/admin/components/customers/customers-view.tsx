@@ -7,7 +7,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Search, Users } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
@@ -20,25 +19,21 @@ import {
 } from "@/shared/components/ui/tabs";
 
 import { CustomersList } from "@/features/admin/components/customers/customers-list";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 const MAX_SEARCH_WIDTH = "max-w-sm";
 const ENTER_KEY = "Enter";
 
 export function CustomersView() {
-  const t = useTranslations();
-  const searchParams = useSearchParams();
-  const initialUserId = searchParams.get("userId");
+  const { t } = useTranslation();
   const [listKey, setListKey] = useState(0);
-  const [search, setSearch] = useState(initialUserId ?? "");
-  const [searchInput, setSearchInput] = useState(initialUserId ?? "");
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(
-    initialUserId
-  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const handleSearch = (): void => {
     setSelectedUserId(null);
-    setSearch(searchInput);
+    setSearchTerm(searchInput);
     setListKey((previousKey) => previousKey + 1);
   };
 
@@ -105,21 +100,21 @@ export function CustomersView() {
         <TabsContent value="all" className="space-y-4 mt-6">
           <CustomersList
             key={listKey}
-            search={search}
+            search={searchTerm}
             selectedUserId={selectedUserId}
           />
         </TabsContent>
         <TabsContent value="active" className="space-y-4 mt-6">
           <CustomersList
             key={listKey}
-            search={search}
+            search={searchTerm}
             selectedUserId={selectedUserId}
           />
         </TabsContent>
         <TabsContent value="inactive" className="space-y-4 mt-6">
           <CustomersList
             key={listKey}
-            search={search}
+            search={searchTerm}
             selectedUserId={selectedUserId}
           />
         </TabsContent>

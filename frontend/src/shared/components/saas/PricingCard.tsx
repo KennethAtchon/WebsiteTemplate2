@@ -28,7 +28,7 @@ import { useApp } from "@/shared/contexts/app-context";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryFetcher } from "@/shared/hooks/use-query-fetcher";
 import { queryKeys } from "@/shared/lib/query-keys";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 interface PricingCardProps {
   tier: SubscriptionTierConfig;
@@ -41,7 +41,7 @@ export function PricingCard({
   tierKey,
   isPopular = false,
 }: PricingCardProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { role } = useSubscription();
   const { portalUrl, isLoading: portalLoading } = usePortalLink();
   const { user } = useApp();

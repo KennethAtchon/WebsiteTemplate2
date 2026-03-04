@@ -7,7 +7,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { useApp } from "@/shared/contexts/app-context";
 import {
   Card,
@@ -39,7 +39,7 @@ import { ErrorAlert } from "@/shared/components/custom-ui/error-alert";
 const COMPONENT_NAME = "ProfileEditor";
 
 export function ProfileEditor() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const {
     profile,
     profileLoading,

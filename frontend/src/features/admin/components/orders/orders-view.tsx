@@ -21,7 +21,7 @@ import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 
 import { OrdersList } from "@/features/admin/components/orders/orders-list";
 import { OrderForm } from "@/features/admin/components/orders/order-form";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 const SEARCH_MAX_WIDTH = "max-w-sm";
 const MODAL_MAX_WIDTH = "sm:max-w-[600px]";
@@ -29,7 +29,7 @@ const MODAL_MAX_WIDTH = "sm:max-w-[600px]";
 type OrderStatusFilter = "all" | "pending" | "paid" | "cancelled";
 
 export function OrdersView() {
-  const t = useTranslations();
+  const { t } = useTranslation();
 
   const STATUS_TABS = [
     { value: "all", label: t("admin_orders_all") },

@@ -14,7 +14,7 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { RecentOrdersList } from "@/features/admin/components/orders/recent-orders-list";
@@ -28,7 +28,7 @@ import {
 import { useApp } from "@/shared/contexts/app-context";
 import { useQueryFetcher } from "@/shared/hooks/use-query-fetcher";
 import { queryKeys } from "@/shared/lib/query-keys";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 interface CustomersCountResponse {
   totalCustomers: number;
@@ -146,7 +146,7 @@ function TabSection({
           <p className="text-muted-foreground text-sm mt-1">{description}</p>
         </div>
         <Button asChild variant="outline" className="shadow-sm">
-          <Link href={linkHref}>{linkText}</Link>
+          <Link to={linkHref}>{linkText}</Link>
         </Button>
       </div>
       {children}
@@ -155,7 +155,7 @@ function TabSection({
 }
 
 export function DashboardView() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { user } = useApp();
   const fetcher = useQueryFetcher();
 
@@ -168,10 +168,7 @@ export function DashboardView() {
     }
 
     const sign = percentChange > 0 ? "+" : "";
-    return t("admin_dashboard_percent_change", {
-      sign,
-      value: percentChange.toFixed(PERCENTAGE_DECIMAL_PLACES),
-    });
+    return `${sign}${percentChange.toFixed(PERCENTAGE_DECIMAL_PLACES)}%`;
   };
 
   const {
@@ -276,9 +273,7 @@ export function DashboardView() {
           title={t("admin_dashboard_average_revenue_per_user")}
           icon={TrendingUp}
           value={subscriptionsData?.arpu ?? 0}
-          change={t("admin_dashboard_churn", {
-            rate: subscriptionsData?.churnRate?.toFixed(2) ?? 0,
-          })}
+          change={`Churn: ${subscriptionsData?.churnRate?.toFixed(2) ?? 0}%`}
           loading={subscriptionsLoading}
           error={
             subscriptionsError instanceof Error

@@ -8,7 +8,7 @@ import {
   useMemo,
   startTransition,
 } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { CreditCard, AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -18,7 +18,7 @@ import {
 import { CheckoutLineItem } from "@/features/payments/services/stripe-checkout";
 import { debugLog } from "@/shared/utils/debug";
 import { IS_DEVELOPMENT } from "@/shared/utils/config/envUtil";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 // Constants
 const COMPONENT_NAME = "StripePaymentFallback";
@@ -79,9 +79,9 @@ export default function StripePaymentFallback() {
     component: COMPONENT_NAME,
   });
 
-  const t = useTranslations();
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const searchParams = useSearch({ strict: false }) as Record<string, string | undefined>;
   const { isAuthenticated, userId } = { isAuthenticated: true, userId: null }; // Simplified for SaaS
 
   // Enhanced state management

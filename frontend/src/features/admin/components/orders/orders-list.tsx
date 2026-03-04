@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   MoreHorizontal,
   Package,
@@ -155,7 +155,7 @@ export function OrdersList({
   statusFilter,
   refreshKey,
 }: OrdersListProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   // Edit state
   const [editOrder, setEditOrder] = useState<Order | null>(null);
   const [editOpen, setEditOpen] = useState(false);

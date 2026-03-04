@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { ArrowUp, Sparkles } from "lucide-react";
 import { useSubscription } from "@/features/subscriptions/hooks/use-subscription";
 import { ManageSubscriptionButton } from "@/features/subscriptions/components/manage-subscription-button";

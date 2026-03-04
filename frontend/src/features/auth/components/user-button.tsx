@@ -1,7 +1,7 @@
 "use client";
 
 import { useApp } from "@/shared/contexts/app-context";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -16,8 +16,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/shared/components/ui/avatar";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { User, LogOut } from "lucide-react";
 import { debugLog } from "@/shared/utils/debug";
 
@@ -35,9 +34,9 @@ const ACCOUNT_ROUTE = "/account";
  * Shows sign-in/sign-up buttons for unauthenticated users or user avatar with menu for authenticated users.
  */
 export default function UserButton() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { user, authLoading: loading, logout } = useApp();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   /**
    * Handles user sign out with navigation.
@@ -45,7 +44,7 @@ export default function UserButton() {
   const handleSignOut = async () => {
     try {
       await logout();
-      router.push(HOME_ROUTE);
+      navigate({ to: HOME_ROUTE });
       debugLog.info(t("auth_user_signed_out_successfully"), {
         service: "user-button",
         operation: "handleSignOut",
@@ -139,10 +138,10 @@ export default function UserButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={ACCOUNT_ROUTE} className="cursor-pointer">
+          <button onClick={() => navigate({ to: ACCOUNT_ROUTE })} className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             <span>Account</span>
-          </Link>
+          </button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>

@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronRight, Home } from "lucide-react";
 import { StructuredDataStatic } from "@/shared/components/marketing/structured-data";
 import { generateBreadcrumbSchema } from "@/shared/services/seo/structured-data";
@@ -58,7 +57,8 @@ function generateBreadcrumbsFromPath(pathname: string): BreadcrumbItem[] {
 }
 
 export function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   const breadcrumbs = items || generateBreadcrumbsFromPath(pathname);
 
   // Don't show breadcrumbs on homepage

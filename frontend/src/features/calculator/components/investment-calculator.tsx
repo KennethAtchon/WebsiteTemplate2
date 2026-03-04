@@ -21,7 +21,7 @@ import { useSubscription } from "@/features/subscriptions/hooks/use-subscription
 import { InvestmentInputs, InvestmentResult } from "../types/calculator.types";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, TrendingUp } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   LineChart,
   Line,
@@ -34,7 +34,7 @@ import {
 } from "recharts";
 
 export function InvestmentCalculator() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { role } = useSubscription();
   const {
     calculate,

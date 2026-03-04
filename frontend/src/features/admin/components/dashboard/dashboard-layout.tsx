@@ -7,9 +7,9 @@
 "use client";
 
 import React, { useState, useEffect, startTransition } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { Link } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import UserButton from "@/features/auth/components/user-button";
 import {
   LayoutDashboard,
@@ -113,11 +113,11 @@ interface SidebarProps {
 }
 
 function BrandHeader() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   return (
     <div className="flex h-16 items-center border-b border-border bg-gradient-to-r from-primary/5 to-purple-500/5 px-6">
       <Link
-        href="/admin/dashboard"
+        to="/admin/dashboard"
         className="flex items-center gap-3 font-bold text-lg"
       >
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
@@ -142,7 +142,7 @@ function NavigationLink({
 
   return (
     <Link
-      href={item.href}
+      to={item.href}
       className={cn(
         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
         isActive
@@ -157,7 +157,7 @@ function NavigationLink({
 }
 
 function DesktopSidebar({ pathname }: SidebarProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const adminNavItems: AdminNavItem[] = [
     {
       href: "/admin/dashboard",
@@ -219,11 +219,11 @@ interface MobileSidebarProps {
 }
 
 function MobileBrandHeader({ onClose }: { onClose: () => void }) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   return (
     <div className="flex h-16 items-center justify-between border-b border-border bg-gradient-to-r from-primary/5 to-purple-500/5 px-6">
       <Link
-        href="/admin/dashboard"
+        to="/admin/dashboard"
         className="flex items-center gap-3 font-bold text-lg"
       >
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
@@ -241,7 +241,7 @@ function MobileBrandHeader({ onClose }: { onClose: () => void }) {
 }
 
 function MobileSidebar({ isOpen, onClose, pathname }: MobileSidebarProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const adminNavItems: AdminNavItem[] = [
     {
       href: "/admin/dashboard",
@@ -295,7 +295,7 @@ function MobileSidebar({ isOpen, onClose, pathname }: MobileSidebarProps) {
             {adminNavItems.map((item) => (
               <Link
                 key={item.href}
-                href={item.href}
+                to={item.href}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
                   pathname === item.href
@@ -332,15 +332,23 @@ const INITIAL_LAYOUT_STATE: LayoutState = {
   mobileNavOpen: false,
 };
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const t = useTranslations();
-  const [layoutState, setLayoutState] =
-    useState<LayoutState>(INITIAL_LAYOUT_STATE);
-  const pathname = usePathname();
-
-  const updateLayoutState = (updates: Partial<LayoutState>) => {
-    setLayoutState((prev) => ({ ...prev, ...updates }));
+const t = (key: string) => {
+  const translations: Record<string, string> = {
+    "admin_layout_navigation_dashboard": "Dashboard",
+    "admin_layout_navigation_customers": "Customers",
+    "admin_layout_navigation_orders": "Orders",
+    "admin_layout_navigation_subscriptions": "Subscriptions",
+    "admin_layout_navigation_contact_messages": "Contact Messages",
+    "admin_layout_navigation_developer": "Developer",
+    "admin_layout_navigation_settings": "Settings",
   };
+  return translations[key] || key;
+};
+
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const location = useLocation();
+  const pathname = location.pathname;
 
   const adminNavItems: AdminNavItem[] = [
     {

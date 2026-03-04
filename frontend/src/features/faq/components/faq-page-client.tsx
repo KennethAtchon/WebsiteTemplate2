@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   getFAQCategories,
   type FAQCategory,
@@ -32,7 +32,7 @@ const filterFAQsBySearchTerm = (
 };
 
 export default function FAQPageClient() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const faqCategories = useMemo(() => getFAQCategories(t), [t]);
   const [filteredFAQs, setFilteredFAQs] = useState(faqCategories);
 

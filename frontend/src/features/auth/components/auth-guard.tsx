@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, startTransition } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useNavigate, useLocation } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useApp } from "@/shared/contexts/app-context";
 import { useAuthenticatedFetch } from "@/features/auth/hooks/use-authenticated-fetch";
 import { debugLog } from "@/shared/utils/debug";
@@ -61,10 +61,11 @@ export function AuthGuard({
   authType,
   publicRoutes,
 }: AuthGuardProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { user, authLoading: loading } = useApp();
-  const router = useRouter();
-  const pathname = usePathname();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const pathname = location.pathname;
   const [verificationState, setVerificationState] = useState<VerificationState>(
     INITIAL_VERIFICATION_STATE
   );

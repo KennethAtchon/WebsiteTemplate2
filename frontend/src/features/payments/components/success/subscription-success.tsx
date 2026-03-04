@@ -17,7 +17,7 @@ import {
   Calculator,
   Zap,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useAuthenticatedFetch } from "@/features/auth/hooks/use-authenticated-fetch";
 import { debugLog } from "@/shared/utils/debug";
 import { APP_NAME, CORE_FEATURE_PATH } from "@/shared/constants/app.constants";
@@ -93,7 +93,7 @@ export function SubscriptionSuccess({ sessionId }: SubscriptionSuccessProps) {
           {/* Quick Actions */}
           <div className="grid gap-4 sm:grid-cols-2">
             <Button asChild size="lg" className="h-12 shadow-lg">
-              <Link href={CORE_FEATURE_PATH}>
+              <Link to={CORE_FEATURE_PATH}>
                 <Calculator className="mr-2 h-5 w-5" />
                 Start Calculating
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -105,7 +105,7 @@ export function SubscriptionSuccess({ sessionId }: SubscriptionSuccessProps) {
               size="lg"
               className="h-12 border-2"
             >
-              <Link href="/account">
+              <Link to="/account">
                 <Zap className="mr-2 h-5 w-5" />
                 View Account
               </Link>

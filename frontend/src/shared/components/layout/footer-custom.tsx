@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 import { useState } from "react";
 import { useApp } from "@/shared/contexts/app-context";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +14,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { useAuthenticatedFetch } from "@/features/auth/hooks/use-authenticated-fetch";
 import { debugLog } from "@/shared/utils/debug";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   APP_NAME,
   APP_DESCRIPTION,
@@ -32,11 +31,11 @@ const SIGN_IN_ROUTE = "/sign-in";
  * Includes contact details, business hours, quick links, and admin verification modal.
  */
 export default function FooterCustom() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [adminCode, setAdminCode] = useState("");
   const { user } = useApp();
-  const router = useRouter();
+  const navigate = useNavigate();
   const { authenticatedFetch, authenticatedFetchJson } =
     useAuthenticatedFetch();
 

@@ -25,9 +25,9 @@ import {
   Package,
   DollarSign,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useApp } from "@/shared/contexts/app-context";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   createProductCheckout,
   CheckoutLineItem,
@@ -51,7 +51,7 @@ export function OrderCheckout({
   initialItems,
   onItemsChange,
 }: OrderCheckoutProps) {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { user } = useApp();
   const [items, setItems] = useState<OrderItem[]>(initialItems);
   const [isProcessing, setIsProcessing] = useState(false);

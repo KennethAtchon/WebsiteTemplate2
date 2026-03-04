@@ -28,7 +28,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { Progress } from "@/shared/components/ui/progress";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { ErrorAlert } from "@/shared/components/custom-ui/error-alert";
@@ -75,7 +75,7 @@ interface CalculatorHistoryResponse {
 const HISTORY_PAGE_LIMIT = 10;
 
 export function UsageDashboard() {
-  const t = useTranslations();
+  const { t } = useTranslation();
   const { user } = useApp();
   const queryClient = useQueryClient();
   const fetcher = useQueryFetcher<UsageStats>();
