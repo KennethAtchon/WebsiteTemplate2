@@ -1,15 +1,14 @@
-import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { SubscriptionCheckout } from '@/features/payments/components/checkout/subscription-checkout'
-import { OrderCheckout } from '@/features/payments/components/checkout/order-checkout'
+import { createFileRoute } from '@tanstack/react-router'
+import { CheckoutInteractive } from '@/routes/checkout/checkout-interactive'
+import { PageLayout } from '@/shared/components/layout/page-layout'
 
 function CheckoutPage() {
-  const search = useSearch({ from: '/checkout' })
-  const type = (search as any)?.type || 'subscription'
-
   return (
-    <div className="container mx-auto py-12">
-      {type === 'subscription' ? <SubscriptionCheckout /> : <OrderCheckout />}
-    </div>
+    <PageLayout variant="customer">
+      <div className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
+        <CheckoutInteractive />
+      </div>
+    </PageLayout>
   )
 }
 

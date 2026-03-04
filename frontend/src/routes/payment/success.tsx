@@ -1,15 +1,14 @@
-import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { OrderSuccess } from '@/features/payments/components/success/order-success'
-import { SubscriptionSuccess } from '@/features/payments/components/success/subscription-success'
+import { createFileRoute } from '@tanstack/react-router'
+import { PaymentSuccessInteractive } from '@/routes/payment/success/payment-success-interactive'
+import { PageLayout } from '@/shared/components/layout/page-layout'
 
 function PaymentSuccessPage() {
-  const search = useSearch({ from: '/payment/success' })
-  const type = (search as any)?.type || 'subscription'
-
   return (
-    <div className="container mx-auto py-12">
-      {type === 'subscription' ? <SubscriptionSuccess /> : <OrderSuccess />}
-    </div>
+    <PageLayout variant="customer">
+      <div className="container mx-auto px-4 py-16 md:py-24">
+        <PaymentSuccessInteractive />
+      </div>
+    </PageLayout>
   )
 }
 

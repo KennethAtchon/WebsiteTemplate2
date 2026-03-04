@@ -1,48 +1,35 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Calculator } from 'lucide-react'
+import { PageLayout } from '@/shared/components/layout/page-layout'
+import { Section } from '@/shared/components/custom-ui/section'
+import { CalculatorInteractive } from '@/routes/calculator/calculator-interactive'
 import { useTranslation } from 'react-i18next'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs'
-import { MortgageCalculator } from '@/features/calculator/components/mortgage-calculator'
-import { LoanCalculator } from '@/features/calculator/components/loan-calculator'
-import { InvestmentCalculator } from '@/features/calculator/components/investment-calculator'
-import { RetirementCalculator } from '@/features/calculator/components/retirement-calculator'
 
 function CalculatorPage() {
   const { t } = useTranslation()
 
   return (
-    <div className="container mx-auto py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">{t('calculator_page_title')}</h1>
-        <p className="text-xl text-muted-foreground">
-          {t('calculator_page_subtitle')}
-        </p>
-      </div>
-      
-      <Tabs defaultValue="mortgage" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8">
-          <TabsTrigger value="mortgage">{t('calculator_mortgage')}</TabsTrigger>
-          <TabsTrigger value="loan">{t('calculator_loan')}</TabsTrigger>
-          <TabsTrigger value="investment">{t('calculator_investment')}</TabsTrigger>
-          <TabsTrigger value="retirement">{t('calculator_retirement')}</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="mortgage">
-          <MortgageCalculator />
-        </TabsContent>
-        
-        <TabsContent value="loan">
-          <LoanCalculator />
-        </TabsContent>
-        
-        <TabsContent value="investment">
-          <InvestmentCalculator />
-        </TabsContent>
-        
-        <TabsContent value="retirement">
-          <RetirementCalculator />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <PageLayout variant="customer">
+      <Section maxWidth="7xl" padding="sm">
+        <div className="mb-8 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+              <Calculator className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
+                {t('common_financial_calculators')}
+              </h1>
+              <p className="text-lg text-muted-foreground mt-1">
+                {t('metadata_calculator_description')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <CalculatorInteractive />
+      </Section>
+    </PageLayout>
   )
 }
 

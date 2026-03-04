@@ -17,6 +17,6 @@ function AdminLayout() {
   );
 }
 
-export const Route = createFileRoute()({
+export const Route = createFileRoute('/admin/')({
   component: AdminLayout,
 });

@@ -1,24 +1,27 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { AuthGuard } from '@/features/auth/components/auth-guard'
-import { ProfileEditor } from '@/features/account/components/profile-editor'
-import { SubscriptionManagement } from '@/features/account/components/subscription-management'
-import { UsageDashboard } from '@/features/account/components/usage-dashboard'
+import { PageLayout } from '@/shared/components/layout/page-layout'
+import { Section } from '@/shared/components/custom-ui/section'
+import { AccountInteractive } from '@/routes/account/account-interactive'
 import { useTranslation } from 'react-i18next'
 
 function AccountPage() {
   const { t } = useTranslation()
 
   return (
-    <AuthGuard>
-      <div className="container mx-auto py-12">
-        <h1 className="text-4xl font-bold mb-8">{t('metadata_account_title')}</h1>
-        <div className="grid gap-8">
-          <ProfileEditor />
-          <SubscriptionManagement />
-          <UsageDashboard />
+    <PageLayout variant="customer">
+      <Section maxWidth="7xl" padding="sm">
+        <div className="mb-8 space-y-2">
+          <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
+            {t('common_account_dashboard')}
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            {t('common_manage_your_subscription_view_usage_and_access_calculators')}
+          </p>
         </div>
-      </div>
-    </AuthGuard>
+
+        <AccountInteractive />
+      </Section>
+    </PageLayout>
   )
 }
 

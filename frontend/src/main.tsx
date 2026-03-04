@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider } from "@tanstack/react-router";
-import { router } from "./routes/router";
+import { router } from "./router";
 
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";

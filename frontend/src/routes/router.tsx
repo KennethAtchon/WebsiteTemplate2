@@ -65,9 +65,4 @@ export const router = createRouter({
   defaultPreload: 'intent',
 });
 
-// Register router for TypeScript
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router;
-  }
-}
+// Legacy manual router kept for reference during migration.
