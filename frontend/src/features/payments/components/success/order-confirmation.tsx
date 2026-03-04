@@ -172,7 +172,7 @@ export function OrderConfirmation({ orderId }: OrderConfirmationProps) {
                 Try Again
               </Button>
               <Button asChild variant="outline">
-                <Link href="/account">Go to Account</Link>
+                <Link to="/account">Go to Account</Link>
               </Button>
             </div>
           </div>
@@ -310,13 +310,13 @@ export function OrderConfirmation({ orderId }: OrderConfirmationProps) {
       {/* Navigation Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-700">
-          <Link href="/account">
+          <Link to="/account">
             <User className="mr-2 h-5 w-5" />
             View My Account
           </Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <Link href="/therapies">
+          <Link to="/therapies">
             <ShoppingBag className="mr-2 h-5 w-5" />
             Browse More Therapies
           </Link>

@@ -69,23 +69,20 @@ export default function NavBar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md shadow-sm">
       <div className="container flex h-16 items-center justify-between">
         <Link
-          href="/"
+          to="/"
           className="flex items-center gap-2 transition-transform hover:scale-105"
         >
-          <Image
+          <img
             src={LOGO_PATH}
             alt={LOGO_ALT}
-            width={120}
-            height={40}
             className="h-8 w-auto"
-            priority
           />
         </Link>
         <nav className="hidden md:flex items-center gap-1">
           {navigationLinks.map(({ href, label }) => (
             <Link
               key={href}
-              href={href}
+              to={href}
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                 isLinkActive(href)
@@ -101,10 +98,10 @@ export default function NavBar() {
           {!user && (
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild>
-                <Link href="/sign-in">{t("navigation_signIn")}</Link>
+                <Link to="/sign-in">{t("navigation_signIn")}</Link>
               </Button>
               <Button asChild className="shadow-sm">
-                <Link href="/sign-up">{t("navigation_signUp")}</Link>
+                <Link to="/sign-up">{t("navigation_signUp")}</Link>
               </Button>
             </div>
           )}
@@ -173,7 +170,7 @@ function MobileMenu({
         {navigationLinks.map(({ href, label }) => (
           <Link
             key={href}
-            href={href}
+            to={href}
             onClick={onLinkClick}
             className={cn(
               "px-4 py-3 text-sm font-medium rounded-lg transition-all",
@@ -197,17 +194,17 @@ function MobileMenu({
  * Mobile menu authentication buttons with translations
  */
 function MobileMenuAuthButtons({ onLinkClick }: { onLinkClick: () => void }) {
-  const t = useTranslations();
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-2 pt-4 mt-4 border-t">
       <Button variant="outline" asChild className="w-full">
-        <Link href="/sign-in" onClick={onLinkClick}>
+        <Link to="/sign-in" onClick={onLinkClick}>
           {t("navigation_signIn")}
         </Link>
       </Button>
       <Button asChild className="w-full shadow-sm">
-        <Link href="/sign-up" onClick={onLinkClick}>
+        <Link to="/sign-up" onClick={onLinkClick}>
           {t("navigation_signUp")}
         </Link>
       </Button>

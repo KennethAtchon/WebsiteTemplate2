@@ -52,7 +52,7 @@ export default function FooterCustom() {
 
         if (response.ok) {
           // User already has admin access
-          router.push(ADMIN_DASHBOARD_ROUTE);
+          navigate({ to: ADMIN_DASHBOARD_ROUTE });
         } else {
           // User doesn't have admin access, show verification modal
           setIsAdminModalOpen(true);
@@ -68,7 +68,7 @@ export default function FooterCustom() {
       }
     } else {
       // Redirect unauthenticated users to sign-in
-      router.push(SIGN_IN_ROUTE);
+      navigate({ to: SIGN_IN_ROUTE });
     }
   };
 
@@ -96,7 +96,7 @@ export default function FooterCustom() {
         setAdminCode("");
         // Force token refresh to get new claims
         await user.getIdToken(true);
-        router.push(ADMIN_DASHBOARD_ROUTE);
+        navigate({ to: ADMIN_DASHBOARD_ROUTE });
       } else {
         alert(result.error || t("shared_footer_admin_invalid_code"));
       }
@@ -132,7 +132,7 @@ export default function FooterCustom() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/pricing"
+                  to="/pricing"
                   className="text-gray-700 hover:text-teal-600"
                 >
                   {t("metadata_pricing_title")}
@@ -140,20 +140,20 @@ export default function FooterCustom() {
               </li>
               <li>
                 <Link
-                  href={CORE_FEATURE_PATH}
+                  to={CORE_FEATURE_PATH}
                   className="text-gray-700 hover:text-teal-600"
                 >
                   {t("shared_footer_calculators")}
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-700 hover:text-teal-600">
+                <Link to="/faq" className="text-gray-700 hover:text-teal-600">
                   {t("faq_metadata_title")}
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/contact"
+                  to="/contact"
                   className="text-gray-700 hover:text-teal-600"
                 >
                   {t("shared_footer_contact")}
@@ -168,7 +168,7 @@ export default function FooterCustom() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/features"
+                  to="/features"
                   className="text-gray-700 hover:text-teal-600"
                 >
                   {t("metadata_features_title")}
@@ -176,7 +176,7 @@ export default function FooterCustom() {
               </li>
               <li>
                 <Link
-                  href="/api/docs"
+                  to="/api/docs"
                   className="text-gray-700 hover:text-teal-600"
                 >
                   {t("metadata_api_documentation_title")}
@@ -184,7 +184,7 @@ export default function FooterCustom() {
               </li>
               <li>
                 <Link
-                  href="/support"
+                  to="/support"
                   className="text-gray-700 hover:text-teal-600"
                 >
                   {t("metadata_support_title")}
@@ -238,17 +238,17 @@ export default function FooterCustom() {
             })}
           </p>
           <div className="flex gap-4">
-            <Link href="/privacy" className="text-gray-700 hover:text-teal-600">
+            <Link to="/privacy" className="text-gray-700 hover:text-teal-600">
               {t("metadata_privacy_title")}
             </Link>
-            <Link href="/terms" className="text-gray-700 hover:text-teal-600">
+            <Link to="/terms" className="text-gray-700 hover:text-teal-600">
               {t("metadata_terms_title")}
             </Link>
-            <Link href="/cookies" className="text-gray-700 hover:text-teal-600">
+            <Link to="/cookies" className="text-gray-700 hover:text-teal-600">
               {t("metadata_cookies_title")}
             </Link>
             <Link
-              href="/accessibility"
+              to="/accessibility"
               className="text-gray-700 hover:text-teal-600"
             >
               {t("metadata_accessibility_title")}

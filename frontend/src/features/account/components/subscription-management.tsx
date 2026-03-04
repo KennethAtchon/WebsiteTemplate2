@@ -75,7 +75,7 @@ export function SubscriptionManagement() {
         </CardHeader>
         <CardContent>
           <Button asChild>
-            <Link href="/pricing">{t("common_view_pricing_plans")}</Link>
+            <Link to="/pricing">{t("common_view_pricing_plans")}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -193,8 +193,7 @@ export function SubscriptionManagement() {
                 {tierConfig.features.maxCalculationsPerMonth === -1
                   ? t("account_subscription_unlimited_calculations_feature")
                   : t("account_subscription_calculations_per_month", {
-                      count:
-                        tierConfig.features.maxCalculationsPerMonth.toLocaleString(),
+                      count: tierConfig.features.maxCalculationsPerMonth,
                     })}
               </span>
             </li>

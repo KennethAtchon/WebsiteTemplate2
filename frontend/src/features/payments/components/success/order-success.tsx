@@ -55,7 +55,7 @@ export function OrderSuccess({ sessionId, orderId }: OrderSuccessProps) {
           {/* Quick Actions */}
           <div className="grid gap-4 sm:grid-cols-2">
             <Button asChild size="lg" className="h-12 shadow-lg">
-              <Link href="/account">
+              <Link to="/account">
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 View Orders
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -67,7 +67,7 @@ export function OrderSuccess({ sessionId, orderId }: OrderSuccessProps) {
               size="lg"
               className="h-12 border-2"
             >
-              <Link href="/">
+              <Link to="/">
                 <ArrowRight className="mr-2 h-5 w-5" />
                 Back to Home
               </Link>

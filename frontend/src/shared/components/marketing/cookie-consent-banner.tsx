@@ -57,7 +57,7 @@ export function CookieConsentBanner() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               {t("cookies_consent_message")}{" "}
               <Link
-                href="/cookies"
+                to="/cookies"
                 className="text-primary underline hover:no-underline"
               >
                 {t("cookies_learn_more")}

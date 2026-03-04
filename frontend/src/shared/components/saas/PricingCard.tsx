@@ -154,10 +154,9 @@ export function PricingCard({
                 </span>
               )}{" "}
               {t("account_subscription_calculations_per_month", {
-                count:
-                  tier.features.maxCalculationsPerMonth === -1
-                    ? t("calculator_unlimited")
-                    : tier.features.maxCalculationsPerMonth.toLocaleString(),
+                count: tier.features.maxCalculationsPerMonth === -1
+                    ? 0
+                    : tier.features.maxCalculationsPerMonth,
               })}
             </span>
           </li>

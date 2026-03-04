@@ -66,7 +66,7 @@ export function UpgradePrompt({
           </ManageSubscriptionButton>
         ) : (
           <Button asChild className="w-full">
-            <Link href="/pricing">
+            <Link to="/pricing">
               <ArrowUp className="mr-2 h-4 w-4" />
               Upgrade to {tierNames[requiredTier] || requiredTier}
             </Link>

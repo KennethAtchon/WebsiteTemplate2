@@ -99,7 +99,7 @@ export function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
                     </span>
                   ) : (
                     <Link
-                      href={breadcrumb.href}
+                      to={breadcrumb.href}
                       className="text-gray-600 hover:text-teal-600 transition-colors flex items-center"
                     >
                       {index === 0 && <Home className="w-4 h-4 mr-1" />}

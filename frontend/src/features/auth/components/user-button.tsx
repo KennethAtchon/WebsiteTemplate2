@@ -77,10 +77,10 @@ export default function UserButton() {
     return (
       <div className="hidden md:flex items-center gap-2">
         <Button variant="ghost" asChild>
-          <Link href={SIGN_IN_ROUTE}>Sign In</Link>
+          <Link to={SIGN_IN_ROUTE}>Sign In</Link>
         </Button>
         <Button asChild>
-          <Link href={SIGN_UP_ROUTE}>Sign Up</Link>
+          <Link to={SIGN_UP_ROUTE}>Sign Up</Link>
         </Button>
       </div>
     );

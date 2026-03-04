@@ -387,7 +387,7 @@ export function OrderCheckout({
               <p className="text-sm text-blue-700 dark:text-blue-300">
                 {t("checkout_one_time_purchase_description")}{" "}
                 <Link
-                  href="/pricing"
+                  to="/pricing"
                   className="underline font-medium hover:text-blue-900"
                 >
                   {t("checkout_our_pricing_page")}

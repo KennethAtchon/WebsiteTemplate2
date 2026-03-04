@@ -100,7 +100,7 @@ export function AuthGuard({
             pathname,
           });
           const returnUrl = encodeURIComponent(window.location.href);
-          router.push(`${SIGN_IN_ROUTE}?redirect_url=${returnUrl}`);
+          navigate({ to: `${SIGN_IN_ROUTE}?redirect_url=${returnUrl}` });
           return;
         }
 
@@ -123,7 +123,7 @@ export function AuthGuard({
               pathname,
             }
           );
-          router.push(SIGN_IN_ROUTE);
+          navigate({ to: SIGN_IN_ROUTE });
           return;
         }
 
@@ -176,7 +176,7 @@ export function AuthGuard({
               userId: user.uid,
               pathname,
             });
-            router.push("/");
+            navigate({ to: "/" });
           }
         } catch (error) {
           debugLog.error(
@@ -188,7 +188,7 @@ export function AuthGuard({
             },
             error
           );
-          router.push("/");
+          navigate({ to: "/" });
         }
         return;
       }
@@ -205,7 +205,7 @@ export function AuthGuard({
   }, [
     user,
     loading,
-    router,
+    navigate,
     pathname,
     requiresAdmin,
     requiresUser,
