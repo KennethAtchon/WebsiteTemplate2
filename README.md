@@ -1,121 +1,238 @@
-# WebsiteTemplate
+# WebsiteTemplate2
 
-A **Next.js SaaS template** with auth, subscriptions, payments, and admin already set up. Use it as a base for your product and focus on your **core feature** and branding.
+A **modern SaaS template** with split frontend/backend architecture. Built with Vite + React (frontend) and Hono on Bun (backend). Includes auth, subscriptions, payments, and admin panel.
+
+## Architecture
+
+This project uses a **split architecture** for better scalability and developer experience:
+
+- **Frontend**: Vite + React 19 + TanStack Router (SPA deployed to CDN)
+- **Backend**: Hono on Bun (API server with full Node.js capabilities)
+
+### Why Split Architecture?
+
+- ✅ **Faster builds**: Vite builds in ~10s vs Next.js ~30-60s
+- ✅ **Better DX**: HMR in <50ms, no server/client boundary confusion
+- ✅ **Independent scaling**: Frontend on CDN, backend scales separately
+- ✅ **No edge runtime limits**: Full access to Redis, Prisma, crypto in middleware
+- ✅ **Simpler deployment**: Static frontend + containerized backend
 
 ---
 
-## Using this template
+## Quick Start
 
 ### 1. Clone
 
 ```bash
 git clone <this-repo> your-project
-cd your-project/project
+cd your-project
 ```
 
-### 2. Environment
-
-Copy the example env file and fill in your values:
+### 2. Install Dependencies
 
 ```bash
-cp .env.example .env
-```
-
-Edit `.env` with your database URL, Firebase config, Stripe keys, and other required variables. See `.env.example` for comments.
-
-### 3. Product identity (change these first)
-
-Set your app name, tagline, and support email in one place:
-
-**File:** `project/shared/constants/app.constants.ts`
-
-- `APP_NAME` — Your product name (used in UI, SEO, manifest, GDPR export).
-- `APP_DESCRIPTION` / `APP_TAGLINE` — Short description.
-- `SUPPORT_EMAIL` — Contact email.
-- `CORE_FEATURE_SLUG` — URL slug for your main app feature (default `"calculator"`). Change to `"tools"`, `"documents"`, etc. if you build something else.
-
-### 4. Copy and marketing text
-
-All user-facing strings are in one file:
-
-**File:** `project/translations/en.json`
-
-Search-replace `CalcPro` and `calcpro.com` with your app name and domain. This covers landing page copy, FAQ, footer, legal pages, and email templates. You can also update descriptions and taglines here.
-
-### 5. Environment variables
-
-Copy `project/example.env` to `project/.env` and fill in your values. Key things to change:
-
-- `DATABASE_URL` / `POSTGRES_DB` — Replace `your_app` with your database name.
-- `CORS_ALLOWED_ORIGINS` — Replace `your-app.com` with your actual domain(s).
-- `PROD_URL` — Set this in your shell or CI to use `bun run load-test:prod`.
-
-### 6. Install and run
-
-```bash
-cd project
+# Install frontend dependencies
+cd frontend
 bun install
+
+# Install backend dependencies
+cd ../backend
+bun install
+```
+
+### 3. Environment Variables
+
+```bash
+# Frontend
+cd frontend
+cp .env.example .env
+# Edit with Firebase, Stripe public key, API URL
+
+# Backend
+cd ../backend
+cp .env.example .env
+# Edit with database, Firebase Admin, Stripe secret, etc.
+```
+
+### 4. Database Setup
+
+```bash
+cd backend
 bun run db:generate
 bun run db:migrate
-bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). You should see the app with the default (calculator) implementation.
+### 5. Run Development Servers
 
-**Note:** If you have an existing database, the migration renames the usage table from `calculator_usage` to `feature_usage` (and related columns). Run `bun run db:migrate` so the schema stays in sync.
+```bash
+# Terminal 1 - Backend (API server)
+cd backend
+bun run dev
+# Runs on http://localhost:3001
 
-### 7. Where to build your feature
+# Terminal 2 - Frontend (Vite dev server)
+cd frontend
+bun run dev
+# Runs on http://localhost:3000
+```
 
-- **Product identity:** `project/shared/constants/app.constants.ts`
-- **Core feature (default: calculators):** `project/features/calculator/`  
-  - Add or edit ?feature types? via config, services, and components here.  
-  - To replace with a different product (e.g. document tools), implement your logic in a feature module and point routes/config to it. See [Where to start coding](docs/where-to-start-coding.md).
-- **Copy and marketing:** `project/translations/en.json` and public pages (landing, pricing, FAQ, etc.).
+Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+### 6. Customize Your App
+
+- **Branding**: Update `frontend/src/translations/en.json` with your app name and copy
+- **Features**: Add/modify features in `frontend/src/features/`
+- **API Routes**: Add backend routes in `backend/src/routes/`
+- **Styling**: Customize Tailwind theme in `frontend/tailwind.config.ts`
+
+---
+
+## What's Included
+
+### Frontend (Vite + React)
+- ✅ **Routing**: TanStack Router with file-based routing
+- ✅ **State Management**: TanStack Query for server state
+- ✅ **UI Components**: Radix UI + Tailwind CSS 4
+- ✅ **Forms**: React Hook Form + Zod validation
+- ✅ **Auth**: Firebase Auth client SDK
+- ✅ **i18n**: i18next for internationalization
+- ✅ **SEO**: react-helmet-async for meta tags
+- ✅ **Themes**: Custom theme provider (dark/light mode)
+
+### Backend (Hono on Bun)
+- ✅ **API Framework**: Hono (ultra-lightweight, TypeScript-first)
+- ✅ **Database**: PostgreSQL with Prisma ORM
+- ✅ **Auth**: Firebase Admin SDK for token verification
+- ✅ **Payments**: Stripe integration (subscriptions + one-time)
+- ✅ **Email**: Resend for transactional emails
+- ✅ **Storage**: AWS S3/R2 integration
+- ✅ **Caching**: Redis for rate limiting and sessions
+- ✅ **Security**: CORS, CSRF, rate limiting, security headers
+- ✅ **Monitoring**: Prometheus metrics, structured logging
+
+### Features (Ready to Use)
+- ✅ **Authentication**: Sign up, sign in, OAuth, password reset
+- ✅ **Subscriptions**: Stripe subscription tiers and management
+- ✅ **Admin Panel**: User management, orders, analytics
+- ✅ **Usage Tracking**: Per-user usage limits and tracking
+- ✅ **Contact Forms**: With email notifications
+- ✅ **Legal Pages**: Terms, privacy, cookie policy templates
 
 ---
 
-## What?s included (common stuff)
+## Project Structure
 
-You don?t need to build these; they?re already in the template:
-
-| Area | What?s there |
-|------|------------------|
-| **Auth** | Firebase Auth, sign-in/sign-up, session, roles (user/admin) |
-| **Subscriptions** | Stripe + Firebase Extension, tiers, checkout, customer portal |
-| **Payments** | Stripe Checkout (subscriptions and one-time), webhooks |
-| **Orders** | One-time orders in PostgreSQL, admin order list |
-| **Admin** | Dashboard, customers, orders, subscriptions, contact messages, dev tools |
-| **Public** | Landing, pricing, FAQ, contact, about, terms, privacy |
-| **Usage & limits** | Per-user usage tracking, tier-based limits, usage dashboard |
-| **Infra** | PostgreSQL (Prisma), Redis, env config, CSRF, rate limiting, error handling |
-
-Configure via env and Stripe/Firebase; customize branding and copy.
-
----
+```
+WebsiteTemplate2/
+├── frontend/              # Vite + React SPA
+│   ├── src/
+│   │   ├── routes/        # TanStack Router routes
+│   │   ├── features/      # Feature modules
+│   │   ├── shared/        # Shared components, hooks, utils
+│   │   ├── providers/     # React context providers
+│   │   ├── lib/           # Core libraries (Firebase, i18n)
+│   │   └── translations/  # i18n files
+│   ├── public/            # Static assets
+│   └── package.json
+│
+├── backend/               # Hono API on Bun
+│   ├── src/
+│   │   ├── routes/        # API endpoints
+│   │   ├── services/      # Business logic
+│   │   ├── middleware/    # Auth, CSRF, rate limiting
+│   │   ├── utils/         # Utilities
+│   │   └── infrastructure/ # Prisma, database
+│   └── package.json
+│
+├── docs/                  # Documentation
+└── MIGRATION_GUIDE.md     # Next.js → Vite migration guide
+```
 
 ## Documentation
 
-- [Template Guide](docs/TEMPLATE_GUIDE.md) — **Master reference:** full project map, where everything lives, and how to make it your own.
-- [Where to start coding](docs/where-to-start-coding.md) ? Core feature module, config, and how to add or replace feature types.
-- [Template roadmap](docs/template-roadmap.md) ? Full plan for making the project topic-agnostic and adopter-friendly.
-- [AI_Orchestrator](docs/AI_Orchestrator/index.md) ? Architecture, domain docs, and guides.
+- **[Migration Guide](MIGRATION_GUIDE.md)** — Complete guide for migrating from Next.js
+- **[Frontend README](frontend/README.md)** — Frontend setup and development
+- **[Backend README](backend/README.md)** — Backend API documentation
+- [Template Guide](docs/TEMPLATE_GUIDE.md) — Full project reference
+- [AI_Orchestrator](docs/AI_Orchestrator/index.md) — Architecture docs
 
 ---
 
-## Scripts (from `project/`)
+## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `bun run dev` | Start dev server |
-| `bun run build` | Production build |
-| `bun run db:generate` | Generate Prisma client |
-| `bun run db:migrate` | Run migrations |
-| `bun run db:studio` | Open Prisma Studio |
-| `bun run lint` | Run ESLint |
-| `bun run test` | Run tests |
+### Frontend
+```bash
+cd frontend
+bun run dev          # Start dev server (port 3000)
+bun run build        # Production build
+bun run preview      # Preview production build
+bun run lint         # Lint code
+bun run test         # Run tests
+```
+
+### Backend
+```bash
+cd backend
+bun run dev          # Start API server (port 3001)
+bun run build        # Build for production
+bun run start        # Start production server
+bun run db:generate  # Generate Prisma client
+bun run db:migrate   # Run migrations
+bun run db:studio    # Open Prisma Studio
+bun run test         # Run tests
+```
 
 ---
 
-## Tech stack
+## Tech Stack
 
-Next.js 15 (App Router), React 19, TypeScript, Prisma, PostgreSQL, Firebase Auth, Stripe, Tailwind CSS, next-intl.
+### Frontend
+- **Framework**: React 19
+- **Build Tool**: Vite 6
+- **Router**: TanStack Router
+- **State**: TanStack Query
+- **Styling**: Tailwind CSS 4
+- **UI**: Radix UI
+- **Forms**: React Hook Form + Zod
+- **i18n**: i18next
+
+### Backend
+- **Runtime**: Bun
+- **Framework**: Hono
+- **Database**: PostgreSQL + Prisma
+- **Auth**: Firebase Admin SDK
+- **Payments**: Stripe
+- **Email**: Resend
+- **Cache**: Redis (ioredis)
+
+---
+
+## Migration from Next.js
+
+This project was migrated from Next.js to a split Vite + Hono architecture. The original Next.js project is preserved in `project/` for reference.
+
+See **[MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)** for:
+- Complete migration steps
+- Code conversion examples
+- Deployment instructions
+- Troubleshooting guide
+
+---
+
+## Deployment
+
+### Frontend (Static SPA)
+Deploy to any static hosting:
+- **Cloudflare Pages** (recommended)
+- Vercel
+- Netlify
+- AWS S3 + CloudFront
+
+### Backend (API Server)
+Deploy to any container platform:
+- **Railway** (recommended)
+- Fly.io
+- AWS ECS/Fargate
+- DigitalOcean App Platform
+
+See deployment guides in `frontend/README.md` and `backend/README.md`.

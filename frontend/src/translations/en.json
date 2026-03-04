@@ -1,0 +1,8 @@
+{
+  "home": {
+    "title": "Home",
+    "description": "Welcome to WebsiteTemplate2",
+    "welcome": "Welcome to WebsiteTemplate2",
+    "subtitle": "Vite + React + TanStack Router + Hono Backend"
+  }
+}

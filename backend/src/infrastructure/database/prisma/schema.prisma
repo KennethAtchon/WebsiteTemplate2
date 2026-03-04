@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../lib/generated/prisma"
+  engineType    = "binary"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  firebaseUid String?  @unique @map("firebase_uid")
+  name        String
+  email       String   @unique
+  phone       String?
+  address     String?
+  notes       String?  // Generic notes field for any additional information
+  timezone    String?  @default("UTC") // User's timezone
+  role        String   @default("user") // "user", "admin"
+  isActive    Boolean  @default(true)
+  isDeleted   Boolean  @default(false) @map("is_deleted")
+  deletedAt   DateTime? @map("deleted_at")
+  lastLogin   DateTime?
+  hasUsedFreeTrial Boolean @default(false) @map("has_used_free_trial") // Track if user has used free trial (one-time only)
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt
+  
+  // Customer relationships
+  Orders          Order[]
+  FeatureUsages   FeatureUsage[]
+
+  @@index([firebaseUid])
+  @@index([email])
+  @@index([role, isActive, isDeleted])
+  @@map("user")
+}
+
+
+// ============================================================================
+// ARCHITECTURE: Orders vs Subscriptions - Clean Separation
+// ============================================================================
+// 
+// ORDERS (Prisma/PostgreSQL):
+//   - Purpose: Track ONE-TIME PURCHASES only (e.g., one-time products, services)
+//   - Storage: PostgreSQL via Prisma
+//   - When created: When a one-time payment succeeds
+//   - Admin view: /admin/orders (queries Prisma)
+//   - DO NOT use for subscriptions (subscriptions are in Firestore)
+//
+// SUBSCRIPTIONS (Firestore):
+//   - Purpose: Track RECURRING BILLING and subscription lifecycle
+//   - Storage: Firestore (managed by Firebase Stripe Extension)
+//   - When created: Automatically by Firebase Extension when subscription checkout completes
+//   - Admin view: /admin/subscriptions (queries Firestore)
+//   - Source of truth for subscription status, billing, access control
+//
+// SEPARATION OF CONCERNS:
+//   - Subscriptions → Firestore (via Firebase Extension)
+//   - One-time Orders → Prisma (this model)
+//   - No duplication, no sync issues, clear responsibilities
+//
+// ============================================================================
+
+model Order {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id])
+  totalAmount Decimal   @db.Decimal(10, 2) @map("total_amount")
+  status      String?
+  stripeSessionId String? @unique @map("stripe_session_id") // To prevent replay attacks
+  skipPayment Boolean   @default(false) @map("skip_payment") // Mark orders that skip payment
+  
+  // IMPORTANT: This field is ONLY for one-time purchases
+  // Subscriptions are NOT tracked here - they're in Firestore (see architecture comment above)
+  // If you need to track subscription payments, query Firestore subscriptions instead
+  orderType         String    @default("one_time") @map("order_type") // "one_time" only (subscriptions are in Firestore)
+
+  // Soft delete fields
+  isDeleted   Boolean  @default(false) @map("is_deleted")
+  deletedAt   DateTime? @map("deleted_at")
+  deletedBy   String?  @map("deleted_by") // Admin who deleted it
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([isDeleted, status, createdAt])
+  @@map("order")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([email])
+  @@map("contact_message")
+}
+
+// Template: generic usage for core feature (default: calculator types like mortgage, loan, etc.)
+model FeatureUsage {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+
+  featureType String   @map("feature_type") // e.g. "mortgage", "loan", "investment", "retirement"
+  inputData   Json     @map("input_data")
+  resultData  Json     @map("result_data")
+  usageTimeMs Int     @map("usage_time_ms") // milliseconds
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([userId, featureType])
+  @@index([featureType, createdAt])
+  @@map("feature_usage")
+}
+
+
