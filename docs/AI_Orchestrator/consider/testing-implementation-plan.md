@@ -680,7 +680,7 @@ Update `jest.config.js` to include:
 2. **Set Up Test Infrastructure** - Create test utilities and helpers
 3. **Start Phase 1** - Begin with CSRF protection tests
 4. **Track Progress** - Update this document as tests are added
-5. **Update AI_Orchastrator** - Document test patterns and examples
+5. **Update AI_Orchestrator** - Document test patterns and examples
 
 ---
 

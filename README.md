@@ -98,7 +98,7 @@ Configure via env and Stripe/Firebase; customize branding and copy.
 - [Template Guide](docs/TEMPLATE_GUIDE.md) — **Master reference:** full project map, where everything lives, and how to make it your own.
 - [Where to start coding](docs/where-to-start-coding.md) ? Core feature module, config, and how to add or replace feature types.
 - [Template roadmap](docs/template-roadmap.md) ? Full plan for making the project topic-agnostic and adopter-friendly.
-- [AI_Orchastrator](docs/AI_Orchastrator/index.md) ? Architecture, domain docs, and guides.
+- [AI_Orchestrator](docs/AI_Orchestrator/index.md) ? Architecture, domain docs, and guides.
 
 ---
 

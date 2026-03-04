@@ -59,13 +59,13 @@ Example: adding a new calculator (e.g. “savings”) while keeping the same pro
 5. **Component** – Add a component (e.g. `savings-calculator.tsx`) and register it in `calculator-component-map.tsx`.
 6. **API** – The calculate route uses the config and validation; add a `case` for the new type in the route’s switch if needed.
 
-Details: [Calculator system – Adding new calculators](AI_Orchastrator/architecture/domain/calculator-system.md#adding-new-calculators).
+Details: [Calculator system – Adding new calculators](AI_Orchestrator/architecture/domain/calculator-system.md#adding-new-calculators).
 
 ---
 
 ## 4. Replacing the core feature (different product)
 
-**For a full step-by-step swap (e.g. to ResumeHelper), use the [Core Feature Swap Expert](AI_Orchastrator/roles/core-feature-swap-expert.md) role:** it lists every file to touch and the exact contract your new feature must fulfill.
+**For a full step-by-step swap (e.g. to ResumeHelper), use the [Core Feature Swap Expert](AI_Orchestrator/roles/core-feature-swap-expert.md) role:** it lists every file to touch and the exact contract your new feature must fulfill.
 
 If your product is not “calculators” (e.g. document generator, image tools):
 

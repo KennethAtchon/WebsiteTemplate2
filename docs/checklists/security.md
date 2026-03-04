@@ -2,7 +2,7 @@
 
 **Review Frequency:** Monthly or before major releases
 
-**References:** Auth — `project/features/auth/`, `project/shared/services/api/authenticated-fetch.ts`. API protection — `project/features/auth/services/firebase-middleware.ts`, rate limiter. Env — `project/shared/utils/config/envUtil.ts`. [AI_Orchastrator security role](../AI_Orchastrator/roles/security-engineer.md).
+**References:** Auth — `project/features/auth/`, `project/shared/services/api/authenticated-fetch.ts`. API protection — `project/features/auth/services/firebase-middleware.ts`, rate limiter. Env — `project/shared/utils/config/envUtil.ts`. [AI_Orchestrator security role](../AI_Orchestrator/roles/security-engineer.md).
 
 ## Authentication & Authorization
 
@@ -11,7 +11,7 @@
 - [x] Role-based access control (RBAC) implemented
 - [x] Admin routes require admin role verification
 - [x] Customer routes verify resource ownership
-- [x] No privilege escalation vulnerabilities — OWASP review completed (Feb 21, 2026); no privilege escalation path found; see `docs/AI_Orchastrator/consider/owasp-top10-review.md`
+- [x] No privilege escalation vulnerabilities — OWASP review completed (Feb 21, 2026); no privilege escalation path found; see `docs/AI_Orchestrator/consider/owasp-top10-review.md`
 - [x] Session management secure (expiration, invalidation) — `checkRevoked: true` added to all `verifyIdToken` calls; revoked tokens rejected immediately (Feb 21, 2026)
 - [x] Tokens stored securely — evaluated in `docs/runbooks/security-token-storage.md`; Firebase IndexedDB storage kept; risk LOW under current CSP + `checkRevoked` mitigations (Feb 21, 2026)
 
@@ -106,7 +106,7 @@
 - [ ] Penetration testing performed (if applicable) — not yet scheduled
 - [ ] Security code review completed — informal review done; no formal third-party pentest
 - [x] Automated security tests in CI/CD
-- [x] OWASP Top 10 reviewed — full review completed Feb 21, 2026; see `docs/AI_Orchastrator/consider/owasp-top10-review.md`; fixes applied (CSP header, rate limit, checkRevoked)
+- [x] OWASP Top 10 reviewed — full review completed Feb 21, 2026; see `docs/AI_Orchestrator/consider/owasp-top10-review.md`; fixes applied (CSP header, rate limit, checkRevoked)
 - [ ] Security headers validated (securityheaders.com) — CSP header added (Feb 21, 2026); external validation pending live deployment
 - [x] CORS configuration tested
 - [x] Rate limiting tested

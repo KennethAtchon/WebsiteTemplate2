@@ -2,7 +2,7 @@
 
 **Review Frequency:** Quarterly or when regulations change
 
-**References:** Data handling — `project/shared/services/db/prisma.ts`, auth/subscription flows. [Logging & monitoring](../AI_Orchastrator/architecture/core/logging-monitoring.md) (PII in logs). Legal pages — app routes for privacy/terms/cookies if present.
+**References:** Data handling — `project/shared/services/db/prisma.ts`, auth/subscription flows. [Logging & monitoring](../AI_Orchestrator/architecture/core/logging-monitoring.md) (PII in logs). Legal pages — app routes for privacy/terms/cookies if present.
 
 ## Privacy & Data Protection
 

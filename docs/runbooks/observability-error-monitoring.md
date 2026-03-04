@@ -215,4 +215,4 @@ For advanced IDS, consider:
 - `alerting.md` — full alert threshold reference
 - `on-call.md` — who responds to alerts
 - `security-incident-response.md` — what to do after a breach
-- `docs/AI_Orchastrator/consider/owasp-top10-review.md`
+- `docs/AI_Orchestrator/consider/owasp-top10-review.md`

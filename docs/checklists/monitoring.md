@@ -2,7 +2,7 @@
 
 **Review Frequency:** Monthly
 
-**References:** Logging & metrics — `project/shared/services/observability/`, `project/app/api/metrics/route.ts`. [Logging & monitoring doc](../AI_Orchastrator/architecture/core/logging-monitoring.md).
+**References:** Logging & metrics — `project/shared/services/observability/`, `project/app/api/metrics/route.ts`. [Logging & monitoring doc](../AI_Orchestrator/architecture/core/logging-monitoring.md).
 
 ## Application Monitoring
 

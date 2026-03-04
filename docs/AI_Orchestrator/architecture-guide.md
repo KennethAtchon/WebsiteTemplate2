@@ -5,7 +5,7 @@
 The architecture documentation is organized into **two main categories** to separate reusable patterns from project-specific implementations:
 
 ```
-docs/AI_Orchastrator/
+docs/AI_Orchestrator/
 ├── overview.md                          # Main project overview
 ├── architecture-guide.md                # This file
 └── architecture/

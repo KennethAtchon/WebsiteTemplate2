@@ -15,7 +15,7 @@
     enabled: !!user,
   });
   ```
-  Use `queryKeys` from `@/shared/lib/query-keys` for consistent cache keys. See [React Query Migration Guide](docs/AI_Orchastrator/consider/react-query-migration-guide.md).
+  Use `queryKeys` from `@/shared/lib/query-keys` for consistent cache keys. See [React Query Migration Guide](docs/AI_Orchestrator/consider/react-query-migration-guide.md).
 
 - **For authenticated API calls:** Use `useAuthenticatedFetch` hook
   ```typescript
@@ -62,4 +62,4 @@ import { BASE_URL } from "@/shared/utils/config/envUtil";
 - **Follow existing patterns** - Look at similar code in the codebase before writing new code
 - **Use TypeScript properly** - Leverage types and avoid `any` when possible
 - **Keep code organized** - Follow the feature-based organization structure
-- **Update AI_Orchastrator docs** - When making code changes, update relevant documentation
+- **Update AI_Orchestrator docs** - When making code changes, update relevant documentation

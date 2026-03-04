@@ -26,7 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Rollback runbook (`docs/runbooks/rollback.md`)
 - Incident response runbook (`docs/runbooks/incident-response.md`)
 - Security incident response runbook + GDPR breach notification template (`docs/runbooks/security-incident-response.md`)
-- OWASP Top 10 review (`docs/AI_Orchastrator/consider/owasp-top10-review.md`)
+- OWASP Top 10 review (`docs/AI_Orchestrator/consider/owasp-top10-review.md`)
 - Data retention policy (`docs/runbooks/data-retention-policy.md`)
 - Cloudflare setup runbook (`docs/runbooks/cloudflare-setup.md`)
 - `railway.toml` for Railway deployment with health check and migration on deploy

@@ -7,10 +7,10 @@ Welcome to the documentation for this **Next.js SaaS template**. The template in
 ## 📚 Documentation Structure
 
 ```
-AI_Orchastrator/
+AI_Orchestrator/
 ├── overview.md                  # 📖 Complete project overview
 ├── architecture-guide.md        # 🗺️ Documentation navigation guide
-├── translation-workflow.md      # 🌐 Translation workflow guide
+├── STRUCTURE.md                 # 📂 Folder hierarchy explanation
 │
 ├── roles/                      # 🤖 AI Role Definitions
 │   ├── code-organization-expert.md
@@ -19,15 +19,30 @@ AI_Orchastrator/
 │   └── UI-design-expert.md
 │
 ├── consider/                    # 💭 Architecture Considerations
-│   ├── api-data-caching-swr-react-query.md
+│   ├── react-query-migration-guide.md
 │   ├── graphql-architecture.md
-│   └── automatic-translation-system.md
+│   ├── e2e-testing-plan.md
+│   ├── owasp-top10-review.md
+│   ├── production-readiness.md
+│   ├── testing-100-coverage-plan.md
+│   └── testing-implementation-plan.md
+│
+├── graveyard/                   # 🪦 Archived / completed docs
+│   └── security-audit-tickets.md
+│
+├── troubleshooting/             # 🔧 Step-by-step fixes
+│   ├── stripe-role-missing.md
+│   ├── subscription-cancellation-during-trial.md
+│   ├── subscription-upgrade-downgrade-flow.md
+│   └── translation-system.md
 │
 └── architecture/                # 🏗️ Architecture documentation
     ├── README.md               # Architecture index
+    ├── architecture-diagrams.md # System & data flow diagrams
     │
     ├── core/                   # ⭐ Reusable patterns
     │   ├── README.md
+    │   ├── api-auth-context-pattern.md
     │   └── [Pattern docs...]
     │
     └── domain/                 # 🎯 Template default (e.g. calculator)
@@ -50,7 +65,7 @@ AI_Orchastrator/
 3. Reference [**Architecture Index**](./architecture/) - Find specific docs
 
 ### For Architects
-1. Read [**System Architecture**](./architecture/system-architecture.md) - High-level design
+1. Read [**Architecture Diagrams**](./architecture/architecture-diagrams.md) - High-level system design
 2. Study [**Core Patterns**](./architecture/core/) - Design patterns used
 3. Review [**Key Decisions**](./architecture-guide.md#-key-architectural-decisions) - Why we made these choices
 
@@ -83,10 +98,10 @@ AI_Orchastrator/
 - [Security Engineer](./roles/security-engineer.md) - Security best practices and implementation
 - [UI Design Expert](./roles/UI-design-expert.md) - UI/UX design, React components, and visual aesthetics
 
-### [Security Audit](./security-audit-tickets.md)
+### [Security Audit](./graveyard/security-audit-tickets.md) *(archived)*
 **Security audit findings and remediation tickets:**
 - Comprehensive security audit based on security-engineer.md guidelines
-- 15 security issues identified (3 Critical, 5 High, 3 Medium, 4 Low)
+- 15 security issues identified (3 Critical, 5 High, 3 Medium, 4 Low) — all resolved
 - Prioritized remediation recommendations
 - Testing and validation requirements
 
@@ -94,16 +109,11 @@ AI_Orchastrator/
 **Proposed features and architectural decisions:**
 - [React Query Migration Guide](./consider/react-query-migration-guide.md) - Migrate from SWR to TanStack Query (setup, integration, file-by-file checklist)
 - [GraphQL Architecture](./consider/graphql-architecture.md) - GraphQL integration options
-- [Automatic Translation System](./consider/automatic-translation-system.md) - i18n and multi-language support
 - [Testing Implementation Plan](./consider/testing-implementation-plan.md) - Comprehensive plan for adding unit and integration tests
+- [Testing 100% Coverage Plan](./consider/testing-100-coverage-plan.md) - Full coverage testing strategy
+- [E2E Testing Plan](./consider/e2e-testing-plan.md) - End-to-end testing strategy
+- [OWASP Top 10 Review](./consider/owasp-top10-review.md) - Security review against OWASP guidelines
 - [Production Readiness Checklist](./consider/production-readiness.md) - Pre-launch checklist and requirements
-
-### [Translation Workflow](./translation-workflow.md)
-**Manual translation workflow for adding i18n to source files:**
-- Step-by-step process for translating `.ts` and `.tsx` files
-- Using the `inject-translations` script
-- Handling failed translations and manual fixes
-- Best practices and common issues
 
 ---
 

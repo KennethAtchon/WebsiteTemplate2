@@ -2,7 +2,7 @@
 
 **Review Frequency:** Quarterly or after major changes
 
-**References:** DB — `project/shared/services/db/prisma.ts`. Caching — React Query / `project/shared/lib/query-keys.ts`. [API data caching](../AI_Orchastrator/consider/api-data-caching-swr-react-query.md).
+**References:** DB — `project/shared/services/db/prisma.ts`. Caching — React Query / `project/shared/lib/query-keys.ts`. [API data caching](../AI_Orchestrator/consider/api-data-caching-swr-react-query.md).
 
 ## Frontend Performance
 

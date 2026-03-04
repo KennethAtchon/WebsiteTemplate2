@@ -44,7 +44,7 @@ Use these as quick pointers when working through the checklists:
 | **Database** | Prisma; `project/shared/services/db/prisma.ts`, `project/prisma/` |
 | **Subscriptions / payments** | Stripe; `project/features/subscriptions/`, `project/shared/constants/subscription.constants.ts` |
 | **Logging / metrics** | `project/shared/services/observability/`, `project/app/api/metrics/route.ts` |
-| **Architecture & patterns** | [AI_Orchastrator](../AI_Orchastrator/index.md), [logging & monitoring](../AI_Orchastrator/architecture/core/logging-monitoring.md) |
+| **Architecture & patterns** | [AI_Orchestrator](../AI_Orchestrator/index.md), [logging & monitoring](../AI_Orchestrator/architecture/core/logging-monitoring.md) |
 
 ---
 

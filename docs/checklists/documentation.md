@@ -2,12 +2,12 @@
 
 **Review Frequency:** Quarterly
 
-**References:** [AI_Orchastrator index](../AI_Orchastrator/index.md), [architecture guide](../AI_Orchastrator/architecture-guide.md), [core patterns](../AI_Orchastrator/architecture/core/). Env — `project/example.env`, `project/shared/utils/config/envUtil.ts`.
+**References:** [AI_Orchestrator index](../AI_Orchestrator/index.md), [architecture guide](../AI_Orchestrator/architecture-guide.md), [core patterns](../AI_Orchestrator/architecture/core/). Env — `project/example.env`, `project/shared/utils/config/envUtil.ts`.
 
 ## Code Documentation
 
 - [x] README.md up to date — workspace root `README.md` and `project/README.md` both exist and are populated
-- [x] Architecture documentation current — `docs/AI_Orchastrator/` fully updated
+- [x] Architecture documentation current — `docs/AI_Orchestrator/` fully updated
 - [x] API documentation current — `/api-documentation` page with full endpoint reference, auth, rate limiting, error codes (Feb 21, 2026)
 - [ ] Code comments for complex logic — present in key files; not exhaustive
 - [ ] Function/method documentation — JSDoc present on critical functions; not exhaustive
@@ -33,7 +33,7 @@
 - [x] Testing guidelines — `CONTRIBUTING.md` covers `test:ci`, unit vs integration separation
 - [x] Deployment procedures — `docs/runbooks/deployment.md` (Feb 21, 2026)
 - [x] Environment variables documented — `project/example.env` and `project/shared/utils/config/envUtil.ts`
-- [x] Database schema documented — Prisma schema at `project/infrastructure/database/prisma/schema.prisma`; architecture doc at `docs/AI_Orchastrator/architecture/core/database.md`
+- [x] Database schema documented — Prisma schema at `project/infrastructure/database/prisma/schema.prisma`; architecture doc at `docs/AI_Orchestrator/architecture/core/database.md`
 
 ## API Documentation
 
@@ -58,9 +58,9 @@
 
 ## Security Documentation
 
-- [x] Security policies documented — `docs/runbooks/security-incident-response.md`, `docs/AI_Orchastrator/architecture/core/security.md`
-- [x] Authentication flow documented — `docs/AI_Orchastrator/architecture/core/authentication.md` + `docs/architecture-diagrams.md`
-- [x] Authorization model documented — `docs/AI_Orchastrator/architecture/core/security.md`
+- [x] Security policies documented — `docs/runbooks/security-incident-response.md`, `docs/AI_Orchestrator/architecture/core/security.md`
+- [x] Authentication flow documented — `docs/AI_Orchestrator/architecture/core/authentication.md` + `docs/architecture-diagrams.md`
+- [x] Authorization model documented — `docs/AI_Orchestrator/architecture/core/security.md`
 - [x] Security best practices documented — `CLAUDE.md` + OWASP review
 - [ ] Vulnerability reporting process — no public security disclosure policy
 - [ ] Security audit procedures — informal; no formal audit schedule
@@ -69,9 +69,9 @@
 
 - [x] System architecture diagram — `docs/architecture-diagrams.md` (Mermaid, Feb 21, 2026)
 - [x] Database schema diagram — Prisma schema at `project/infrastructure/database/prisma/schema.prisma`
-- [x] API architecture documented — `docs/AI_Orchastrator/architecture/` covers API patterns
+- [x] API architecture documented — `docs/AI_Orchestrator/architecture/` covers API patterns
 - [x] Data flow documented — `docs/architecture-diagrams.md` (data flow diagram, Feb 21, 2026)
-- [x] Integration points documented — `docs/AI_Orchastrator/` documents Stripe, Firebase, Redis integrations
+- [x] Integration points documented — `docs/AI_Orchestrator/` documents Stripe, Firebase, Redis integrations
 - [x] Technology stack documented
 - [x] Design decisions documented — `docs/adr/` contains 8 ADRs (Feb 21, 2026)
 

@@ -3,7 +3,7 @@
 ## Complete Folder Hierarchy
 
 ```
-docs/AI_Orchastrator/
+docs/AI_Orchestrator/
 │
 ├── 📄 index.md                          # Documentation hub (START HERE)
 ├── 📄 overview.md                       # Complete project overview
@@ -12,108 +12,61 @@ docs/AI_Orchastrator/
 │
 ├── 📁 roles/                            # 🤖 AI Role Definitions
 │   ├── code-organization-expert.md      # Code organization specialist
+│   ├── core-feature-swap-expert.md      # Core feature swap guide
 │   ├── security-engineer.md             # Security expert
 │   └── UI-design-expert.md              # UI/UX design expert
+│
+├── 📁 consider/                         # 💭 Architecture Considerations
+│   ├── e2e-testing-plan.md              # E2E testing strategy
+│   ├── graphql-architecture.md          # GraphQL integration options
+│   ├── owasp-top10-review.md            # OWASP security review
+│   ├── production-readiness.md          # Pre-launch checklist
+│   ├── react-query-migration-guide.md   # SWR → TanStack Query migration
+│   ├── testing-100-coverage-plan.md     # Full coverage testing plan
+│   └── testing-implementation-plan.md   # Comprehensive test plan
+│
+├── 📁 graveyard/                        # 🪦 Archived / completed docs
+│   └── security-audit-tickets.md        # Completed security audit (all resolved)
+│
+├── 📁 issues/                           # 🐛 Known issues
+│   └── index.md                         # Issues tracker (resolved + open)
+│
+├── 📁 plantofix/                        # 🔧 Planned fixes & refactors
+│   └── index.md                         # Fix backlog
+│
+├── 📁 troubleshooting/                  # 🛠️ Step-by-step fixes
+│   ├── README.md
+│   ├── stripe-role-missing.md
+│   ├── subscription-cancellation-during-trial.md
+│   ├── subscription-upgrade-downgrade-flow.md
+│   └── translation-system.md
 │
 └── 📁 architecture/
     │
     ├── 📄 README.md                     # Architecture index
+    ├── 📄 architecture-diagrams.md      # System & data flow Mermaid diagrams
     │
     ├── 📁 core/                         # ⭐ REUSABLE PATTERNS
     │   │                                # Can be used in ANY project
     │   ├── 📄 README.md
-    │   │
-    │   ├── 🔐 Authentication & Authorization
-    │   │   ├── authentication-system.md
-    │   │   ├── authorization-roles.md
-    │   │   └── session-management.md
-    │   │
-    │   ├── 🌐 API & Backend
-    │   │   ├── api-architecture.md
-    │   │   ├── api-route-protection.md
-    │   │   ├── error-handling.md
-    │   │   └── rate-limiting.md
-    │   │
-    │   ├── 💾 Data Management
-    │   │   ├── database-patterns.md
-    │   │   ├── data-validation.md
-    │   │   └── caching-strategies.md
-    │   │
-    │   ├── 🔒 Security
-    │   │   ├── security.md
-    │   │   ├── csrf-protection.md
-    │   │   └── cors-configuration.md
-    │   │
-    │   ├── 🎨 Frontend
-    │   │   ├── component-architecture.md
-    │   │   ├── state-management.md
-    │   │   ├── seo-strategy.md
-    │   │   └── form-handling.md
-    │   │
-    │   ├── 🏗️ Infrastructure
-    │   │   ├── deployment-architecture.md
-    │   │   ├── environment-configuration.md
-    │   │   └── monitoring-logging.md
-    │   │
-    │   ├── 🧪 Testing
-    │   │   ├── testing-strategy.md
-    │   │   └── test-patterns.md
-    │   │
-    │   └── 📝 Development
-    │       ├── code-organization.md
-    │       └── typescript-patterns.md
+    │   ├── 📄 api.md                    # API design & client-side fetch
+    │   ├── 📄 api-auth-context-pattern.md # Auth context passthrough pattern
+    │   ├── 📄 authentication.md         # Authentication system
+    │   ├── 📄 code-structure.md         # Code organization patterns
+    │   ├── 📄 database.md               # Database patterns
+    │   ├── 📄 error-handling.md         # Error handling strategies
+    │   ├── 📄 logging-monitoring.md     # Logging & monitoring
+    │   ├── 📄 performance.md            # Performance optimization
+    │   └── 📄 security.md               # Security best practices
     │
-    └── 📁 domain/                       # 🎯 CALCPRO-SPECIFIC
+    └── 📁 domain/                       # 🎯 TEMPLATE DEFAULT
         │                                # Project business logic
         ├── 📄 README.md
-        │
-        ├── 🧮 Calculator System
-        │   ├── calculator-system.md
-        │   ├── calculator-service.md
-        │   └── calculator-types.md
-        │
-        ├── 💳 Subscription Model
-        │   ├── subscription-architecture.md
-        │   ├── subscriptions-vs-orders.md
-        │   ├── feature-gating.md
-        │   └── usage-tracking.md
-        │
-        ├── 🛒 Order Management
-        │   ├── order-system.md
-        │   └── order-processing.md
-        │
-        ├── 💰 Payment Processing
-        │   ├── stripe-integration.md
-        │   ├── payment-flows.md
-        │   └── checkout-implementation.md
-        │
-        ├── 🔥 Firebase Integration
-        │   ├── firebase-integration.md
-        │   ├── firebase-stripe-extension.md
-        │   └── custom-claims.md
-        │
-        ├── 👤 User Features
-        │   ├── account-management.md
-        │   ├── profile-management.md
-        │   └── usage-dashboard.md
-        │
-        ├── 👨‍💼 Admin Features
-        │   ├── admin-dashboard.md
-        │   ├── customer-management.md
-        │   ├── subscription-analytics.md
-        │   └── order-analytics.md
-        │
-        ├── 🌍 Public Features
-        │   ├── landing-page.md
-        │   ├── pricing-page.md
-        │   ├── faq-system.md
-        │   └── contact-system.md
-        │
-        └── 📊 Data Models
-            ├── user-model.md
-            ├── order-model.md
-            ├── subscription-model.md
-            └── calculator-usage-model.md
+        ├── 📄 account-management.md     # User account features
+        ├── 📄 admin-dashboard.md        # Admin panel
+        ├── 📄 business-model.md         # Business model & subscriptions
+        ├── 📄 calculator-system.md      # Default core feature (calculator)
+        └── 📄 subscription-system.md    # Subscription management
 ```
 
 ---

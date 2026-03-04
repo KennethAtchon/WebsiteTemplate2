@@ -2,7 +2,7 @@
 
 **Review Frequency:** Before releases
 
-**References:** [AI_Orchastrator overview](../AI_Orchastrator/overview.md) (testing section). API patterns — `project/shared/services/api/authenticated-fetch.ts`, `project/features/auth/`. **Plan for 100% coverage:** [Testing Plan: 100% Coverage](../AI_Orchastrator/consider/testing-100-coverage-plan.md). **Integration tests plan:** [Integration Tests Plan](../AI_Orchastrator/consider/integration-tests-plan.md). **E2E plan:** [E2E Testing Plan](../AI_Orchastrator/consider/e2e-testing-plan.md).
+**References:** [AI_Orchestrator overview](../AI_Orchestrator/overview.md) (testing section). API patterns — `project/shared/services/api/authenticated-fetch.ts`, `project/features/auth/`. **Plan for 100% coverage:** [Testing Plan: 100% Coverage](../AI_Orchestrator/consider/testing-100-coverage-plan.md). **Integration tests plan:** [Integration Tests Plan](../AI_Orchestrator/consider/integration-tests-plan.md). **E2E plan:** [E2E Testing Plan](../AI_Orchestrator/consider/e2e-testing-plan.md).
 
 ## Unit Tests
 
@@ -17,7 +17,7 @@
 ## Integration Tests
 
 - [x] API endpoint tests written — 180 tests across 13 files
-- [x] All API routes covered per [Integration Tests Plan](../AI_Orchastrator/consider/integration-tests-plan.md) (phases 1–7)
+- [x] All API routes covered per [Integration Tests Plan](../AI_Orchestrator/consider/integration-tests-plan.md) (phases 1–7)
   - [x] Phase 1: Health & readiness (`api-health-ready.test.ts`) — `/api/health`, `/api/ready`, `/api/metrics`
   - [x] Phase 2: Calculator (`api-calculator.test.ts`) — types, history, usage, export
   - [x] Phase 3: Customer orders (`api-customer-orders.test.ts`) — list, create, by-id, create, total-revenue, by-session
@@ -34,7 +34,7 @@
 
 ## End-to-End Tests
 
-> Playwright fully configured. 102 E2E tests across 13 spec files (× 5 browsers = 510 total runs). Tests are written and discovered; **running them requires the app to be live and a real Firebase test account** (storageState not yet generated). E2E CI job added to `.github/workflows/ci.yml` (runs when `E2E_ENABLED=true`). See [E2E Testing Plan](../AI_Orchastrator/consider/e2e-testing-plan.md).
+> Playwright fully configured. 102 E2E tests across 13 spec files (× 5 browsers = 510 total runs). Tests are written and discovered; **running them requires the app to be live and a real Firebase test account** (storageState not yet generated). E2E CI job added to `.github/workflows/ci.yml` (runs when `E2E_ENABLED=true`). See [E2E Testing Plan](../AI_Orchestrator/consider/e2e-testing-plan.md).
 
 - [x] Critical user flows tested — specs written for all major flows
 - [x] Authentication flow tested (sign-in, sign-up, sign-out, protected redirect)
@@ -117,7 +117,7 @@
 ## Test Documentation
 
 - [x] Test cases documented — `__tests__/integration/README.md`, inline JSDoc in test files
-- [x] Test scenarios documented — [Integration Tests Plan](../AI_Orchastrator/consider/integration-tests-plan.md), [Testing Implementation Plan](../AI_Orchastrator/consider/testing-implementation-plan.md)
+- [x] Test scenarios documented — [Integration Tests Plan](../AI_Orchestrator/consider/integration-tests-plan.md), [Testing Implementation Plan](../AI_Orchestrator/consider/testing-implementation-plan.md)
 - [x] Known issues documented — Bun `mock.module` isolation bug (oven-sh/bun#25712): running unit+integration in a single `bun test` invocation causes mock bleed; `test:ci` runs them separately to avoid this
 - [x] Test coverage reports available — `bun test --coverage` generates `coverage/` (lcov + text)
-- [x] Testing procedures documented — [Testing Plan: 100% Coverage](../AI_Orchastrator/consider/testing-100-coverage-plan.md)
+- [x] Testing procedures documented — [Testing Plan: 100% Coverage](../AI_Orchestrator/consider/testing-100-coverage-plan.md)

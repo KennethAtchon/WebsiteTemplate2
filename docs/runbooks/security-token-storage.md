@@ -93,5 +93,5 @@ const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
 
 ## See Also
 
-- `docs/AI_Orchastrator/architecture/core/authentication.md`
-- `docs/AI_Orchastrator/consider/owasp-top10-review.md`
+- `docs/AI_Orchestrator/architecture/core/authentication.md`
+- `docs/AI_Orchestrator/consider/owasp-top10-review.md`

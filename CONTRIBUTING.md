@@ -132,7 +132,7 @@ project/
     └── setup/                # Bun preload and test configuration
 ```
 
-Full architecture documentation: [`docs/AI_Orchastrator/`](docs/AI_Orchastrator/)
+Full architecture documentation: [`docs/AI_Orchestrator/`](docs/AI_Orchestrator/)
 
 ---
 
@@ -218,7 +218,7 @@ See [`CLAUDE.md`](CLAUDE.md) at the workspace root for the full code-pattern rul
 3. Run `bun run build:all` (lint + format check + type check + build) to verify nothing is broken.
 4. Run `bun run test:ci` to confirm all tests pass.
 5. Update relevant checklist items in `docs/checklists/` if applicable.
-6. Update `docs/AI_Orchastrator/` if you're adding or changing architecture.
+6. Update `docs/AI_Orchestrator/` if you're adding or changing architecture.
 
 ---
 

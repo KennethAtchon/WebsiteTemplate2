@@ -395,11 +395,11 @@ Where you currently don’t use optimistic UI, you can leave as-is. If you add i
 After migration:
 
 - **CLAUDE.md:** Replace “useSWR with useSWRFetcher” with “use useQuery with useQueryFetcher” and point to this guide and `api.md`.
-- **docs/AI_Orchastrator/architecture/core/api.md:** In “Client-Side Fetch Utilities”, add a subsection “React Query (TanStack Query)” describing:
+- **docs/AI_Orchestrator/architecture/core/api.md:** In “Client-Side Fetch Utilities”, add a subsection “React Query (TanStack Query)” describing:
   - GET/caching: `useQuery` + `useQueryFetcher` (or equivalent).
   - Mutations: `useMutation` + `authenticatedFetch`/`authenticatedFetchJson`, then `queryClient.invalidateQueries`.
   - Query keys: use shared `queryKeys` and clear on logout.
-- **AI_Orchastrator index:** Link to this migration guide under Architecture Considerations.
+- **AI_Orchestrator index:** Link to this migration guide under Architecture Considerations.
 
 ---
 

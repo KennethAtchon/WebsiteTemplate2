@@ -95,10 +95,8 @@ WebsiteTemplate/                     ← repo root
 │   ├── TEMPLATE_GUIDE.md            ← THIS FILE — master reference
 │   ├── where-to-start-coding.md     ← detailed guide: identity, core feature, adding types
 │   ├── template-roadmap.md          ← plan for making the template topic-agnostic
-│   ├── architecture-diagrams.md     ← system diagrams
-│   ├── TODO.md                      ← open work items
 │   │
-│   ├── AI_Orchastrator/             ← architecture docs hub (start here for deep dives)
+│   ├── AI_Orchestrator/             ← architecture docs hub (start here for deep dives)
 │   │   ├── index.md                 ← documentation hub (links to everything)
 │   │   ├── overview.md              ← full tech stack + system overview
 │   │   ├── architecture-guide.md    ← how docs are organized
@@ -280,7 +278,7 @@ Swap out the calculator module for your product while keeping the same folder:
 4. Wire usage tracking and permissions (reuse `FeatureUsage` and `core-feature-permissions.ts`)
 5. Update `CORE_FEATURE_SLUG` and nav links
 
-For a full file-by-file checklist for Options B and C, see the [Core Feature Swap Expert](AI_Orchastrator/roles/core-feature-swap-expert.md).
+For a full file-by-file checklist for Options B and C, see the [Core Feature Swap Expert](AI_Orchestrator/roles/core-feature-swap-expert.md).
 
 ---
 
@@ -421,7 +419,7 @@ Example: add a "savings calculator" to the existing calculator feature.
 
 ### Replacing the core feature entirely
 
-See [Where to start coding §4](where-to-start-coding.md#4-replacing-the-core-feature-different-product) and [Core Feature Swap Expert](AI_Orchastrator/roles/core-feature-swap-expert.md).
+See [Where to start coding §4](where-to-start-coding.md#4-replacing-the-core-feature-different-product) and [Core Feature Swap Expert](AI_Orchestrator/roles/core-feature-swap-expert.md).
 
 Short version:
 1. Update `CORE_FEATURE_SLUG` (and identity constants) in `app.constants.ts`
@@ -483,7 +481,7 @@ All user-facing strings live in `project/translations/en.json`.
 - **New keys:** Add to `en.json` first, then use in components
 - **Never hardcode** visible text strings — always use a translation key
 
-For the full workflow, see [Translation Workflow](AI_Orchastrator/translation-workflow.md).
+For the full workflow, see the i18n section in [Where to start coding](where-to-start-coding.md#6-i18n-copy).
 
 ---
 
@@ -509,16 +507,16 @@ Query cache keys go in `shared/lib/query-keys.ts`. Always add a new key there ra
 | [docs/TEMPLATE_GUIDE.md](TEMPLATE_GUIDE.md) | **This file.** Full map + make-it-yours steps. |
 | [docs/where-to-start-coding.md](where-to-start-coding.md) | Detailed guide: identity, core feature structure, adding/replacing types |
 | [docs/template-roadmap.md](template-roadmap.md) | Plan and checklist for making the repo fully topic-agnostic |
-| [docs/AI_Orchastrator/index.md](AI_Orchastrator/index.md) | Documentation hub — links to all architecture docs |
-| [docs/AI_Orchastrator/overview.md](AI_Orchastrator/overview.md) | Full project overview: tech stack, API routes, DB, security |
-| [docs/AI_Orchastrator/architecture-guide.md](AI_Orchastrator/architecture-guide.md) | How the architecture docs are organized |
-| [docs/AI_Orchastrator/roles/core-feature-swap-expert.md](AI_Orchastrator/roles/core-feature-swap-expert.md) | Step-by-step: swap the core feature to a different product |
-| [docs/AI_Orchastrator/roles/code-organization-expert.md](AI_Orchastrator/roles/code-organization-expert.md) | Code structure and organization patterns |
-| [docs/AI_Orchastrator/roles/security-engineer.md](AI_Orchastrator/roles/security-engineer.md) | Security best practices and implementation |
-| [docs/AI_Orchastrator/roles/UI-design-expert.md](AI_Orchastrator/roles/UI-design-expert.md) | UI/UX design patterns |
-| [docs/AI_Orchastrator/architecture/core/](AI_Orchastrator/architecture/core/) | Reusable patterns: auth, API, DB, security, error handling, etc. |
-| [docs/AI_Orchastrator/architecture/domain/](AI_Orchastrator/architecture/domain/) | Default implementation docs: calculator, subscriptions, payments, admin |
-| [docs/AI_Orchastrator/troubleshooting/](AI_Orchastrator/troubleshooting/) | Fixes for Stripe, subscription, translation issues |
+| [docs/AI_Orchestrator/index.md](AI_Orchestrator/index.md) | Documentation hub — links to all architecture docs |
+| [docs/AI_Orchestrator/overview.md](AI_Orchestrator/overview.md) | Full project overview: tech stack, API routes, DB, security |
+| [docs/AI_Orchestrator/architecture-guide.md](AI_Orchestrator/architecture-guide.md) | How the architecture docs are organized |
+| [docs/AI_Orchestrator/roles/core-feature-swap-expert.md](AI_Orchestrator/roles/core-feature-swap-expert.md) | Step-by-step: swap the core feature to a different product |
+| [docs/AI_Orchestrator/roles/code-organization-expert.md](AI_Orchestrator/roles/code-organization-expert.md) | Code structure and organization patterns |
+| [docs/AI_Orchestrator/roles/security-engineer.md](AI_Orchestrator/roles/security-engineer.md) | Security best practices and implementation |
+| [docs/AI_Orchestrator/roles/UI-design-expert.md](AI_Orchestrator/roles/UI-design-expert.md) | UI/UX design patterns |
+| [docs/AI_Orchestrator/architecture/core/](AI_Orchestrator/architecture/core/) | Reusable patterns: auth, API, DB, security, error handling, etc. |
+| [docs/AI_Orchestrator/architecture/domain/](AI_Orchestrator/architecture/domain/) | Default implementation docs: calculator, subscriptions, payments, admin |
+| [docs/AI_Orchestrator/troubleshooting/](AI_Orchestrator/troubleshooting/) | Fixes for Stripe, subscription, translation issues |
 | [docs/adr/](adr/) | Architecture Decision Records (why we chose Next.js, Firebase, PostgreSQL, Stripe, etc.) |
 | [docs/runbooks/](runbooks/) | Operational runbooks: deploy, rollback, DB, incidents, monitoring |
 | [docs/checklists/](checklists/) | Pre-launch checklists: security, performance, compliance, testing |
@@ -535,7 +533,7 @@ Query cache keys go in `shared/lib/query-keys.ts`. Always add a new key there ra
 | Change the main feature URL (e.g. `/calculator` → `/tools`) | `CORE_FEATURE_SLUG` in `app.constants.ts` |
 | Change marketing copy, page text, pricing descriptions | `project/translations/en.json` |
 | Add/edit a calculator type (or default feature type) | `features/calculator/constants/calculator.constants.ts` + types + service + component |
-| Replace the calculator with a different product | [Core Feature Swap Expert](AI_Orchastrator/roles/core-feature-swap-expert.md) |
+| Replace the calculator with a different product | [Core Feature Swap Expert](AI_Orchestrator/roles/core-feature-swap-expert.md) |
 | Change subscription tier names, limits, prices | `project/shared/constants/subscription.constants.ts` |
 | Add a new env variable | `project/.env.example` + `project/shared/utils/config/envUtil.ts` |
 | Add a public marketing page | `project/app/(public)/your-page/page.tsx` |
@@ -549,7 +547,7 @@ Query cache keys go in `shared/lib/query-keys.ts`. Always add a new key there ra
 | Find the Prisma DB client | `project/shared/services/db/prisma.ts` |
 | Find the email sending service | `project/shared/services/email/resend.ts` |
 | Change the order confirmation email template | `project/public/templates/order-confirmation.html` |
-| Understand the subscription vs. orders split | `docs/AI_Orchastrator/architecture/domain/subscription-system.md` |
+| Understand the subscription vs. orders split | `docs/AI_Orchestrator/architecture/domain/subscription-system.md` |
 | Run the app locally | `cd project && bun run dev` |
 | Reset the database | `bun run db:reset` (⚠️ destructive) |
 | Run all tests | `bun run test` |

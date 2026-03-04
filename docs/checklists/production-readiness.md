@@ -2,7 +2,7 @@
 
 **Review Frequency:** Before each deployment
 
-**References:** Env vars — `project/shared/utils/config/envUtil.ts`, `project/example.env`. DB — `project/shared/services/db/prisma.ts`, `project/prisma/`. [AI_Orchastrator overview](../AI_Orchastrator/overview.md).
+**References:** Env vars — `project/shared/utils/config/envUtil.ts`, `project/example.env`. DB — `project/shared/services/db/prisma.ts`, `project/prisma/`. [AI_Orchestrator overview](../AI_Orchestrator/overview.md).
 
 ## Environment Configuration
 

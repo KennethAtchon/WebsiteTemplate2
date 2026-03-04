@@ -125,7 +125,7 @@ These are in addition to the technical renames (generic usage model, permissions
 |------|---------|
 | **Define template terminology** | Pick one term for the main product area used in code and docs, e.g. **“core feature”** or **“tools”**. Use it in new shared types, route config, and docs. The **default implementation** remains “calculator” (existing `features/calculator/`). |
 | **Optional: feature slug config** | Add a constant or env (e.g. `CORE_FEATURE_SLUG`) with default `"calculator"` so the main app route and API prefix can be derived (e.g. `/${CORE_FEATURE_SLUG}`, `/api/${CORE_FEATURE_SLUG}/*`). This allows switching to `"tools"` or `"documents"` without renaming folders. |
-| **Document the pattern** | In `docs/AI_Orchastrator/architecture/`, add a short doc: “Core feature / template topic” that explains this is the one swappable area and points to the calculator implementation as the default. |
+| **Document the pattern** | In `docs/AI_Orchestrator/architecture/`, add a short doc: “Core feature / template topic” that explains this is the one swappable area and points to the calculator implementation as the default. |
 
 **Decision:** Either (A) keep URL/API as `/calculator` and treat “calculator” as the default implementation name, or (B) introduce a configurable slug and route by config. (B) is more flexible but requires more refactors (see Routes below).
 
@@ -198,7 +198,7 @@ These are in addition to the technical renames (generic usage model, permissions
 | Task | Details |
 |------|---------|
 | **Keep or rename feature folder** | Either keep `features/calculator/` as the default implementation (recommended for v1) or rename to something like `features/core-feature/` with an internal `implementations/calculator/` or similar. Latter is a larger refactor. |
-| **Document the contract** | Add a short doc (e.g. in `features/calculator/README.md` or under `docs/AI_Orchastrator/architecture/domain/`) that describes: what the core feature module must provide (config, types, service, API routes, permission checks), and that the calculator is the reference implementation. |
+| **Document the contract** | Add a short doc (e.g. in `features/calculator/README.md` or under `docs/AI_Orchestrator/architecture/domain/`) that describes: what the core feature module must provide (config, types, service, API routes, permission checks), and that the calculator is the reference implementation. |
 | **Shared component mapping** | The component map (e.g. `calculator-component-map.tsx`) can stay calculator-specific; document that “adding another topic” means providing a new config and component map for that topic (or a separate feature module that fulfills the same contract). |
 
 **Recommendation:** Keep `features/calculator/` as-is for the roadmap; focus on generic naming in **shared** layer (permissions, usage model, constants) and in **docs**. A second topic can be added later as `features/documents/` or similar, reusing the same usage model and permission pattern.
@@ -229,20 +229,20 @@ These are in addition to the technical renames (generic usage model, permissions
 
 | Task | Details |
 |------|---------|
-| **Overview & index** | In `docs/AI_Orchastrator/overview.md` and `index.md`: lead with “SaaS template” and “configurable core feature”; then “Default implementation: financial calculators (YourApp-style).” |
+| **Overview & index** | In `docs/AI_Orchestrator/overview.md` and `index.md`: lead with “SaaS template” and “configurable core feature”; then “Default implementation: financial calculators (YourApp-style).” |
 | **Architecture guide** | In `architecture-guide.md`: change “YourApp-specific” to “Template default / example implementation” or “Domain (example: calculator).” |
 | **Domain docs** | In `architecture/domain/README.md` and domain docs: frame as “Example domain: calculator SaaS” and point to template roadmap for “how to change the topic.” |
 | **Calculator system doc** | In `calculator-system.md`: add a short “Template context” section: “This describes the default core-feature implementation (calculators). For a different topic, replace this module and config; see [Template Roadmap](../template-roadmap.md).” |
-| **Link roadmap** | Add a link to `docs/template-roadmap.md` from the main AI_Orchastrator index and from the architecture README. |
+| **Link roadmap** | Add a link to `docs/template-roadmap.md` from the main AI_Orchestrator index and from the architecture README. |
 
 **Files to touch (examples):**
 
-- `docs/AI_Orchastrator/index.md`
-- `docs/AI_Orchastrator/overview.md`
-- `docs/AI_Orchastrator/architecture-guide.md`
-- `docs/AI_Orchastrator/architecture/domain/README.md`
-- `docs/AI_Orchastrator/architecture/domain/calculator-system.md`
-- `docs/AI_Orchastrator/architecture/README.md` (if it exists)
+- `docs/AI_Orchestrator/index.md`
+- `docs/AI_Orchestrator/overview.md`
+- `docs/AI_Orchestrator/architecture-guide.md`
+- `docs/AI_Orchestrator/architecture/domain/README.md`
+- `docs/AI_Orchestrator/architecture/domain/calculator-system.md`
+- `docs/AI_Orchestrator/architecture/README.md` (if it exists)
 
 ---
 
@@ -342,7 +342,7 @@ To turn this template into a different product (e.g. ResumeHelper, DocFlow) with
 
 No need to hunt for brand strings in code: app constants and the email template are driven by `app.constants.ts`; the rest is translations and your feature module.
 
-**For a full file-by-file checklist and the exact “core feature contract” (what to implement when replacing the default), see the [Core Feature Swap Expert](AI_Orchastrator/roles/core-feature-swap-expert.md) role in `docs/AI_Orchastrator/roles/`.**
+**For a full file-by-file checklist and the exact “core feature contract” (what to implement when replacing the default), see the [Core Feature Swap Expert](AI_Orchestrator/roles/core-feature-swap-expert.md) role in `docs/AI_Orchestrator/roles/`.**
 
 ---
 
