@@ -30,7 +30,7 @@ jobs:
     # post-deploy health checks.
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Trigger Railway Deploy
         # Railway auto-deploys on push to master if connected to this GitHub repo.
