@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { CheckoutInteractive } from '@/routes/checkout/-checkout-interactive'
+import { CheckoutInteractive } from '@/routes/(customer)/checkout/-checkout-interactive'
 import { PageLayout } from '@/shared/components/layout/page-layout'
 
 function CheckoutPage() {
@@ -12,6 +12,6 @@ function CheckoutPage() {
   )
 }
 
-export const Route = createFileRoute('/checkout')({
+export const Route = createFileRoute('/(customer)/checkout')({
   component: CheckoutPage,
 })

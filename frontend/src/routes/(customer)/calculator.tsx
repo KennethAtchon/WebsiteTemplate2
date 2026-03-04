@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Calculator } from 'lucide-react'
 import { PageLayout } from '@/shared/components/layout/page-layout'
 import { Section } from '@/shared/components/custom-ui/section'
-import { CalculatorInteractive } from '@/routes/calculator/-calculator-interactive'
+import { CalculatorInteractive } from '@/routes/(customer)/calculator/-calculator-interactive'
 import { useTranslation } from 'react-i18next'
 
 function CalculatorPage() {
@@ -33,6 +33,6 @@ function CalculatorPage() {
   )
 }
 
-export const Route = createFileRoute('/calculator')({
+export const Route = createFileRoute('/(customer)/calculator')({
   component: CalculatorPage,
 })

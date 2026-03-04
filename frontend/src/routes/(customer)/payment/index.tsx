@@ -112,6 +112,6 @@ function PaymentPage() {
   )
 }
 
-export const Route = createFileRoute('/payment/')({
+export const Route = createFileRoute('/(customer)/payment/')({
   component: PaymentPage,
 })

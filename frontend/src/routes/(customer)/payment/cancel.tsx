@@ -73,6 +73,6 @@ function PaymentCancelPage() {
   )
 }
 
-export const Route = createFileRoute('/payment/cancel')({
+export const Route = createFileRoute('/(customer)/payment/cancel')({
   component: PaymentCancelPage,
 })

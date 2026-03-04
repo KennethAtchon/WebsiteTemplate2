@@ -10,6 +10,7 @@ import i18n from "@/shared/lib/i18n";
 import { ThemeProvider } from "@/shared/providers/theme-provider";
 import { AppProvider } from "@/shared/contexts/app-context";
 
+import "./styles/globals.css";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
@@ -29,22 +30,20 @@ const queryClient = new QueryClient({
 });
 
 const rootElement = document.getElementById("root")!;
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <React.StrictMode>
-      <I18nextProvider i18n={i18n}>
-        <HelmetProvider>
-          <QueryClientProvider client={queryClient}>
-            <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-              <AppProvider>
-                <RouterProvider router={router} />
-                <ReactQueryDevtools initialIsOpen={false} />
-              </AppProvider>
-            </ThemeProvider>
-          </QueryClientProvider>
-        </HelmetProvider>
-      </I18nextProvider>
-    </React.StrictMode>
-  );
-}
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <I18nextProvider i18n={i18n}>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+            <AppProvider>
+              <RouterProvider router={router} />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </AppProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    </I18nextProvider>
+  </React.StrictMode>
+);

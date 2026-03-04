@@ -283,6 +283,6 @@ function SignInPage() {
   );
 }
 
-export const Route = createFileRoute('/sign-in')({
+export const Route = createFileRoute('/(auth)/sign-in')({
   component: SignInPage,
 })
