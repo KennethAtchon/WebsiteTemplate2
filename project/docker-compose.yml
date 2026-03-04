@@ -1,0 +1,137 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: template_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-template}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-template}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - template-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: template_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy noeviction --timeout 0 --tcp-keepalive 60 --tcp-backlog 511 --databases 16
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - template-network
+
+  # Main Application
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        APP_ENV: ${APP_ENV:-development}
+        NEXT_PUBLIC_DEBUG: true
+        ADMIN_SPECIAL_CODE_HASH: ${ADMIN_SPECIAL_CODE_HASH}
+        NEXT_PUBLIC_APP_ENV: ${APP_ENV}
+        NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
+        ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+        NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY}
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+        NEXT_PUBLIC_FIREBASE_APP_ID: ${NEXT_PUBLIC_FIREBASE_APP_ID}
+        FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
+        FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+        REDIS_URL: ${REDIS_URL}
+        R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+        R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+        R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+        R2_BUCKET_NAME: ${R2_BUCKET_NAME}
+        R2_PUBLIC_URL: ${R2_PUBLIC_URL}
+        R2_ENABLED: ${R2_ENABLED}
+        RESEND_API_KEY: ${RESEND_API_KEY}
+        DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-template}
+        CSRF_SECRET: ${CSRF_SECRET}
+    container_name: template_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-template}
+      REDIS_URL: redis://redis:6379
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NEXT_PUBLIC_DEBUG: true
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes: []
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    networks:
+      - template-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000/api/public/system",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local
+
+networks:
+  template-network:
+    driver: bridge
