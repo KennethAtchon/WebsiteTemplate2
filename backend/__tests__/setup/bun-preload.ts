@@ -367,7 +367,13 @@ mock.module("@/services/db/prisma", () => ({
     errorQueries: 0,
     topSlowQueries: [],
   })),
-  getConnectionPoolStats: mock(() => ({})),
+  getConnectionPoolStats: mock(() => ({
+    totalConnections: 0,
+    averageActiveConnections: 0,
+    averageIdleConnections: 0,
+    peakConnections: 0,
+    poolUtilization: 0,
+  })),
 }));
 
 mock.module("@/utils/debug/debug", () => ({

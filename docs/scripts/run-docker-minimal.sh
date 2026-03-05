@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Navigate to project directory and start Docker
-cd "$(dirname "$0")/../../project"
+# Navigate to root directory and start Docker
+cd "$(dirname "$0")/../.."
 
 echo "🚀 Starting Docker Compose..."
 

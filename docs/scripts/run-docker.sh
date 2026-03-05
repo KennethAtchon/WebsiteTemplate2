@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Navigate to project directory and restart Docker with persistent volumes (WSL compatible)
-cd "$(dirname "$0")/../../project"
+# Navigate to root directory and restart Docker with persistent volumes (WSL compatible)
+cd "$(dirname "$0")/../.."
 
 echo "🔄 DOCKER RESTART - Preserving Persistent Volumes"
 

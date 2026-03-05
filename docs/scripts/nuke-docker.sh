@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Navigate to project directory and completely nuke Docker then start fresh (WSL compatible)
-cd "$(dirname "$0")/../../project"
+# Navigate to root directory and completely nuke Docker then start fresh (WSL compatible)
+cd "$(dirname "$0")/../.."
 
 echo "🔥 NUCLEAR DOCKER CLEANUP - Removing EVERYTHING 🔥"
 
