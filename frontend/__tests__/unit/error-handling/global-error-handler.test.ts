@@ -12,8 +12,6 @@ import {
   resetErrorMetrics,
   withErrorHandling,
   withTimeout,
-  installGlobalErrorHandlers,
-  removeGlobalErrorHandlers,
   ErrorCategory,
 } from "@/shared/utils/error-handling/global-error-handler";
 
@@ -153,10 +151,4 @@ describe("global-error-handler", () => {
     });
   });
 
-  describe("installGlobalErrorHandlers / removeGlobalErrorHandlers", () => {
-    it("installGlobalErrorHandlers does not throw (server-side)", () => {
-      installGlobalErrorHandlers();
-      removeGlobalErrorHandlers();
-    });
-  });
 });

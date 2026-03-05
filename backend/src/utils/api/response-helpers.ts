@@ -41,7 +41,7 @@
  * DO NOT import or use next-intl in API routes.
  */
 
-import { NextResponse } from "hono";
+
 import {
   sanitizeObject,
   sanitizeString,
@@ -97,8 +97,8 @@ export function createSuccessResponse<T>(
   data: T,
   meta?: Record<string, unknown>,
   status: number = 200
-): NextResponse<ApiResponse<T>> {
-  return NextResponse.json(
+): Response<ApiResponse<T>> {
+  return Response.json(
     {
       data,
       ...(meta && { meta: { ...meta, timestamp: new Date().toISOString() } }),
@@ -122,11 +122,11 @@ export function createPaginatedResponse<T>(
   limit: number,
   total: number,
   status: number = 200
-): NextResponse<PaginatedApiResponse<T>> {
+): Response<PaginatedApiResponse<T>> {
   const totalPages = Math.ceil(total / limit);
   const skip = (page - 1) * limit;
 
-  return NextResponse.json(
+  return Response.json(
     {
       data,
       pagination: {
@@ -154,7 +154,7 @@ export function createErrorResponse(
   status: number = 500,
   code?: string,
   details?: unknown
-): NextResponse<ApiError> {
+): Response<ApiError> {
   const response: ApiError = {
     error: message,
   };
@@ -167,7 +167,7 @@ export function createErrorResponse(
     response.details = details;
   }
 
-  return NextResponse.json(response, { status });
+  return Response.json(response, { status });
 }
 
 /**
@@ -176,7 +176,7 @@ export function createErrorResponse(
 export function createBadRequestResponse(
   message: string = "Bad Request",
   details?: unknown
-): NextResponse<ApiError> {
+): Response<ApiError> {
   return createErrorResponse(message, 400, "BAD_REQUEST", details);
 }
 
@@ -185,7 +185,7 @@ export function createBadRequestResponse(
  */
 export function createUnauthorizedResponse(
   message: string = "Unauthorized"
-): NextResponse<ApiError> {
+): Response<ApiError> {
   return createErrorResponse(message, 401, "UNAUTHORIZED");
 }
 
@@ -194,7 +194,7 @@ export function createUnauthorizedResponse(
  */
 export function createForbiddenResponse(
   message: string = "Forbidden"
-): NextResponse<ApiError> {
+): Response<ApiError> {
   return createErrorResponse(message, 403, "FORBIDDEN");
 }
 
@@ -203,7 +203,7 @@ export function createForbiddenResponse(
  */
 export function createNotFoundResponse(
   message: string = "Not Found"
-): NextResponse<ApiError> {
+): Response<ApiError> {
   return createErrorResponse(message, 404, "NOT_FOUND");
 }
 
@@ -214,7 +214,7 @@ export function createNotFoundResponse(
 export function createInternalErrorResponse(
   message: string = "Internal Server Error",
   details?: unknown
-): NextResponse<ApiError> {
+): Response<ApiError> {
   // SECURITY: Sanitize error details to prevent leaking sensitive information
   // Only include safe, generic error information in client responses
   // Detailed errors are logged server-side via debugLog

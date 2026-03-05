@@ -14,10 +14,16 @@
  * from `@/utils/api/response-helpers` instead.
  */
 
-import { NextRequest, NextResponse } from "hono";
 import { reportError, withTimeout } from "./global-error-handler";
-import { getClientIp } from "@/services/request-identity";
 import debugLog from "@/utils/debug/debug";
+
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
 import {
   createErrorResponse,
   createInternalErrorResponse,
@@ -56,16 +62,16 @@ export const ERROR_MESSAGES = {
 } as const;
 
 type ApiHandler = (
-  request: NextRequest,
+  request: Request,
   context?: any
-) => Promise<NextResponse>;
+) => Promise<Response>;
 
 /**
  * Optional hook to intercept errors before default classification.
- * Return a `NextResponse` to short-circuit the default handler, or `null`
+ * Return a `Response` to short-circuit the default handler, or `null`
  * to fall through to the standard `classifyAndRespond` logic.
  */
-type CustomErrorHandler = (error: Error) => NextResponse | null;
+type CustomErrorHandler = (error: Error) => Response | null;
 
 /**
  * Wraps an API route handler with request logging, timeout enforcement,
@@ -87,7 +93,7 @@ export function withApiErrorHandling(
 ): ApiHandler {
   const { timeoutMs = 30000, allowedMethods, customErrorHandler } = options;
 
-  return async (request: NextRequest, context?: any): Promise<NextResponse> => {
+  return async (request: Request, context?: any): Promise<Response> => {
     const requestId = `req_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
     const startTime = Date.now();
 
@@ -105,7 +111,7 @@ export function withApiErrorHandling(
 
     try {
       if (allowedMethods && !allowedMethods.includes(request.method)) {
-        return NextResponse.json(
+        return Response.json(
           {
             error: ERROR_MESSAGES.METHOD_NOT_ALLOWED,
             code: "METHOD_NOT_ALLOWED",
@@ -172,7 +178,7 @@ export function withApiErrorHandling(
  * Maps an error to an appropriate HTTP response based on its message.
  * Uses the canonical `createErrorResponse` from response-helpers.
  */
-function classifyAndRespond(error: Error): NextResponse {
+function classifyAndRespond(error: Error): Response {
   const message = error.message.toLowerCase();
 
   if (
