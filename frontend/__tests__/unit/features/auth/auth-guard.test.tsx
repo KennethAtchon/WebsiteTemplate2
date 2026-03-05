@@ -1,79 +1,162 @@
 /**
- * Unit tests for AuthGuard component.
- * Tests the component API and renders basic states.
+ * AuthGuard test with completely stable mock references.
+ * Prevents infinite re-renders by returning exact same objects every time.
  */
 /// <reference lib="dom" />
-import { describe, it, expect, afterEach, mock } from "bun:test";
+import { describe, it, expect, afterEach, mock, beforeAll } from "bun:test";
 import { render, screen, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-// Mock all dependencies before imports
-mock.module("@tanstack/react-router", () => ({
-  useNavigate: mock(() => mock()),
-  useLocation: mock(() => ({ pathname: "/sign-in" })),
-}));
+// Create COMPLETELY STABLE mock references - these will never change
+const stableNavigate = mock();
+const stableLocation = { pathname: "/sign-in" };
+const stableAuthenticatedFetch = mock(() => Promise.resolve({ ok: true }));
+const stableAuthObject = { authenticatedFetch: stableAuthenticatedFetch };
+const stableAppContext = { user: null, authLoading: false };
+const stableTranslation = { t: (key: string) => key };
+const stableDebugLog = { info: mock(), warn: mock(), error: mock(), debug: mock() };
 
-mock.module("react-i18next", () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
+// Mock modules BEFORE any imports - return the EXACT SAME objects every time
+beforeAll(() => {
+  mock.module("@tanstack/react-router", () => ({
+    useNavigate: () => stableNavigate,
+    useLocation: () => stableLocation,
+  }));
 
-mock.module("@/shared/contexts/app-context", () => ({
-  useApp: mock(() => ({ user: null, authLoading: false })),
-}));
+  mock.module("react-i18next", () => ({
+    useTranslation: () => stableTranslation,
+  }));
 
-mock.module("@/features/auth/hooks/use-authenticated-fetch", () => ({
-  useAuthenticatedFetch: mock(() => ({
-    authenticatedFetch: mock(() => Promise.resolve({ ok: true })),
-  })),
-}));
+  mock.module("@/shared/contexts/app-context", () => ({
+    useApp: () => stableAppContext, // Always returns same object reference
+  }));
 
-mock.module("@/shared/utils/debug", () => ({
-  debugLog: { info: mock(), warn: mock(), error: mock(), debug: mock() },
-}));
+  mock.module("@/features/auth/hooks/use-authenticated-fetch", () => ({
+    useAuthenticatedFetch: () => stableAuthObject, // Always returns same object
+  }));
 
-mock.module("lucide-react", () => ({
-  Loader2: () => null,
-}));
+  mock.module("@/shared/utils/debug", () => ({
+    debugLog: stableDebugLog,
+  }));
 
+  mock.module("lucide-react", () => ({
+    Loader2: () => null,
+  }));
+});
+
+// Import AFTER mocking
 import { AuthGuard } from "@/features/auth/components/auth-guard";
 
 describe("AuthGuard", () => {
   afterEach(() => {
     cleanup();
     document.body.innerHTML = "";
+    // Reset mock call counts but keep implementations
+    stableNavigate.mockClear();
+    stableAuthenticatedFetch.mockClear();
+    stableDebugLog.info.mockClear();
+    stableDebugLog.warn.mockClear();
+    stableDebugLog.error.mockClear();
   });
 
-  it("is a React component (function)", () => {
-    expect(typeof AuthGuard).toBe("function");
-  });
+  it("renders children on sign-in route", () => {
+    // Set up auth route
+    stableLocation.pathname = "/sign-in";
 
-  it("renders children on sign-in route (public auth route)", () => {
-    // useLocation returns { pathname: "/sign-in" } from mock
     render(
       <AuthGuard>
         <div data-testid="signin-content">Sign In Content</div>
       </AuthGuard>
     );
-    // Auth route bypass: children should be rendered
+
     expect(screen.getByTestId("signin-content")).toBeInTheDocument();
   });
 
-  it("accepts authType prop without crashing", () => {
+  it("shows loading spinner when auth is loading", () => {
+    // Update the stable context to show loading
+    Object.assign(stableAppContext, { user: null, authLoading: true });
+    stableLocation.pathname = "/protected";
+
+    render(
+      <AuthGuard authType="user">
+        <div data-testid="protected-content">Protected Content</div>
+      </AuthGuard>
+    );
+
+    // Should show loading, not the children
+    expect(document.querySelector('[data-testid="protected-content"]')).toBeNull();
+    // Should show loading message (check for loading text instead of spinner)
+    expect(document.body.textContent).toContain('subscription_manage_loading');
+    
+    // Reset for next test
+    Object.assign(stableAppContext, { user: null, authLoading: false });
+  });
+
+  it("bypasses auth on public routes", () => {
+    // Set up public route
+    stableLocation.pathname = "/about";
+    Object.assign(stableAppContext, { user: null, authLoading: false });
+
+    render(
+      <AuthGuard publicRoutes={["/about", "/pricing"]}>
+        <div data-testid="public-content">Public Content</div>
+      </AuthGuard>
+    );
+
+    expect(screen.getByTestId("public-content")).toBeInTheDocument();
+  });
+
+  it("renders children for authenticated user", () => {
+    // Set up authenticated user on protected route
+    const mockUser = { 
+      uid: "test-user", 
+      getIdToken: mock(() => Promise.resolve("token")),
+      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "user" } }))
+    };
+    Object.assign(stableAppContext, { user: mockUser, authLoading: false });
+    stableLocation.pathname = "/protected";
+
     render(
       <AuthGuard authType="user">
         <div data-testid="user-content">User Content</div>
       </AuthGuard>
     );
-    // Location is /sign-in so auth is skipped
-    expect(document.body).toBeTruthy();
+
+    expect(screen.getByTestId("user-content")).toBeInTheDocument();
+    
+    // Reset for next test
+    Object.assign(stableAppContext, { user: null, authLoading: false });
   });
 
-  it("accepts publicRoutes prop", () => {
+  it("redirects unauthenticated user to sign-in", () => {
+    // Set up unauthenticated user on protected route
+    stableLocation.pathname = "/protected";
+    Object.assign(stableAppContext, { user: null, authLoading: false });
+
     render(
-      <AuthGuard publicRoutes={["/about", "/pricing"]}>
-        <div data-testid="public-content">Content</div>
+      <AuthGuard authType="user">
+        <div data-testid="protected-content">Protected Content</div>
       </AuthGuard>
     );
-    expect(document.body).toBeTruthy();
+
+    // Should not render children
+    expect(document.querySelector('[data-testid="protected-content"]')).toBeNull();
+    // Should have called navigate to redirect
+    expect(stableNavigate).toHaveBeenCalledWith(
+      expect.objectContaining({ to: expect.stringContaining("/sign-in") })
+    );
+  });
+
+  it("accepts different auth types without crashing", () => {
+    stableLocation.pathname = "/admin";
+    Object.assign(stableAppContext, { user: null, authLoading: false });
+
+    expect(() => {
+      render(
+        <AuthGuard authType="admin">
+          <div data-testid="admin-content">Admin Content</div>
+        </AuthGuard>
+      );
+    }).not.toThrow();
   });
 });

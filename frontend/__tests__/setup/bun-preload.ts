@@ -1,6 +1,6 @@
 /**
  * Bun test preload: polyfills, env, and module mocks.
- * Load with: bunfig.toml [test] preload = ["./__tests__/setup/bun-preload.ts"]
+ * Load with: bunfig.toml [test] preload = ["./__tests__/setup/bun-preload-fixed.ts"]
  */
 import { mock } from "bun:test";
 import { TextEncoder, TextDecoder } from "util";
@@ -10,6 +10,66 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 // DOM (for React Testing Library and component tests)
 // ---------------------------------------------------------------------------
 GlobalRegistrator.register();
+
+// Add cleanup hook to unregister Happy-DOM after all tests
+process.on('exit', () => {
+  GlobalRegistrator.unregister();
+});
+
+// Also add cleanup for SIGINT and SIGTERM for better coverage
+process.on('SIGINT', () => {
+  GlobalRegistrator.unregister();
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  GlobalRegistrator.unregister();
+  process.exit(0);
+});
+
+// Add more aggressive cleanup - unregister after each test file
+// This helps prevent memory accumulation in test suites
+if (typeof afterEach !== 'undefined') {
+  afterEach(() => {
+    // Force cleanup of DOM references
+    if (typeof document !== 'undefined') {
+      document.body.innerHTML = '';
+    }
+    // Clear any remaining timers
+    if (typeof clearTimeout !== 'undefined') {
+      const maxTimerId = setTimeout(() => {}, 0);
+      for (let i = 1; i <= maxTimerId; i++) {
+        clearTimeout(i);
+      }
+    }
+  });
+}
+
+// Set a global timeout to prevent infinite hanging
+// Using a simple timeout mechanism for Bun
+const originalTest = global.test || global.it;
+if (originalTest) {
+  const testWithTimeout = function(name, fn, timeout = 5000) {
+    return originalTest(name, function() {
+      const timeoutId = setTimeout(() => {
+        console.error(`Test timeout: ${name}`);
+        process.exit(1);
+      }, timeout);
+      
+      try {
+        const result = fn.apply(this, arguments);
+        clearTimeout(timeoutId);
+        return result;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+    });
+  };
+  
+  global.test = testWithTimeout;
+  global.it = testWithTimeout;
+}
 
 // ---------------------------------------------------------------------------
 // Polyfills
@@ -320,6 +380,40 @@ mock.module("firebase-admin", () => ({
   })),
 }));
 
+// Mock Firebase client to prevent duplicate app errors
+const mockFirebaseApp = { name: '[DEFAULT]', options: {} };
+
+mock.module("firebase/app", () => ({
+  initializeApp: mock(() => mockFirebaseApp),
+  getApps: mock(() => [mockFirebaseApp]),
+  getApp: mock(() => mockFirebaseApp),
+  deleteApp: mock(),
+}));
+
+mock.module("firebase/auth", () => ({
+  getAuth: mock(() => ({})),
+  onAuthStateChanged: mock(),
+  signInWithEmailAndPassword: mock(),
+  createUserWithEmailAndPassword: mock(),
+  signOut: mock(),
+  updateProfile: mock(),
+  signInWithPopup: mock(),
+  GoogleAuthProvider: class {},
+}));
+
+mock.module("firebase/firestore", () => ({
+  getFirestore: mock(() => ({})),
+  collection: mock(() => ({})),
+  doc: mock(() => ({})),
+  getDoc: mock(),
+  getDocs: mock(),
+  setDoc: mock(),
+  addDoc: mock(),
+  updateDoc: mock(),
+  deleteDoc: mock(),
+  onSnapshot: mock(),
+}));
+
 mock.module("firebase-admin/app", () => ({
   initializeApp: mock(),
   getApps: mock(() => []),
@@ -530,7 +624,7 @@ mock.module("@/shared/utils/system/system-logger", () => ({
     systemLoggerMocks.security(level, msg, op, data),
   logAuthEvent: (level: string, msg: string, op: string, data?: any) =>
     systemLoggerMocks.auth(level, msg, op, data),
-  logPerformanceEvent: (msg: string, op: string, data?: any) =>
+  logPerformanceEvent: (msg: string, op: string, data: any) =>
     systemLoggerMocks.performance(msg, op, data),
 }));
 
