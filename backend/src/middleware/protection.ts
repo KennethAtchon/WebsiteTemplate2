@@ -174,7 +174,7 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
   return async (c, next) => {
     try {
       const { checkRateLimit } = await import(
-        "../services/rate-limit/rate-limiter"
+        "../services/rate-limit/rate-limit-redis"
       );
       const ip =
         c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||

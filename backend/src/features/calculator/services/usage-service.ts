@@ -8,12 +8,12 @@
  *   - app/api/admin/subscriptions/route.ts   (admin view)
  */
 
-import { prisma } from "@/shared/services/db/prisma";
+import { prisma } from "@/services/db/prisma";
 import {
   FEATURE_TIER_REQUIREMENTS,
   isFeatureFree,
-} from "@/shared/utils/permissions/core-feature-permissions";
-import { getMonthBoundaries } from "@/shared/utils/helpers/date";
+} from "@/utils/permissions/core-feature-permissions";
+import { getMonthBoundaries } from "@/utils/helpers/date";
 
 /**
  * Returns the list of gated (non-free) calculator feature keys.

@@ -17,7 +17,7 @@ import {
   RetirementResult,
   CalculationResponse,
 } from "../types/calculator.types";
-import { debugLog } from "@/shared/utils/debug";
+import { debugLog } from "@/utils/debug";
 
 const SERVICE_NAME = "calculator-service";
 

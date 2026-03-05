@@ -111,7 +111,7 @@ publicRoutes.post(
   rateLimiter("public"),
   async (c) => {
     try {
-      const { sendOrderConfirmationEmail } = await import("../services/email/email/resend");
+      const { sendOrderConfirmationEmail } = await import("../services/email/resend");
       const body = await c.req.json();
       const { customerName, customerEmail, orderId, therapies, products, totalAmount, address, phone } = body;
 
@@ -166,7 +166,7 @@ publicRoutes.post(
         return c.json({ error: "File type not allowed. Only images are accepted." }, 400);
       }
 
-      const { storage } = await import("../services/storage/storage");
+      const { storage } = await import("../services/storage");
       const { generateSecureFilename } = await import("../utils/validation/file-validation");
       const filename = generateSecureFilename(file.name);
       const buffer = Buffer.from(await file.arrayBuffer());

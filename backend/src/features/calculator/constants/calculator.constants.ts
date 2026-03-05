@@ -19,7 +19,7 @@
  * 5. Add component to shared/components/calculator/
  */
 
-import { SubscriptionTier } from "@/shared/constants/subscription.constants";
+import { SubscriptionTier } from "@/constants/subscription.constants";
 import { Home, CreditCard, TrendingUp, Target } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 

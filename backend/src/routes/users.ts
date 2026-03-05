@@ -59,7 +59,7 @@ users.post(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { FirebaseUserSync } = await import("../shared/services/firebase/sync");
+      const { FirebaseUserSync } = await import("../services/firebase/sync");
       const { name, email, password, createInFirebase, timezone } = await c.req.json();
 
       let firebaseUid: string | null = null;
@@ -94,7 +94,7 @@ users.patch(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { FirebaseUserSync } = await import("../shared/services/firebase/sync");
+      const { FirebaseUserSync } = await import("../services/firebase/sync");
       const { id, phone, address, role, name, password, email, isActive, timezone } = await c.req.json();
 
       if (!id) return c.json({ error: "User id is required" }, 400);
@@ -148,7 +148,7 @@ users.delete(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { FirebaseUserSync } = await import("../shared/services/firebase/sync");
+      const { FirebaseUserSync } = await import("../services/firebase/sync");
       const { id, hardDelete = false } = await c.req.json();
 
       if (!id) return c.json({ error: "User id is required" }, 400);

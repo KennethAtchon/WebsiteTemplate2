@@ -7,7 +7,7 @@
 import {
   SubscriptionTier,
   SubscriptionStatus,
-} from "@/shared/constants/subscription.constants";
+} from "@/constants/subscription.constants";
 
 export interface Subscription {
   id: string;
