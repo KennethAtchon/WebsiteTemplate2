@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { PaymentSuccessInteractive } from '@/routes/(customer)/payment/success/-payment-success-interactive'
-import { PageLayout } from '@/shared/components/layout/page-layout'
+import { createFileRoute } from "@tanstack/react-router";
+import { PaymentSuccessInteractive } from "@/routes/(customer)/payment/success/-payment-success-interactive";
+import { PageLayout } from "@/shared/components/layout/page-layout";
 
 function PaymentSuccessPage() {
   return (
@@ -9,9 +9,9 @@ function PaymentSuccessPage() {
         <PaymentSuccessInteractive />
       </div>
     </PageLayout>
-  )
+  );
 }
 
-export const Route = createFileRoute('/(customer)/payment/success/')({
+export const Route = createFileRoute("/(customer)/payment/success/")({
   component: PaymentSuccessPage,
-})
+});

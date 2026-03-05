@@ -154,7 +154,8 @@ export function PricingCard({
                 </span>
               )}{" "}
               {t("account_subscription_calculations_per_month", {
-                count: tier.features.maxCalculationsPerMonth === -1
+                count:
+                  tier.features.maxCalculationsPerMonth === -1
                     ? 0
                     : tier.features.maxCalculationsPerMonth,
               })}

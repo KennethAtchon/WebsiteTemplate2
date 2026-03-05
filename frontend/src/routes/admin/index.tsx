@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { DashboardLayout } from '../../features/admin/components/dashboard/dashboard-layout';
-import { AuthGuard } from '../../features/auth/components/auth-guard';
+import { createFileRoute } from "@tanstack/react-router";
+import { DashboardLayout } from "../../features/admin/components/dashboard/dashboard-layout";
+import { AuthGuard } from "../../features/auth/components/auth-guard";
 
 function AdminLayout() {
   return (
@@ -17,6 +17,6 @@ function AdminLayout() {
   );
 }
 
-export const Route = createFileRoute('/admin/')({
+export const Route = createFileRoute("/admin/")({
   component: AdminLayout,
 });

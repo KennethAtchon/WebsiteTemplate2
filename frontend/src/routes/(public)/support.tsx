@@ -1,19 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { PageLayout } from '@/shared/components/layout/page-layout'
-import { HeroSection } from '@/shared/components/layout/hero-section'
-import { Section } from '@/shared/components/custom-ui/section'
+import { createFileRoute } from "@tanstack/react-router";
+import { PageLayout } from "@/shared/components/layout/page-layout";
+import { HeroSection } from "@/shared/components/layout/hero-section";
+import { Section } from "@/shared/components/custom-ui/section";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/shared/components/ui/card'
+} from "@/shared/components/ui/card";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/shared/components/ui/accordion'
+} from "@/shared/components/ui/accordion";
 import {
   HelpCircle,
   Rocket,
@@ -22,79 +22,79 @@ import {
   Wrench,
   CheckCircle2,
   ArrowRight,
-} from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { Link } from '@tanstack/react-router'
-import { SUPPORT_EMAIL } from '@/shared/constants/app.constants'
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
+import { SUPPORT_EMAIL } from "@/shared/constants/app.constants";
 
 function SupportPage() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   const gettingStartedSteps = [
-    t('support_step_signup'),
-    t('support_step_choose_plan'),
-    t('support_step_pick_calculator'),
-    t('support_step_enter_inputs'),
-    t('support_step_export'),
-  ]
+    t("support_step_signup"),
+    t("support_step_choose_plan"),
+    t("support_step_pick_calculator"),
+    t("support_step_enter_inputs"),
+    t("support_step_export"),
+  ];
 
   const accountFAQs = [
     {
-      question: t('support_change_plan'),
-      answer: t('support_change_plan_answer'),
+      question: t("support_change_plan"),
+      answer: t("support_change_plan_answer"),
     },
     {
-      question: t('support_billing_question'),
-      answer: t('support_billing_answer'),
+      question: t("support_billing_question"),
+      answer: t("support_billing_answer"),
     },
     {
-      question: t('support_reset_question'),
-      answer: t('support_reset_answer'),
+      question: t("support_reset_question"),
+      answer: t("support_reset_answer"),
     },
     {
-      question: t('support_export_question'),
-      answer: t('support_export_answer'),
+      question: t("support_export_question"),
+      answer: t("support_export_answer"),
     },
-  ]
+  ];
 
   const troubleshootingFAQs = [
     {
-      question: t('support_calc_not_loading'),
-      answer: t('support_calc_not_loading_answer'),
+      question: t("support_calc_not_loading"),
+      answer: t("support_calc_not_loading_answer"),
     },
     {
-      question: t('support_payment_failed'),
-      answer: t('support_payment_failed_answer'),
+      question: t("support_payment_failed"),
+      answer: t("support_payment_failed_answer"),
     },
-  ]
+  ];
 
   const categories = [
     {
-      title: t('support_getting_started_title'),
-      description: t('support_getting_started_desc'),
+      title: t("support_getting_started_title"),
+      description: t("support_getting_started_desc"),
       icon: Rocket,
     },
     {
-      title: t('support_account_title'),
-      description: t('support_account_desc'),
+      title: t("support_account_title"),
+      description: t("support_account_desc"),
       icon: CreditCard,
     },
     {
-      title: t('support_calculators_title'),
-      description: t('support_calculators_desc'),
+      title: t("support_calculators_title"),
+      description: t("support_calculators_desc"),
       icon: Calculator,
     },
     {
-      title: t('support_troubleshooting_title'),
-      description: t('support_troubleshooting_desc'),
+      title: t("support_troubleshooting_title"),
+      description: t("support_troubleshooting_desc"),
       icon: Wrench,
     },
-  ]
+  ];
 
   return (
     <PageLayout variant="public">
       <HeroSection
-        badge={{ icon: HelpCircle, text: t('metadata_support_title') }}
+        badge={{ icon: HelpCircle, text: t("metadata_support_title") }}
         title={
           <>
             Support
@@ -103,7 +103,7 @@ function SupportPage() {
             </span>
           </>
         }
-        description={t('support_description')}
+        description={t("support_description")}
         showGradient
       />
 
@@ -111,7 +111,10 @@ function SupportPage() {
         <div className="space-y-10">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map(({ title, description, icon: Icon }) => (
-              <div key={title} className="rounded-xl border bg-card p-5 shadow-sm">
+              <div
+                key={title}
+                className="rounded-xl border bg-card p-5 shadow-sm"
+              >
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <Icon className="h-5 w-5 text-primary" />
                 </div>
@@ -127,7 +130,7 @@ function SupportPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <Rocket className="h-5 w-5 text-primary" />
                 </div>
-                {t('support_getting_started_title')}
+                {t("support_getting_started_title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -142,12 +145,18 @@ function SupportPage() {
                 ))}
               </ol>
               <div className="pt-2 flex flex-col gap-2 sm:flex-row sm:gap-4">
-                <Link to="/faq" className="inline-flex items-center gap-1 text-sm text-primary hover:underline font-medium">
-                  {t('support_faq_link')}
+                <Link
+                  to="/faq"
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline font-medium"
+                >
+                  {t("support_faq_link")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link to="/contact" className="inline-flex items-center gap-1 text-sm text-primary hover:underline font-medium">
-                  {t('support_contact_link')}
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline font-medium"
+                >
+                  {t("support_contact_link")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -160,13 +169,17 @@ function SupportPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <CreditCard className="h-5 w-5 text-primary" />
                 </div>
-                {t('support_account_title')}
+                {t("support_account_title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Accordion type="single" collapsible className="w-full">
                 {accountFAQs.map((item, i) => (
-                  <AccordionItem key={i} value={`account-${i}`} className="border-b last:border-b-0">
+                  <AccordionItem
+                    key={i}
+                    value={`account-${i}`}
+                    className="border-b last:border-b-0"
+                  >
                     <AccordionTrigger className="text-left font-semibold hover:no-underline py-4">
                       {item.question}
                     </AccordionTrigger>
@@ -184,9 +197,16 @@ function SupportPage() {
               <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                 <HelpCircle className="h-8 w-8 text-primary" />
               </div>
-              <h2 className="mb-4 text-3xl font-bold tracking-tight">{t('support_still_need_help')}</h2>
-              <p className="mb-6 text-lg text-muted-foreground">{t('support_reach_out')}</p>
-              <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-primary hover:underline font-semibold text-lg">
+              <h2 className="mb-4 text-3xl font-bold tracking-tight">
+                {t("support_still_need_help")}
+              </h2>
+              <p className="mb-6 text-lg text-muted-foreground">
+                {t("support_reach_out")}
+              </p>
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="inline-flex items-center gap-2 text-primary hover:underline font-semibold text-lg"
+              >
                 {SUPPORT_EMAIL}
                 <ArrowRight className="h-5 w-5" />
               </a>
@@ -195,9 +215,9 @@ function SupportPage() {
         </div>
       </Section>
     </PageLayout>
-  )
+  );
 }
 
-export const Route = createFileRoute('/(public)/support')({
+export const Route = createFileRoute("/(public)/support")({
   component: SupportPage,
-})
+});

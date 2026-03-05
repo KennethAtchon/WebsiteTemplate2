@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { CheckoutInteractive } from '@/routes/(customer)/checkout/-checkout-interactive'
-import { PageLayout } from '@/shared/components/layout/page-layout'
+import { createFileRoute } from "@tanstack/react-router";
+import { CheckoutInteractive } from "@/routes/(customer)/checkout/-checkout-interactive";
+import { PageLayout } from "@/shared/components/layout/page-layout";
 
 function CheckoutPage() {
   return (
@@ -9,9 +9,9 @@ function CheckoutPage() {
         <CheckoutInteractive />
       </div>
     </PageLayout>
-  )
+  );
 }
 
-export const Route = createFileRoute('/(customer)/checkout')({
+export const Route = createFileRoute("/(customer)/checkout")({
   component: CheckoutPage,
-})
+});

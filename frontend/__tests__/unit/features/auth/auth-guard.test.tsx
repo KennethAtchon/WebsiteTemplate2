@@ -14,7 +14,12 @@ const stableAuthenticatedFetch = mock(() => Promise.resolve({ ok: true }));
 const stableAuthObject = { authenticatedFetch: stableAuthenticatedFetch };
 const stableAppContext = { user: null, authLoading: false };
 const stableTranslation = { t: (key: string) => key };
-const stableDebugLog = { info: mock(), warn: mock(), error: mock(), debug: mock() };
+const stableDebugLog = {
+  info: mock(),
+  warn: mock(),
+  error: mock(),
+  debug: mock(),
+};
 
 // Mock modules BEFORE any imports - return the EXACT SAME objects every time
 beforeAll(() => {
@@ -87,10 +92,12 @@ describe("AuthGuard", () => {
     );
 
     // Should show loading, not the children
-    expect(document.querySelector('[data-testid="protected-content"]')).toBeNull();
+    expect(
+      document.querySelector('[data-testid="protected-content"]')
+    ).toBeNull();
     // Should show loading message (check for loading text instead of spinner)
-    expect(document.body.textContent).toContain('subscription_manage_loading');
-    
+    expect(document.body.textContent).toContain("subscription_manage_loading");
+
     // Reset for next test
     Object.assign(stableAppContext, { user: null, authLoading: false });
   });
@@ -111,10 +118,12 @@ describe("AuthGuard", () => {
 
   it("renders children for authenticated user", () => {
     // Set up authenticated user on protected route
-    const mockUser = { 
-      uid: "test-user", 
+    const mockUser = {
+      uid: "test-user",
       getIdToken: mock(() => Promise.resolve("token")),
-      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "user" } }))
+      getIdTokenResult: mock(() =>
+        Promise.resolve({ claims: { role: "user" } })
+      ),
     };
     Object.assign(stableAppContext, { user: mockUser, authLoading: false });
     stableLocation.pathname = "/protected";
@@ -126,7 +135,7 @@ describe("AuthGuard", () => {
     );
 
     expect(screen.getByTestId("user-content")).toBeInTheDocument();
-    
+
     // Reset for next test
     Object.assign(stableAppContext, { user: null, authLoading: false });
   });
@@ -143,7 +152,9 @@ describe("AuthGuard", () => {
     );
 
     // Should not render children
-    expect(document.querySelector('[data-testid="protected-content"]')).toBeNull();
+    expect(
+      document.querySelector('[data-testid="protected-content"]')
+    ).toBeNull();
     // Should have called navigate to redirect
     expect(stableNavigate).toHaveBeenCalledWith(
       expect.objectContaining({ to: expect.stringContaining("/sign-in") })
@@ -170,7 +181,9 @@ describe("AuthGuard", () => {
     const adminUser = {
       uid: "admin-user",
       getIdToken: mock(() => Promise.resolve("admin-token")),
-      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "admin" } })),
+      getIdTokenResult: mock(() =>
+        Promise.resolve({ claims: { role: "admin" } })
+      ),
     };
     stableLocation.pathname = "/admin";
     Object.assign(stableAppContext, { user: adminUser, authLoading: false });
@@ -189,7 +202,9 @@ describe("AuthGuard", () => {
     const nonAdminUser = {
       uid: "editor-user",
       getIdToken: mock(() => Promise.resolve("refreshed-token")),
-      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "editor" } })),
+      getIdTokenResult: mock(() =>
+        Promise.resolve({ claims: { role: "editor" } })
+      ),
     };
     stableLocation.pathname = "/admin";
     stableAuthenticatedFetch.mockResolvedValue({ ok: true });
@@ -210,7 +225,9 @@ describe("AuthGuard", () => {
     const nonAdminUser = {
       uid: "regular-user",
       getIdToken: mock(() => Promise.resolve("token")),
-      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "user" } })),
+      getIdTokenResult: mock(() =>
+        Promise.resolve({ claims: { role: "user" } })
+      ),
     };
     stableLocation.pathname = "/admin";
     stableAuthenticatedFetch.mockResolvedValue({ ok: false, status: 403 });
@@ -232,7 +249,9 @@ describe("AuthGuard", () => {
     const nonAdminUser = {
       uid: "regular-user",
       getIdToken: mock(() => Promise.resolve("token")),
-      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "user" } })),
+      getIdTokenResult: mock(() =>
+        Promise.resolve({ claims: { role: "user" } })
+      ),
     };
     stableLocation.pathname = "/admin";
     stableAuthenticatedFetch.mockRejectedValue(new Error("network-error"));

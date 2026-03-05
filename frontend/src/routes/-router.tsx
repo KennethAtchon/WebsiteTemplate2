@@ -1,10 +1,14 @@
-import { createRouter, createRootRoute, createRoute } from '@tanstack/react-router';
-import App from '../App';
+import {
+  createRouter,
+  createRootRoute,
+  createRoute,
+} from "@tanstack/react-router";
+import App from "../App";
 
 // Import simple components
-import SimpleCalculator from '../features/calculator/components/SimpleCalculator';
-import SimpleContactForm from '../features/contact/components/SimpleContactForm';
-import { DashboardView } from '../features/admin/components/dashboard/dashboard-view';
+import SimpleCalculator from "../features/calculator/components/SimpleCalculator";
+import SimpleContactForm from "../features/contact/components/SimpleContactForm";
+import { DashboardView } from "../features/admin/components/dashboard/dashboard-view";
 
 // Create the root route
 const rootRoute = createRootRoute({
@@ -14,21 +18,17 @@ const rootRoute = createRootRoute({
 // Create index route
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: "/",
   component: () => (
     <div>
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">
-          Calculator Features
-        </h2>
+        <h2 className="text-xl font-semibold mb-4">Calculator Features</h2>
         <SimpleCalculator />
       </section>
 
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Contact Form</h2>
-        <SimpleContactForm
-          onSuccess={() => console.log("Form submitted")}
-        />
+        <SimpleContactForm onSuccess={() => console.log("Form submitted")} />
       </section>
     </div>
   ),
@@ -37,12 +37,12 @@ const indexRoute = createRoute({
 // Create admin routes
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: 'admin',
+  path: "admin",
 });
 
 const adminIndexRoute = createRoute({
   getParentRoute: () => adminRoute,
-  path: '/',
+  path: "/",
   component: () => (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
@@ -55,14 +55,17 @@ const adminIndexRoute = createRoute({
 
 const adminDashboardRoute = createRoute({
   getParentRoute: () => adminRoute,
-  path: 'dashboard',
+  path: "dashboard",
   component: DashboardView,
 });
 
 // Create the router with manual route tree
 export const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, adminRoute.addChildren([adminIndexRoute, adminDashboardRoute])]),
-  defaultPreload: 'intent',
+  routeTree: rootRoute.addChildren([
+    indexRoute,
+    adminRoute.addChildren([adminIndexRoute, adminDashboardRoute]),
+  ]),
+  defaultPreload: "intent",
 });
 
 // Legacy manual router kept for reference during migration.

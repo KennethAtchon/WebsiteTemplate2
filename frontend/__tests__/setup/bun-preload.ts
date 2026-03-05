@@ -12,31 +12,31 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 GlobalRegistrator.register();
 
 // Add cleanup hook to unregister Happy-DOM after all tests
-process.on('exit', () => {
+process.on("exit", () => {
   GlobalRegistrator.unregister();
 });
 
 // Also add cleanup for SIGINT and SIGTERM for better coverage
-process.on('SIGINT', () => {
+process.on("SIGINT", () => {
   GlobalRegistrator.unregister();
   process.exit(0);
 });
 
-process.on('SIGTERM', () => {
+process.on("SIGTERM", () => {
   GlobalRegistrator.unregister();
   process.exit(0);
 });
 
 // Add more aggressive cleanup - unregister after each test file
 // This helps prevent memory accumulation in test suites
-if (typeof afterEach !== 'undefined') {
+if (typeof afterEach !== "undefined") {
   afterEach(() => {
     // Force cleanup of DOM references
-    if (typeof document !== 'undefined') {
-      document.body.innerHTML = '';
+    if (typeof document !== "undefined") {
+      document.body.innerHTML = "";
     }
     // Clear any remaining timers
-    if (typeof clearTimeout !== 'undefined') {
+    if (typeof clearTimeout !== "undefined") {
       const maxTimerId = setTimeout(() => {}, 0);
       for (let i = 1; i <= maxTimerId; i++) {
         clearTimeout(i);
@@ -49,13 +49,13 @@ if (typeof afterEach !== 'undefined') {
 // Using a simple timeout mechanism for Bun
 const originalTest = global.test || global.it;
 if (originalTest) {
-  const testWithTimeout = function(name, fn, timeout = 5000) {
-    return originalTest(name, function() {
+  const testWithTimeout = function (name, fn, timeout = 5000) {
+    return originalTest(name, function () {
       const timeoutId = setTimeout(() => {
         console.error(`Test timeout: ${name}`);
         process.exit(1);
       }, timeout);
-      
+
       try {
         const result = fn.apply(this, arguments);
         clearTimeout(timeoutId);
@@ -66,7 +66,7 @@ if (originalTest) {
       }
     });
   };
-  
+
   global.test = testWithTimeout;
   global.it = testWithTimeout;
 }
@@ -381,7 +381,7 @@ mock.module("firebase-admin", () => ({
 }));
 
 // Mock Firebase client to prevent duplicate app errors
-const mockFirebaseApp = { name: '[DEFAULT]', options: {} };
+const mockFirebaseApp = { name: "[DEFAULT]", options: {} };
 
 mock.module("firebase/app", () => ({
   initializeApp: mock(() => mockFirebaseApp),

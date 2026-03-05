@@ -56,7 +56,8 @@ describe("ContactForm", () => {
   it("shows email input", () => {
     const onSuccess = mock();
     render(<ContactForm onSuccess={onSuccess} />);
-    const emailInput = screen.queryByRole("textbox", { name: /email/i }) ||
+    const emailInput =
+      screen.queryByRole("textbox", { name: /email/i }) ||
       document.querySelector('input[type="email"]') ||
       document.querySelector('input[name="email"]');
     expect(emailInput).toBeTruthy();
@@ -65,7 +66,8 @@ describe("ContactForm", () => {
   it("shows submit button", () => {
     const onSuccess = mock();
     render(<ContactForm onSuccess={onSuccess} />);
-    const submitButton = screen.queryByRole("button", { type: "submit" as any }) ||
+    const submitButton =
+      screen.queryByRole("button", { type: "submit" as any }) ||
       document.querySelector('button[type="submit"]') ||
       screen.queryByRole("button");
     expect(submitButton).toBeTruthy();

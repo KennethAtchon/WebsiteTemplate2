@@ -81,7 +81,10 @@ export default function StripePaymentFallback() {
 
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const searchParams = useSearch({ strict: false }) as Record<string, string | undefined>;
+  const searchParams = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const { isAuthenticated, userId } = { isAuthenticated: true, userId: null }; // Simplified for SaaS
 
   // Enhanced state management

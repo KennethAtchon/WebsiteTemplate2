@@ -33,7 +33,9 @@ describe("ErrorBoundary", () => {
 
   it("renders custom fallback when error occurs", () => {
     render(
-      <ErrorBoundary fallback={<div data-testid="custom-fallback">Custom Error</div>}>
+      <ErrorBoundary
+        fallback={<div data-testid="custom-fallback">Custom Error</div>}
+      >
         <ThrowingComponent shouldThrow={true} />
       </ErrorBoundary>
     );

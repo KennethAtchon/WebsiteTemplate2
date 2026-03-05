@@ -4,7 +4,7 @@
  * Modern sign-in page with email/password and Google OAuth support.
  */
 
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useApp } from "@/shared/contexts/app-context";
 import { Button } from "@/shared/components/ui/button";
@@ -18,7 +18,7 @@ import {
   CardTitle,
 } from "@/shared/components/ui/card";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { Link, useSearch } from '@tanstack/react-router';
+import { Link, useSearch } from "@tanstack/react-router";
 import { Eye, EyeOff, ArrowLeft, LogIn, Sparkles, Loader2 } from "lucide-react";
 import { debugLog } from "@/shared/utils/debug";
 import { useTranslation } from "react-i18next";
@@ -34,7 +34,7 @@ function SignInPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const search = useSearch({ from: '/sign-in' });
+  const search = useSearch({ from: "/(auth)/sign-in" });
   const redirectUrl = (search as any)?.redirect_url;
 
   const { signIn, signInWithGoogle, user, authLoading } = useApp();
@@ -283,6 +283,6 @@ function SignInPage() {
   );
 }
 
-export const Route = createFileRoute('/(auth)/sign-in')({
+export const Route = createFileRoute("/(auth)/sign-in")({
   component: SignInPage,
-})
+});

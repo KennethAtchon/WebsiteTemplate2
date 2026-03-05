@@ -277,7 +277,6 @@ function logStructuredError(structuredError: StructuredError, source: string) {
   );
 }
 
-
 /**
  * Manual error reporting for custom error handling
  */
@@ -365,4 +364,3 @@ export function withTimeout<T>(
       });
   });
 }
-

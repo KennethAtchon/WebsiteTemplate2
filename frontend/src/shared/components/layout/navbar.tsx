@@ -72,11 +72,7 @@ export default function NavBar() {
           to="/"
           className="flex items-center gap-2 transition-transform hover:scale-105"
         >
-          <img
-            src={LOGO_PATH}
-            alt={LOGO_ALT}
-            className="h-8 w-auto"
-          />
+          <img src={LOGO_PATH} alt={LOGO_ALT} className="h-8 w-auto" />
         </Link>
         <nav className="hidden md:flex items-center gap-1">
           {navigationLinks.map(({ href, label }) => (

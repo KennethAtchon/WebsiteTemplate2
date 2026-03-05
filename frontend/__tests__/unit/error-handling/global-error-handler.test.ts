@@ -150,5 +150,4 @@ describe("global-error-handler", () => {
       ).rejects.toThrow("inner");
     });
   });
-
 });

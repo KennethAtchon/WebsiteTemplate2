@@ -4,7 +4,11 @@
  */
 import { describe, it, expect } from "bun:test";
 import { usePaginatedData } from "@/shared/hooks/use-paginated-data";
-import type { PaginationInfo, PaginatedResponse, UsePaginatedDataOptions } from "@/shared/hooks/use-paginated-data";
+import type {
+  PaginationInfo,
+  PaginatedResponse,
+  UsePaginatedDataOptions,
+} from "@/shared/hooks/use-paginated-data";
 
 describe("usePaginatedData", () => {
   it("is a function", () => {

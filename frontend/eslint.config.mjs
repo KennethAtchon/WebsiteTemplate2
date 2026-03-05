@@ -40,6 +40,11 @@ export default [
   },
   prettier,
   {
-    ignores: ["dist", "node_modules", "src/routeTree.gen.ts"],
+    ignores: [
+      "dist",
+      "node_modules",
+      "src/routeTree.gen.ts",
+      "src/shared/components/ui",
+    ],
   },
 ];

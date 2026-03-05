@@ -1,12 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Calculator } from 'lucide-react'
-import { PageLayout } from '@/shared/components/layout/page-layout'
-import { Section } from '@/shared/components/custom-ui/section'
-import { CalculatorInteractive } from '@/routes/(customer)/calculator/-calculator-interactive'
-import { useTranslation } from 'react-i18next'
+import { createFileRoute } from "@tanstack/react-router";
+import { Calculator } from "lucide-react";
+import { PageLayout } from "@/shared/components/layout/page-layout";
+import { Section } from "@/shared/components/custom-ui/section";
+import { CalculatorInteractive } from "@/routes/(customer)/calculator/-calculator-interactive";
+import { useTranslation } from "react-i18next";
 
 function CalculatorPage() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <PageLayout variant="customer">
@@ -18,10 +18,10 @@ function CalculatorPage() {
             </div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
-                {t('common_financial_calculators')}
+                {t("common_financial_calculators")}
               </h1>
               <p className="text-lg text-muted-foreground mt-1">
-                {t('metadata_calculator_description')}
+                {t("metadata_calculator_description")}
               </p>
             </div>
           </div>
@@ -30,9 +30,9 @@ function CalculatorPage() {
         <CalculatorInteractive />
       </Section>
     </PageLayout>
-  )
+  );
 }
 
-export const Route = createFileRoute('/(customer)/calculator')({
+export const Route = createFileRoute("/(customer)/calculator")({
   component: CalculatorPage,
-})
+});

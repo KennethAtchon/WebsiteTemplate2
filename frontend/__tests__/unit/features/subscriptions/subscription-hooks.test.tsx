@@ -19,7 +19,10 @@ mock.module("@tanstack/react-query", () => ({
   })),
 }));
 
-import { useSubscription, useHasTierAccess } from "@/features/subscriptions/hooks/use-subscription";
+import {
+  useSubscription,
+  useHasTierAccess,
+} from "@/features/subscriptions/hooks/use-subscription";
 
 describe("useSubscription exports", () => {
   it("useSubscription is a function", () => {

@@ -138,7 +138,10 @@ export default function UserButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <button onClick={() => navigate({ to: ACCOUNT_ROUTE })} className="cursor-pointer">
+          <button
+            onClick={() => navigate({ to: ACCOUNT_ROUTE })}
+            className="cursor-pointer"
+          >
             <User className="mr-2 h-4 w-4" />
             <span>Account</span>
           </button>

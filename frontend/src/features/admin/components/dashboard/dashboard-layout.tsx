@@ -334,13 +334,13 @@ const INITIAL_LAYOUT_STATE: LayoutState = {
 
 const t = (key: string) => {
   const translations: Record<string, string> = {
-    "admin_layout_navigation_dashboard": "Dashboard",
-    "admin_layout_navigation_customers": "Customers",
-    "admin_layout_navigation_orders": "Orders",
-    "admin_layout_navigation_subscriptions": "Subscriptions",
-    "admin_layout_navigation_contact_messages": "Contact Messages",
-    "admin_layout_navigation_developer": "Developer",
-    "admin_layout_navigation_settings": "Settings",
+    admin_layout_navigation_dashboard: "Dashboard",
+    admin_layout_navigation_customers: "Customers",
+    admin_layout_navigation_orders: "Orders",
+    admin_layout_navigation_subscriptions: "Subscriptions",
+    admin_layout_navigation_contact_messages: "Contact Messages",
+    admin_layout_navigation_developer: "Developer",
+    admin_layout_navigation_settings: "Settings",
   };
   return translations[key] || key;
 };

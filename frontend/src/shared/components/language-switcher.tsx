@@ -19,9 +19,9 @@ export function LanguageSwitcher() {
   const handleLocaleChange = (newLocale: string) => {
     // Change language using i18next
     i18n.changeLanguage(newLocale);
-    
+
     // Store preference in localStorage
-    localStorage.setItem('i18nextLng', newLocale);
+    localStorage.setItem("i18nextLng", newLocale);
   };
 
   return (
