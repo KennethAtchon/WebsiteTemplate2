@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { rateLimiter } from "../middleware/protection";
+import { rateLimiter } from "../../middleware/protection";
 
 const health = new Hono();
 
@@ -11,8 +11,8 @@ health.get("/", rateLimiter("health"), async (c) => {
   const startTime = Date.now();
 
   try {
-    const { prisma, getQueryStats } = await import("../services/db/prisma");
-    const getRedisConnection = (await import("../services/db/redis")).default;
+    const { prisma, getQueryStats } = await import("../../services/db/prisma");
+    const getRedisConnection = (await import("../../services/db/redis")).default;
 
     const healthChecks = await Promise.allSettled([
       checkDatabaseHealth(prisma),
@@ -63,7 +63,7 @@ health.get("/", rateLimiter("health"), async (c) => {
  */
 health.get("/error-monitoring", rateLimiter("health"), async (c) => {
   try {
-    const { getErrorMetrics } = await import("../services/observability/metrics");
+    const { getErrorMetrics } = await import("../../services/observability/metrics");
     const metrics = getErrorMetrics();
     return c.json({ metrics });
   } catch {

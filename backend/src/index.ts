@@ -6,13 +6,13 @@ import { getAllowedCorsOrigins } from "./utils/config/envUtil";
 
 // Route imports
 import healthRoutes from "./routes/health";
-import customerRoutes from "./routes/customer";
-import adminRoutes from "./routes/admin";
-import calculatorRoutes from "./routes/calculator";
-import subscriptionRoutes from "./routes/subscriptions";
-import publicRoutes from "./routes/public";
-import analyticsRoutes from "./routes/analytics";
-import userRoutes from "./routes/users";
+import customerRoutes from "./routes/customer/index";
+import adminRoutes from "./routes/admin/index";
+import calculatorRoutes from "./routes/calculator/index";
+import subscriptionRoutes from "./routes/subscriptions/index";
+import publicRoutes from "./routes/public/index";
+import analyticsRoutes from "./routes/analytics/index";
+import userRoutes from "./routes/users/index";
 import csrfRoutes from "./routes/csrf";
 
 const app = new Hono();
