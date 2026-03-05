@@ -4,7 +4,7 @@
  */
 /// <reference lib="dom" />
 import { describe, it, expect, afterEach, mock, beforeAll } from "bun:test";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Create COMPLETELY STABLE mock references - these will never change
@@ -57,6 +57,9 @@ describe("AuthGuard", () => {
     stableDebugLog.info.mockClear();
     stableDebugLog.warn.mockClear();
     stableDebugLog.error.mockClear();
+
+    stableLocation.pathname = "/sign-in";
+    Object.assign(stableAppContext, { user: null, authLoading: false });
   });
 
   it("renders children on sign-in route", () => {
@@ -147,16 +150,103 @@ describe("AuthGuard", () => {
     );
   });
 
-  it("accepts different auth types without crashing", () => {
+  it("redirects unauthenticated admin user to sign-in", async () => {
     stableLocation.pathname = "/admin";
     Object.assign(stableAppContext, { user: null, authLoading: false });
 
-    expect(() => {
-      render(
-        <AuthGuard authType="admin">
-          <div data-testid="admin-content">Admin Content</div>
-        </AuthGuard>
-      );
-    }).not.toThrow();
+    render(
+      <AuthGuard authType="admin">
+        <div data-testid="admin-content">Admin Content</div>
+      </AuthGuard>
+    );
+
+    await waitFor(() => {
+      expect(stableNavigate).toHaveBeenCalledWith({ to: "/sign-in" });
+    });
+    expect(screen.queryByTestId("admin-content")).toBeNull();
+  });
+
+  it("renders admin content when user has admin custom claim", async () => {
+    const adminUser = {
+      uid: "admin-user",
+      getIdToken: mock(() => Promise.resolve("admin-token")),
+      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "admin" } })),
+    };
+    stableLocation.pathname = "/admin";
+    Object.assign(stableAppContext, { user: adminUser, authLoading: false });
+
+    render(
+      <AuthGuard authType="admin">
+        <div data-testid="admin-content">Admin Content</div>
+      </AuthGuard>
+    );
+
+    expect(await screen.findByTestId("admin-content")).toBeInTheDocument();
+    expect(stableAuthenticatedFetch).not.toHaveBeenCalled();
+  });
+
+  it("falls back to API verification for non-admin claim and grants access on success", async () => {
+    const nonAdminUser = {
+      uid: "editor-user",
+      getIdToken: mock(() => Promise.resolve("refreshed-token")),
+      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "editor" } })),
+    };
+    stableLocation.pathname = "/admin";
+    stableAuthenticatedFetch.mockResolvedValue({ ok: true });
+    Object.assign(stableAppContext, { user: nonAdminUser, authLoading: false });
+
+    render(
+      <AuthGuard authType="admin">
+        <div data-testid="admin-content">Admin Content</div>
+      </AuthGuard>
+    );
+
+    expect(await screen.findByTestId("admin-content")).toBeInTheDocument();
+    expect(stableAuthenticatedFetch).toHaveBeenCalledWith("/api/admin/verify");
+    expect(nonAdminUser.getIdToken).toHaveBeenCalledWith(true);
+  });
+
+  it("redirects to home when API admin verification fails", async () => {
+    const nonAdminUser = {
+      uid: "regular-user",
+      getIdToken: mock(() => Promise.resolve("token")),
+      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "user" } })),
+    };
+    stableLocation.pathname = "/admin";
+    stableAuthenticatedFetch.mockResolvedValue({ ok: false, status: 403 });
+    Object.assign(stableAppContext, { user: nonAdminUser, authLoading: false });
+
+    render(
+      <AuthGuard authType="admin">
+        <div data-testid="admin-content">Admin Content</div>
+      </AuthGuard>
+    );
+
+    await waitFor(() => {
+      expect(stableNavigate).toHaveBeenCalledWith({ to: "/" });
+    });
+    expect(screen.queryByTestId("admin-content")).toBeNull();
+  });
+
+  it("redirects to home when admin verification throws", async () => {
+    const nonAdminUser = {
+      uid: "regular-user",
+      getIdToken: mock(() => Promise.resolve("token")),
+      getIdTokenResult: mock(() => Promise.resolve({ claims: { role: "user" } })),
+    };
+    stableLocation.pathname = "/admin";
+    stableAuthenticatedFetch.mockRejectedValue(new Error("network-error"));
+    Object.assign(stableAppContext, { user: nonAdminUser, authLoading: false });
+
+    render(
+      <AuthGuard authType="admin">
+        <div data-testid="admin-content">Admin Content</div>
+      </AuthGuard>
+    );
+
+    await waitFor(() => {
+      expect(stableNavigate).toHaveBeenCalledWith({ to: "/" });
+    });
+    expect(screen.queryByTestId("admin-content")).toBeNull();
   });
 });

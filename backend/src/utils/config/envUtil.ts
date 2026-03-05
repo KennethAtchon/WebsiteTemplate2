@@ -13,15 +13,9 @@ function getEnvVar(
 ): string {
   const envValue = value !== undefined ? value : process.env[name];
 
-  // Check if we are on the client side
-  const isClient = typeof window !== "undefined";
+  // In backend/server environment, we don't need client-side checks
+  // All environment variables are available on the server
   const isPublicVar = name.startsWith("NEXT_PUBLIC_");
-
-  // If on client and not a public var, it's a server secret that won't be available.
-  // We shouldn't throw an error in this case.
-  if (isClient && !isPublicVar) {
-    return envValue || defaultValue || "";
-  }
 
   if (required && (!envValue || envValue.length === 0)) {
     if (defaultValue !== undefined) {
@@ -89,44 +83,14 @@ export const ENABLE_DB_HEALTH_CHECKS = getEnvVarAsBoolean(
 export const REDIS_URL = getEnvVar("REDIS_URL", false);
 
 // ============================================================================
-// Firebase Client (NEXT_PUBLIC_*)
+// Firebase Client (without NEXT_PUBLIC_ prefix for backend)
 // ============================================================================
-export const FIREBASE_API_KEY = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_API_KEY",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY
-);
-export const FIREBASE_AUTH_DOMAIN = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-);
-export const FIREBASE_PROJECT_ID = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-);
-export const FIREBASE_STORAGE_BUCKET = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-);
-export const FIREBASE_MESSAGING_SENDER_ID = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-);
-export const FIREBASE_APP_ID = getEnvVar(
-  "NEXT_PUBLIC_FIREBASE_APP_ID",
-  true,
-  undefined,
-  process.env.NEXT_PUBLIC_FIREBASE_APP_ID
-);
+export const FIREBASE_API_KEY = getEnvVar("FIREBASE_API_KEY", true);
+export const FIREBASE_AUTH_DOMAIN = getEnvVar("FIREBASE_AUTH_DOMAIN", true);
+export const FIREBASE_PROJECT_ID = getEnvVar("FIREBASE_PROJECT_ID", true);
+export const FIREBASE_STORAGE_BUCKET = getEnvVar("FIREBASE_STORAGE_BUCKET", true);
+export const FIREBASE_MESSAGING_SENDER_ID = getEnvVar("FIREBASE_MESSAGING_SENDER_ID", true);
+export const FIREBASE_APP_ID = getEnvVar("FIREBASE_APP_ID", true);
 
 // ============================================================================
 // Firebase Admin (Server-side only)
@@ -196,26 +160,20 @@ export const METRICS_SECRET = getEnvVar("METRICS_SECRET", false);
 // ============================================================================
 // Debug & Logging
 // ============================================================================
-export const DEBUG_ENABLED = getEnvVarAsBoolean(
-  "NEXT_PUBLIC_DEBUG",
-  false,
-  process.env.NEXT_PUBLIC_DEBUG
-);
+export const DEBUG_ENABLED = getEnvVarAsBoolean("DEBUG_ENABLED", false);
 export const LOG_LEVEL = getEnvVar(
-  "NEXT_PUBLIC_LOG_LEVEL",
+  "LOG_LEVEL",
   false,
-  "debug",
-  process.env.NEXT_PUBLIC_LOG_LEVEL
+  "debug"
 ) as "debug" | "info" | "warn" | "error";
 
 // ============================================================================
 // SEO & Metadata
 // ============================================================================
 export const BASE_URL = getEnvVar(
-  "NEXT_PUBLIC_BASE_URL",
+  "BASE_URL",
   false,
-  "[BASE_URL]",
-  process.env.NEXT_PUBLIC_BASE_URL
+  "http://localhost:3001"
 );
 
 // ============================================================================
