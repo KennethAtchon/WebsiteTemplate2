@@ -29,6 +29,7 @@ mock.module("@/services/db/redis", () => ({
 // Mock rate limiter so auth doesn't block tests
 mock.module("@/middleware/protection", () => ({
   rateLimiter: () => async (_c: any, next: any) => next(),
+  authMiddleware: () => async (_c: any, next: any) => next(),
   requireAuth: mock(),
 }));
 
