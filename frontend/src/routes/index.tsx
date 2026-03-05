@@ -86,27 +86,58 @@ function HomePage() {
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">{t('home_features_description')}</p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {[Calculator, TrendingUp, Shield, Zap].map((Icon, idx) => (
-            <Card key={idx} className="group border-2 transition-all hover:border-primary/50 hover:shadow-lg">
-              <CardContent className="p-6">
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h3 className="mb-2 text-xl font-semibold">
-                  {idx === 0 && t('home_features_mortgage_title')}
-                  {idx === 1 && t('home_features_investment_title')}
-                  {idx === 2 && t('home_features_loan_title')}
-                  {idx === 3 && t('home_features_retirement_title')}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {idx === 0 && t('home_features_mortgage_description')}
-                  {idx === 1 && t('home_features_investment_description')}
-                  {idx === 2 && t('home_features_loan_description')}
-                  {idx === 3 && t('home_features_retirement_description')}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          <Card className="group border-2 transition-all hover:border-primary/50 hover:shadow-lg">
+            <CardContent className="p-6">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                <Calculator className="h-6 w-6" />
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">
+                {t('home_features_mortgage_title')}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t('home_features_mortgage_description')}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="group border-2 transition-all hover:border-primary/50 hover:shadow-lg">
+            <CardContent className="p-6">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 transition-transform group-hover:scale-110">
+                <TrendingUp className="h-6 w-6" />
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">
+                {t('home_features_investment_title')}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t('home_features_investment_description')}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="group border-2 transition-all hover:border-primary/50 hover:shadow-lg">
+            <CardContent className="p-6">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 transition-transform group-hover:scale-110">
+                <Shield className="h-6 w-6" />
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">
+                {t('home_features_loan_title')}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t('home_features_loan_description')}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="group border-2 transition-all hover:border-primary/50 hover:shadow-lg">
+            <CardContent className="p-6">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 transition-transform group-hover:scale-110">
+                <Zap className="h-6 w-6" />
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">
+                {t('home_features_retirement_title')}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t('home_features_retirement_description')}
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
@@ -119,23 +150,39 @@ function HomePage() {
               </h2>
             </div>
             <div className="grid gap-8 md:grid-cols-3">
-              {[BarChart3, Shield, Zap].map((Icon, idx) => (
-                <div key={idx} className="text-center">
-                  <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-                    <Icon className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="mb-2 text-xl font-semibold">
-                    {idx === 0 && t('common_accurate_calculations')}
-                    {idx === 1 && t('home_benefits_export_title')}
-                    {idx === 2 && t('home_benefits_secure_title')}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {idx === 0 && t('home_benefits_accurate_description')}
-                    {idx === 1 && t('home_benefits_export_description')}
-                    {idx === 2 && t('home_benefits_secure_description')}
-                  </p>
+              <div className="text-center">
+                <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                  <BarChart3 className="h-8 w-8 text-primary" />
                 </div>
-              ))}
+                <h3 className="mb-2 text-xl font-semibold">
+                  {t('common_accurate_calculations')}
+                </h3>
+                <p className="text-muted-foreground">
+                  {t('home_benefits_accurate_description')}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-500/10">
+                  <Shield className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="mb-2 text-xl font-semibold">
+                  {t('home_benefits_export_title')}
+                </h3>
+                <p className="text-muted-foreground">
+                  {t('home_benefits_export_description')}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500/10">
+                  <Zap className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="mb-2 text-xl font-semibold">
+                  {t('home_benefits_secure_title')}
+                </h3>
+                <p className="text-muted-foreground">
+                  {t('home_benefits_secure_description')}
+                </p>
+              </div>
             </div>
           </div>
         </div>
