@@ -1,4 +1,3 @@
-import { NextRequest } from "hono";
 import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
 import { debugLog } from "@/utils/debug";
 import { CSRF_SECRET } from "@/utils/config/envUtil";
@@ -110,7 +109,7 @@ export function validateCSRFToken(token: string, expectedUID: string): boolean {
  * Extracts CSRF token from request headers or body
  */
 export async function extractCSRFToken(
-  request: NextRequest,
+  request: Request,
 ): Promise<string | null> {
   // Check X-CSRF-Token header first
   const headerToken = request.headers.get("X-CSRF-Token");
@@ -137,7 +136,7 @@ export async function extractCSRFToken(
     try {
       // Clone the request to avoid consuming the body
       const clonedRequest = request.clone();
-      const body = await clonedRequest.json();
+      const body = await clonedRequest.json() as { _token?: string; csrfToken?: string };
       return body._token || body.csrfToken || null;
     } catch {
       // If we can't parse JSON, token not found in body
@@ -151,7 +150,7 @@ export async function extractCSRFToken(
  * Middleware helper to validate CSRF for authenticated users
  */
 export async function requireCSRFToken(
-  request: NextRequest,
+  request: Request,
   firebaseUID: string,
 ): Promise<boolean> {
   const method = request.method.toUpperCase();

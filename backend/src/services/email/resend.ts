@@ -159,7 +159,7 @@ export async function sendEmail(options: EmailOptions) {
       );
     }
 
-    const result = await response.json();
+    const result = await response.json() as { id: string };
     debugLog.info(
       "Email sent successfully",
       { service: "resend" },

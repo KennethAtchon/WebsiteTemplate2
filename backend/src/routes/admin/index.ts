@@ -54,8 +54,8 @@ admin.post(
         return c.json({ error: "Invalid admin code" }, 403);
       }
 
-      const { adminAuth } = await import("../services/firebase/admin");
-      const { prisma } = await import("../services/db/prisma");
+      const { adminAuth } = await import("../../services/firebase/admin");
+      const { prisma } = await import("../../services/db/prisma");
       const auth = c.get("auth");
       const uid = auth.firebaseUser.uid;
 
@@ -92,9 +92,9 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
       const { getMonthBoundaries, calculatePercentChange } =
-        await import("../utils/helpers/date");
+        await import("../../utils/helpers/date");
 
       const now = new Date();
       const { startOfThisMonth, startOfLastMonth, endOfLastMonth } =
@@ -188,7 +188,7 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
 
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = Math.min(parseInt(c.req.query("limit") || "20", 10), 50);
@@ -255,9 +255,9 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
       const { formatOrderResponse } =
-        await import("../utils/helpers/order-helpers");
+        await import("../../utils/helpers/order-helpers");
 
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = Math.min(parseInt(c.req.query("limit") || "20", 10), 100);
@@ -317,9 +317,9 @@ admin.post(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
       const { formatOrderResponse } =
-        await import("../utils/helpers/order-helpers");
+        await import("../../utils/helpers/order-helpers");
       const body = await c.req.json();
       const { userId, totalAmount, status } = body;
 
@@ -349,9 +349,9 @@ admin.put(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
       const { formatOrderResponse } =
-        await import("../utils/helpers/order-helpers");
+        await import("../../utils/helpers/order-helpers");
       const body = await c.req.json();
       const { id, userId, totalAmount, status } = body;
 
@@ -385,9 +385,9 @@ admin.delete(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
       const { formatOrderResponse } =
-        await import("../utils/helpers/order-helpers");
+        await import("../../utils/helpers/order-helpers");
       const body = await c.req.json();
       const { id, deletedBy } = body;
 
@@ -422,9 +422,9 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
       const { formatOrderResponse } =
-        await import("../utils/helpers/order-helpers");
+        await import("../../utils/helpers/order-helpers");
       const id = c.req.param("id");
 
       const order = await prisma.order.findUnique({
@@ -449,14 +449,14 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { adminDb } = await import("../services/firebase/admin");
-      const { prisma } = await import("../services/db/prisma");
+      const { adminDb } = await import("../../services/firebase/admin");
+      const { prisma } = await import("../../services/db/prisma");
       const { extractSubscriptionTier, convertFirestoreTimestamp } =
-        await import("../services/firebase/subscription-helpers");
+        await import("../../services/firebase/subscription-helpers");
       const { getTierConfig } =
-        await import("../constants/subscription.constants");
+        await import("../../constants/subscription.constants");
       const { getMonthlyUsageCount } =
-        await import("../features/calculator/services/usage-service");
+        await import("../../features/calculator/services/usage-service");
 
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = parseInt(c.req.query("limit") || "50", 10);
@@ -593,11 +593,11 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { adminDb } = await import("../services/firebase/admin");
+      const { adminDb } = await import("../../services/firebase/admin");
       const { getTierConfig } =
-        await import("../constants/subscription.constants");
+        await import("../../constants/subscription.constants");
       const { extractSubscriptionTier, convertFirestoreTimestamp } =
-        await import("../services/firebase/subscription-helpers");
+        await import("../../services/firebase/subscription-helpers");
 
       const customersSnapshot = await adminDb.collection("customers").get();
       const allSubscriptions: Array<{
@@ -677,7 +677,7 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { adminDb } = await import("../services/firebase/admin");
+      const { adminDb } = await import("../../services/firebase/admin");
       const id = c.req.param("id");
       const customersSnapshot = await adminDb.collection("customers").get();
 
@@ -743,7 +743,7 @@ admin.post(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { FirebaseUserSync } = await import("../services/firebase/sync");
+      const { FirebaseUserSync } = await import("../../services/firebase/sync");
       const results = await FirebaseUserSync.syncAllUsers();
 
       const summary = {
@@ -769,7 +769,7 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
       await prisma.$queryRaw`SELECT 1`;
       return c.json({ status: "healthy", database: "connected" });
     } catch (error) {

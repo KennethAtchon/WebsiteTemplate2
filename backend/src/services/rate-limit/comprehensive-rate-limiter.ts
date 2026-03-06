@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "hono";
 import { checkRateLimit } from "./rate-limit-redis";
 import { debugLog } from "@/utils/debug";
 import { systemLogger } from "@/utils/system/system-logger";
-import {
-  getClientIp,
-  getSecurityIp,
-  extractUserIdFromToken,
-} from "@/services/request-identity";
+// TODO: request-identity module doesn't exist - needs to be implemented or migrated
+// import {
+//   getClientIp,
+//   getSecurityIp,
+//   extractUserIdFromToken,
+// } from "@/services/request-identity";
 import {
   RATE_LIMIT_CONFIGS,
   getRateLimitConfig,
@@ -17,13 +17,13 @@ import {
 // Re-export RateLimitType for convenience
 export type { RateLimitType };
 
-// Re-export request-identity helpers for backward compatibility (IP/blocking are not rate-limit logic)
-export {
-  getClientIp,
-  getSecurityIp,
-  checkIpBlocking,
-  cleanupTokenCache,
-} from "@/services/request-identity";
+// TODO: Re-export request-identity helpers when module exists
+// export {
+//   getClientIp,
+//   getSecurityIp,
+//   checkIpBlocking,
+//   cleanupTokenCache,
+// } from "@/services/request-identity";
 
 /** Path segments used to classify routes for rate limiting (pathname.includes(segment)). Map order = match priority. */
 const RATE_LIMIT_PATH_SEGMENTS = new Map<RateLimitType, readonly string[]>([

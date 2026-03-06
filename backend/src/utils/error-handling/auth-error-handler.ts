@@ -4,7 +4,10 @@
  * Maps Firebase error codes to user-friendly error messages
  */
 
-import { FirebaseError } from "firebase/app";
+// Define FirebaseError type for backend compatibility
+interface FirebaseError extends Error {
+  code: string;
+}
 
 /**
  * Maps Firebase authentication error codes to user-friendly messages

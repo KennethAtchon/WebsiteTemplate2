@@ -19,6 +19,11 @@ const debugLog = Object.assign(
       if (process.env.NODE_ENV === "development") {
         console.info(`[DEBUG] ${message}`, ...args);
       }
+    },
+    debug: (message: string, ...args: any[]) => {
+      if (process.env.NODE_ENV === "development") {
+        console.debug(`[DEBUG] ${message}`, ...args);
+      }
     }
   }
 );

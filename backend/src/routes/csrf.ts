@@ -12,7 +12,7 @@ app.get("/", rateLimiter("public"), authMiddleware("user"), async (c) => {
   try {
     const auth = c.get("auth");
     const { generateCSRFToken } =
-      await import("../services/csrf/csrf-protection");
+      await import("../../services/csrf/csrf-protection");
 
     const token = generateCSRFToken(auth.firebaseUser.uid);
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24h

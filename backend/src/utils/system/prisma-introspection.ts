@@ -34,16 +34,16 @@ async function fetchSchema(): Promise<{ models: any[] } | null> {
     return schemaPromise;
   }
 
-  schemaPromise = (async () => {
+  schemaPromise = (async (): Promise<{ models: any[] } | null> => {
     try {
       // Use dynamic import to avoid issues in server-side contexts
-      const { authenticatedFetch } =
-        await import("@/services/api/authenticated-fetch");
-      const response = await authenticatedFetch("/api/admin/schema");
+      const { safeFetch } =
+        await import("@/services/api/safe-fetch");
+      const response = await safeFetch("/api/admin/schema");
       if (!response.ok) {
         throw new Error("Failed to fetch schema");
       }
-      const data = await response.json();
+      const data = await response.json() as { models: any[] };
       schemaCache = data;
       return data;
     } catch (error) {

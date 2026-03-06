@@ -410,7 +410,7 @@ export async function publicFetchJson<T = unknown>(
     throw new Error(errorMessage);
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
 // Export the main functions

@@ -13,6 +13,9 @@
 
 import { METRICS_ENABLED } from "@/utils/config/envUtil";
 
+// Declare window global for server-side environment detection
+declare const window: undefined | object;
+
 // -----------------------------------------------------------------------------
 // Types (declared locally so we never import from prom-client at the top level)
 // -----------------------------------------------------------------------------

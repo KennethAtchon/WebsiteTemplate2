@@ -1,6 +1,15 @@
 import path from "path";
 import { IS_TEST } from "@/utils/config/envUtil";
 
+// Declare FileReader for server-side compatibility
+declare class FileReader {
+  readAsArrayBuffer(blob: Blob): void;
+  result: ArrayBuffer | string | null;
+  error: DOMException | null;
+  onload: ((event: any) => void) | null;
+  onerror: ((event: any) => void) | null;
+}
+
 export interface FileValidationConfig {
   maxSizeBytes: number;
   allowedTypes: string[];

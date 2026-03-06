@@ -7,6 +7,9 @@
 import debugLog from "@/utils/debug/debug";
 import { APP_ENV } from "@/utils/config/envUtil";
 
+// Declare window global for server-side environment detection
+declare const window: undefined | object;
+
 // metrics.ts uses prom-client which requires Node.js built-ins (fs, v8, cluster).
 // We must NOT statically import it here because this file is transitively
 // imported by client components (safe-fetch → authenticated-fetch → app-context).

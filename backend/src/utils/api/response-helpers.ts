@@ -96,7 +96,7 @@ export function createSuccessResponse<T>(
   data: T,
   meta?: Record<string, unknown>,
   status: number = 200,
-): Response<ApiResponse<T>> {
+): Response {
   return Response.json(
     {
       data,
@@ -121,7 +121,7 @@ export function createPaginatedResponse<T>(
   limit: number,
   total: number,
   status: number = 200,
-): Response<PaginatedApiResponse<T>> {
+): Response {
   const totalPages = Math.ceil(total / limit);
   const skip = (page - 1) * limit;
 
@@ -153,7 +153,7 @@ export function createErrorResponse(
   status: number = 500,
   code?: string,
   details?: unknown,
-): Response<ApiError> {
+): Response {
   const response: ApiError = {
     error: message,
   };
@@ -175,7 +175,7 @@ export function createErrorResponse(
 export function createBadRequestResponse(
   message: string = "Bad Request",
   details?: unknown,
-): Response<ApiError> {
+): Response {
   return createErrorResponse(message, 400, "BAD_REQUEST", details);
 }
 
@@ -184,7 +184,7 @@ export function createBadRequestResponse(
  */
 export function createUnauthorizedResponse(
   message: string = "Unauthorized",
-): Response<ApiError> {
+): Response {
   return createErrorResponse(message, 401, "UNAUTHORIZED");
 }
 
@@ -193,7 +193,7 @@ export function createUnauthorizedResponse(
  */
 export function createForbiddenResponse(
   message: string = "Forbidden",
-): Response<ApiError> {
+): Response {
   return createErrorResponse(message, 403, "FORBIDDEN");
 }
 
@@ -202,7 +202,7 @@ export function createForbiddenResponse(
  */
 export function createNotFoundResponse(
   message: string = "Not Found",
-): Response<ApiError> {
+): Response {
   return createErrorResponse(message, 404, "NOT_FOUND");
 }
 
@@ -213,7 +213,7 @@ export function createNotFoundResponse(
 export function createInternalErrorResponse(
   message: string = "Internal Server Error",
   details?: unknown,
-): Response<ApiError> {
+): Response {
   // SECURITY: Sanitize error details to prevent leaking sensitive information
   // Only include safe, generic error information in client responses
   // Detailed errors are logged server-side via debugLog

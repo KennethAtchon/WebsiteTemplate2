@@ -174,18 +174,26 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
     try {
       const { checkRateLimit } =
         await import("../services/rate-limit/rate-limit-redis");
+      const { getRateLimitConfig } = await import("../constants/rate-limit.config");
+      
+      const config = getRateLimitConfig(type);
       const ip =
         c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
         c.req.header("x-real-ip") ||
         "unknown";
 
-      const result = await checkRateLimit(ip, type);
+      const result = await checkRateLimit(ip, {
+        maxRequests: config.maxRequests,
+        window: config.window,
+        keyPrefix: config.keyPrefix
+      });
 
-      if (!result.allowed) {
-        c.res.headers.set("X-Rate-Limit-Limit", String(result.limit));
+      if (!result) {
+        const resetTime = Date.now() + (config.window * 1000);
+        c.res.headers.set("X-Rate-Limit-Limit", String(config.maxRequests));
         c.res.headers.set("X-Rate-Limit-Remaining", "0");
-        c.res.headers.set("X-Rate-Limit-Reset", String(result.resetAt));
-        c.res.headers.set("Retry-After", String(result.retryAfter || 60));
+        c.res.headers.set("X-Rate-Limit-Reset", String(resetTime));
+        c.res.headers.set("Retry-After", String(config.window));
 
         return c.json(
           { error: "Too many requests", code: "RATE_LIMIT_EXCEEDED" },
@@ -195,9 +203,9 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
 
       // Attach rate limit headers to be added after response
       c.set("rateLimitHeaders", {
-        "X-Rate-Limit-Limit": String(result.limit),
-        "X-Rate-Limit-Remaining": String(result.remaining),
-        "X-Rate-Limit-Reset": String(result.resetAt),
+        "X-Rate-Limit-Limit": String(config.maxRequests),
+        "X-Rate-Limit-Remaining": "1", // We don't track exact count with this simple implementation
+        "X-Rate-Limit-Reset": String(Date.now() + (config.window * 1000)),
       });
 
       await next();

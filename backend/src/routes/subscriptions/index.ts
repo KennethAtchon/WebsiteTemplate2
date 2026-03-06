@@ -23,9 +23,9 @@ subscriptions.get(
       const auth = c.get("auth");
       const uid = auth.firebaseUser.uid;
 
-      const { adminDb } = await import("../services/firebase/admin");
-      const { prisma } = await import("../services/db/prisma");
-      const { STRIPE_MAP } = await import("../constants/stripe.constants");
+      const { adminDb } = await import("../../services/firebase/admin");
+      const { prisma } = await import("../../services/db/prisma");
+      const { STRIPE_MAP } = await import("../../constants/stripe.constants");
 
       const customerRef = adminDb.collection("customers").doc(uid);
       const subscriptionsSnapshot = await customerRef
@@ -121,8 +121,8 @@ subscriptions.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { prisma } = await import("../services/db/prisma");
-      const { adminDb } = await import("../services/firebase/admin");
+      const { prisma } = await import("../../services/db/prisma");
+      const { adminDb } = await import("../../services/firebase/admin");
 
       const dbUser = await prisma.user.findUnique({
         where: { id: auth.user.id },
@@ -252,7 +252,7 @@ subscriptions.post(
 
       if (!priceId) return c.json({ error: "priceId is required" }, 400);
 
-      const { STRIPE_SECRET_KEY } = await import("../utils/config/envUtil");
+      const { STRIPE_SECRET_KEY } = await import("../../utils/config/envUtil");
       if (!STRIPE_SECRET_KEY)
         return c.json({ error: "Stripe not configured" }, 500);
 
@@ -265,8 +265,8 @@ subscriptions.post(
       const baseUrl = BASE_URL !== "[BASE_URL]" ? BASE_URL : origin;
       const uid = auth.firebaseUser.uid;
 
-      const { adminDb } = await import("../services/firebase/admin");
-      const { prisma } = await import("../services/db/prisma");
+      const { adminDb } = await import("../../services/firebase/admin");
+      const { prisma } = await import("../../services/db/prisma");
 
       // Check trial eligibility
       let allowTrial = false;

@@ -15,7 +15,7 @@ publicRoutes.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../services/db/prisma");
+      const { prisma } = await import("../../services/db/prisma");
 
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = Math.min(parseInt(c.req.query("limit") || "50", 10), 100);
@@ -81,7 +81,7 @@ publicRoutes.get(
 
 publicRoutes.post("/contact-messages", rateLimiter("public"), async (c) => {
   try {
-    const { prisma } = await import("../services/db/prisma");
+    const { prisma } = await import("../../services/db/prisma");
     const data = await c.req.json();
     const { name, email, phone, subject, message } = data;
 
@@ -149,7 +149,7 @@ publicRoutes.post("/contact-messages", rateLimiter("public"), async (c) => {
 publicRoutes.post("/emails", rateLimiter("public"), async (c) => {
   try {
     const { sendOrderConfirmationEmail } =
-      await import("../services/email/resend");
+      await import("../../services/email/resend");
     const body = await c.req.json();
     const {
       customerName,
@@ -227,9 +227,9 @@ publicRoutes.post(
         );
       }
 
-      const { storage } = await import("../services/storage");
+      const { storage } = await import("../../services/storage");
       const { generateSecureFilename } =
-        await import("../utils/validation/file-validation");
+        await import("../../utils/validation/file-validation");
       const filename = generateSecureFilename(file.name);
       const buffer = Buffer.from(await file.arrayBuffer());
       const url = await storage.upload(filename, buffer, file.type);
