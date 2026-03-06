@@ -1,12 +1,11 @@
 import { checkRateLimit } from "./rate-limit-redis";
 import { debugLog } from "@/utils/debug";
 import { systemLogger } from "@/utils/system/system-logger";
-// TODO: request-identity module doesn't exist - needs to be implemented or migrated
-// import {
-//   getClientIp,
-//   getSecurityIp,
-//   extractUserIdFromToken,
-// } from "@/services/request-identity";
+import {
+  getClientIp,
+  getSecurityIp,
+  extractUserIdFromToken,
+} from "@/services/request-identity";
 import {
   RATE_LIMIT_CONFIGS,
   getRateLimitConfig,
@@ -17,13 +16,11 @@ import {
 // Re-export RateLimitType for convenience
 export type { RateLimitType };
 
-// TODO: Re-export request-identity helpers when module exists
-// export {
-//   getClientIp,
-//   getSecurityIp,
-//   checkIpBlocking,
-//   cleanupTokenCache,
-// } from "@/services/request-identity";
+export {
+  getClientIp,
+  getSecurityIp,
+  extractUserIdFromToken,
+} from "@/services/request-identity";
 
 /** Path segments used to classify routes for rate limiting (pathname.includes(segment)). Map order = match priority. */
 const RATE_LIMIT_PATH_SEGMENTS = new Map<RateLimitType, readonly string[]>([
@@ -43,8 +40,20 @@ function pathMatchesSegments(
   return segments.some((seg) => pathname.includes(seg));
 }
 
+/** Builds a JSON Response with the given status and headers. */
+function jsonResponse(
+  data: unknown,
+  status: number,
+  headers: Record<string, string> = {},
+): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", ...headers },
+  });
+}
+
 /**
- * Determines rate limit type based on the request path
+ * Determines rate limit type based on the request path.
  */
 export function determineRateLimitType(pathname: string): RateLimitType {
   for (const [rateLimitType, segments] of RATE_LIMIT_PATH_SEGMENTS) {
@@ -54,43 +63,37 @@ export function determineRateLimitType(pathname: string): RateLimitType {
 }
 
 /**
- * Gets a unique identifier for rate limiting (Firebase UID for authenticated, IP for unauthenticated)
+ * Gets a unique identifier for rate limiting.
+ * Authenticated requests use the Firebase UID; unauthenticated use IP.
  */
-async function getRateLimitKey(request: NextRequest): Promise<string> {
-  // Try to get Firebase UID from Authorization header (if authenticated)
+async function getRateLimitKey(request: Request): Promise<string> {
   const authHeader = request.headers.get("authorization");
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
     if (token && token.length > 10) {
-      // Extract actual Firebase UID from token
       const userId = await extractUserIdFromToken(token);
-      if (userId) {
-        // Use Firebase UID for authenticated users (stable across token refreshes)
-        return `user:${userId}`;
-      }
+      if (userId) return `user:${userId}`;
     }
   }
 
-  // Unauthenticated: use IP-based rate limiting
   const ip = getClientIp(request);
   return `ip:${ip}`;
 }
 
 /**
- * Comprehensive rate limiting middleware that can be applied to any API route
+ * Comprehensive rate limiting that can be applied to any API route.
+ * Returns a 429/503 Response when limited, or null to allow the request through.
  */
 export async function applyRateLimit(
-  request: NextRequest,
+  request: Request,
   customType?: RateLimitType,
   customConfig?: { window?: number; maxRequests?: number; keyPrefix?: string },
-): Promise<NextResponse | null> {
+): Promise<Response | null> {
   try {
-    // Get rate limit key (now async)
     const rateLimitKey = await getRateLimitKey(request);
     const securityIp = getSecurityIp(request);
     const pathname = new URL(request.url).pathname;
 
-    // Determine rate limit type
     const limitType = customType || determineRateLimitType(pathname);
     const baseConfig = getRateLimitConfig(limitType);
     const config = customConfig || {
@@ -99,13 +102,9 @@ export async function applyRateLimit(
       keyPrefix: baseConfig.keyPrefix,
     };
 
-    // Log the rate limit check with both rate limiting key AND real IP
     systemLogger.info(
       "Rate limit check initiated",
-      {
-        service: "rate-limiter",
-        operation: "applyRateLimit",
-      },
+      { service: "rate-limiter", operation: "applyRateLimit" },
       {
         rateLimitKey,
         securityIp: securityIp.ip,
@@ -118,7 +117,6 @@ export async function applyRateLimit(
       },
     );
 
-    // Check rate limit using the user/session/IP key
     const allowed = await checkRateLimit(rateLimitKey, {
       window: config.window,
       maxRequests: config.maxRequests,
@@ -126,10 +124,7 @@ export async function applyRateLimit(
     });
 
     if (!allowed) {
-      const baseConfig = getRateLimitConfig(limitType);
       const shouldAlert = shouldAlertOnExceed(limitType);
-
-      // Log rate limit violation
       const logData = {
         rateLimitKey,
         securityIp: securityIp.ip,
@@ -145,84 +140,62 @@ export async function applyRateLimit(
         description: baseConfig.description,
       };
 
-      if (shouldAlert) {
-        // Use error level for alertable rate limits
-        systemLogger.rateLimit(
-          "Rate limit exceeded (ALERT)",
-          "applyRateLimit",
-          logData,
-        );
-      } else {
-        // Use warn level for non-alertable rate limits
-        systemLogger.rateLimit(
-          "Rate limit exceeded",
-          "applyRateLimit",
-          logData,
-        );
-      }
+      systemLogger.rateLimit(
+        shouldAlert ? "Rate limit exceeded (ALERT)" : "Rate limit exceeded",
+        "applyRateLimit",
+        logData,
+      );
 
-      return NextResponse.json(
+      return jsonResponse(
         {
           error: "Rate limit exceeded",
-          message: `Too many requests. Please wait before trying again.`,
+          message: "Too many requests. Please wait before trying again.",
           retryAfter: config.window,
         },
+        429,
         {
-          status: 429,
-          headers: {
-            "X-RateLimit-Limit": (config.maxRequests ?? 30).toString(),
-            "X-RateLimit-Window": (config.window ?? 60).toString(),
-            "X-RateLimit-Type": limitType,
-            "Retry-After": (config.window ?? 60).toString(),
-          },
+          "X-RateLimit-Limit": (config.maxRequests ?? 30).toString(),
+          "X-RateLimit-Window": (config.window ?? 60).toString(),
+          "X-RateLimit-Type": limitType,
+          "Retry-After": (config.window ?? 60).toString(),
         },
       );
     }
 
-    // Rate limit passed, continue with request
     return null;
   } catch (error) {
     debugLog.error(
       "Rate limit check failed",
-      {
-        service: "rate-limiter",
-        operation: "applyRateLimit",
-      },
+      { service: "rate-limiter", operation: "applyRateLimit" },
       error,
     );
 
-    // SECURITY FIX (SEC-003): Fail secure - block requests when rate limiting is unavailable
-    // This prevents DoS attacks during Redis outages
-    return NextResponse.json(
+    // Fail secure — block requests when rate limiting is unavailable.
+    return jsonResponse(
       {
         error: "Rate limit service unavailable",
         message: "Service temporarily unavailable. Please try again later.",
       },
-      {
-        status: 503, // Service Unavailable
-        headers: {
-          "Retry-After": "60", // Suggest retry after 60 seconds
-        },
-      },
+      503,
+      { "Retry-After": "60" },
     );
   }
 }
 
 /**
- * Enhanced rate limiting that supports user-based limits for authenticated users
+ * Enhanced rate limiting that applies both user-based and IP-based limits.
  */
 export async function applyUserBasedRateLimit(
-  request: NextRequest,
+  request: Request,
   userId?: string,
   limitType?: RateLimitType,
-): Promise<NextResponse | null> {
+): Promise<Response | null> {
   const ip = getClientIp(request);
   const pathname = new URL(request.url).pathname;
   const rateLimitType = limitType || determineRateLimitType(pathname);
   const config = RATE_LIMIT_CONFIGS[rateLimitType];
 
   try {
-    // Extract user ID from token if not provided
     if (!userId) {
       const authHeader = request.headers.get("authorization");
       if (authHeader?.startsWith("Bearer ")) {
@@ -231,70 +204,53 @@ export async function applyUserBasedRateLimit(
       }
     }
 
-    // For authenticated users, use both IP and user-based rate limiting
     if (userId) {
-      // Check user-based rate limit (typically more generous)
       const userConfig = {
         ...config,
         keyPrefix: `user_${config.keyPrefix}`,
-        maxRequests: Math.floor(config.maxRequests * 1.5), // 50% more generous for authenticated users
+        maxRequests: Math.floor(config.maxRequests * 1.5),
       };
 
       const userAllowed = await checkRateLimit(userId, userConfig);
       if (!userAllowed) {
         debugLog.warn(
           "User rate limit exceeded",
-          {
-            service: "rate-limiter",
-            operation: "applyUserBasedRateLimit",
-          },
-          {
-            userId,
-            ip,
-            pathname,
-            limitType: rateLimitType,
-          },
+          { service: "rate-limiter", operation: "applyUserBasedRateLimit" },
+          { userId, ip, pathname, limitType: rateLimitType },
         );
 
-        return NextResponse.json(
+        return jsonResponse(
           {
             error: "User rate limit exceeded",
             message:
               "You have made too many requests. Please wait before trying again.",
             retryAfter: userConfig.window,
           },
+          429,
           {
-            status: 429,
-            headers: {
-              "X-RateLimit-Limit": (userConfig.maxRequests ?? 45).toString(),
-              "X-RateLimit-Window": (userConfig.window ?? 60).toString(),
-              "X-RateLimit-Type": `user_${rateLimitType}`,
-              "Retry-After": (userConfig.window ?? 60).toString(),
-            },
+            "X-RateLimit-Limit": (userConfig.maxRequests ?? 45).toString(),
+            "X-RateLimit-Window": (userConfig.window ?? 60).toString(),
+            "X-RateLimit-Type": `user_${rateLimitType}`,
+            "Retry-After": (userConfig.window ?? 60).toString(),
           },
         );
       }
     }
 
-    // Always check IP-based rate limit as well
     return applyRateLimit(request, rateLimitType);
   } catch (error) {
     debugLog.error(
       "User-based rate limit check failed",
-      {
-        service: "rate-limiter",
-        operation: "applyUserBasedRateLimit",
-      },
+      { service: "rate-limiter", operation: "applyUserBasedRateLimit" },
       error,
     );
 
-    // Fallback to IP-based rate limiting
     return applyRateLimit(request, rateLimitType);
   }
 }
 
 /**
- * Rate limit headers for successful requests
+ * Rate limit headers for successful requests.
  */
 export function getRateLimitHeaders(
   limitType: RateLimitType,

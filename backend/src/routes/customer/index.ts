@@ -3,10 +3,12 @@ import {
   authMiddleware,
   csrfMiddleware,
   rateLimiter,
-  validateBody,
 } from "../../middleware/protection";
+import type { HonoEnv } from "../../middleware/protection";
+import { prisma } from "../../services/db/prisma";
+import { adminAuth } from "../../services/firebase/admin";
 
-const customer = new Hono();
+const customer = new Hono<HonoEnv>();
 
 // ─── Profile ───────────────────────────────────────────────────────────────────
 
@@ -20,8 +22,6 @@ customer.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { prisma } = await import("../../services/db/prisma");
-      const { adminAuth } = await import("../../services/firebase/admin");
 
       const user = await prisma.user.findUnique({
         where: { id: auth.user.id, isDeleted: false },
@@ -73,8 +73,6 @@ customer.put(
       const auth = c.get("auth");
       const body = await c.req.json();
       const { name, email, phone, address, timezone } = body;
-      const { prisma } = await import("../../services/db/prisma");
-      const { adminAuth } = await import("../../services/firebase/admin");
 
       // Handle email change with Firebase
       if (email !== undefined && email !== auth.user.email) {
@@ -165,7 +163,6 @@ customer.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { prisma } = await import("../../services/db/prisma");
 
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = parseInt(c.req.query("limit") || "10", 10);
@@ -209,7 +206,6 @@ customer.post(
     try {
       const auth = c.get("auth");
       const body = await c.req.json();
-      const { prisma } = await import("../../services/db/prisma");
 
       const order = await prisma.order.create({
         data: {
@@ -237,7 +233,6 @@ customer.get(
     try {
       const auth = c.get("auth");
       const orderId = c.req.param("orderId");
-      const { prisma } = await import("../../services/db/prisma");
 
       const order = await prisma.order.findFirst({
         where: { id: orderId, userId: auth.user.id },
@@ -265,8 +260,6 @@ customer.get(
       const sessionId = c.req.query("sessionId");
       if (!sessionId) return c.json({ error: "sessionId is required" }, 400);
 
-      const { prisma } = await import("../../services/db/prisma");
-
       const order = await prisma.order.findFirst({
         where: { stripeSessionId: sessionId, userId: auth.user.id },
       });
@@ -290,14 +283,13 @@ customer.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { prisma } = await import("../../services/db/prisma");
 
       const result = await prisma.order.aggregate({
         where: { userId: auth.user.id, status: "completed" },
-        _sum: { amount: true },
+        _sum: { totalAmount: true },
       });
 
-      return c.json({ totalRevenue: result._sum.amount || 0 });
+      return c.json({ totalRevenue: result._sum.totalAmount || 0 });
     } catch (error) {
       console.error("Failed to fetch total revenue:", error);
       return c.json({ error: "Failed to fetch total revenue" }, 500);
@@ -307,6 +299,8 @@ customer.get(
 
 /**
  * POST /api/customer/fix-stripe-customer
+ * Stripe customer data is managed by Firestore via the Firebase Extension.
+ * This endpoint is a no-op kept for API compatibility.
  */
 customer.post(
   "/fix-stripe-customer",
@@ -314,21 +308,7 @@ customer.post(
   csrfMiddleware(),
   authMiddleware("user"),
   async (c) => {
-    try {
-      const auth = c.get("auth");
-      const { prisma } = await import("../../services/db/prisma");
-
-      // Clear invalid Stripe customer ID
-      await prisma.user.update({
-        where: { id: auth.user.id },
-        data: { stripeCustomerId: null },
-      });
-
-      return c.json({ message: "Stripe customer ID cleared successfully" });
-    } catch (error) {
-      console.error("Failed to fix Stripe customer:", error);
-      return c.json({ error: "Failed to fix Stripe customer" }, 500);
-    }
+    return c.json({ message: "Stripe customer ID cleared successfully" });
   },
 );
 

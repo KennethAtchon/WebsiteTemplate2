@@ -242,3 +242,16 @@ export function getRegistry(): PromRegistry | null {
 export const registry = {
   get: () => getRegistry(),
 };
+
+/** Returns a summary of error-related counters for the /api/health/error-monitoring endpoint. */
+export function getErrorMetrics(): Record<string, unknown> {
+  return {
+    metricsEnabled: METRICS_ENABLED,
+    errorsTotal: _errorsTotal !== null ? "available" : "unavailable",
+    unhandledRejections:
+      _unhandledRejectionsTotal !== null ? "available" : "unavailable",
+    uncaughtExceptions:
+      _uncaughtExceptionsTotal !== null ? "available" : "unavailable",
+    initialised: _initialised,
+  };
+}

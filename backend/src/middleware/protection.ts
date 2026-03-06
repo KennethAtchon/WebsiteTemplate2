@@ -1,5 +1,10 @@
 import type { Context, MiddlewareHandler } from "hono";
 import { z } from "zod";
+import { adminAuth } from "../services/firebase/admin";
+import { prisma } from "../services/db/prisma";
+import { validateCSRFToken } from "../services/csrf/csrf-protection";
+import { checkRateLimit } from "../services/rate-limit/rate-limit-redis";
+import { getRateLimitConfig } from "../constants/rate-limit.config";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -36,6 +41,18 @@ export interface ProtectionOptions {
   querySchema?: z.ZodSchema<any>;
 }
 
+// ─── Hono Context Variables ────────────────────────────────────────────────────
+
+/** Context variables set by middleware. Use `HonoEnv` when instantiating Hono in route files. */
+export type Variables = {
+  auth: AuthResult;
+  validatedBody: unknown;
+  validatedQuery: unknown;
+  rateLimitHeaders: Record<string, string>;
+};
+
+export type HonoEnv = { Variables: Variables };
+
 // ─── Auth Middleware ────────────────────────────────────────────────────────────
 
 /**
@@ -44,7 +61,7 @@ export interface ProtectionOptions {
  */
 export function authMiddleware(
   level: "user" | "admin" = "user",
-): MiddlewareHandler {
+): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     const authHeader = c.req.header("Authorization");
 
@@ -57,13 +74,8 @@ export function authMiddleware(
 
     try {
       const token = authHeader.substring(7);
-
-      // Dynamic import to avoid loading firebase-admin at module level
-      const { adminAuth } = await import("../services/firebase/admin");
       const decodedToken = await adminAuth.verifyIdToken(token, true);
 
-      // Look up user in database
-      const { prisma } = await import("../services/db/prisma");
       const user = await prisma.user.findUnique({
         where: { firebaseUid: decodedToken.uid },
         select: { id: true, email: true, role: true },
@@ -80,7 +92,6 @@ export function authMiddleware(
         );
       }
 
-      // Attach auth context to Hono context
       const authResult: AuthResult = {
         user: { id: user.id, email: user.email, role: user.role },
         firebaseUser: {
@@ -108,17 +119,15 @@ export function authMiddleware(
 
 /**
  * CSRF protection middleware for mutation operations.
- * Skips GET requests and the CSRF token endpoint.
+ * Skips GET requests and the CSRF token endpoint itself.
  */
-export function csrfMiddleware(): MiddlewareHandler {
+export function csrfMiddleware(): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
-    // Skip for GET requests (read-only)
     if (c.req.method === "GET") {
       await next();
       return;
     }
 
-    // Skip for the CSRF token endpoint itself
     if (c.req.path.endsWith("/csrf")) {
       await next();
       return;
@@ -137,15 +146,14 @@ export function csrfMiddleware(): MiddlewareHandler {
 
     try {
       const token = authHeader.substring(7);
-      const { adminAuth } = await import("../services/firebase/admin");
       const decodedToken = await adminAuth.verifyIdToken(token, true);
       const firebaseUID = decodedToken.uid;
 
-      const { requireCSRFToken } =
-        await import("../services/csrf/csrf-protection");
       const csrfHeader = c.req.header("X-CSRF-Token") || "";
+      const isValid = csrfHeader
+        ? validateCSRFToken(csrfHeader, firebaseUID)
+        : false;
 
-      const isValid = await requireCSRFToken(csrfHeader, firebaseUID);
       if (!isValid) {
         return c.json(
           { error: "CSRF token validation failed", code: "CSRF_TOKEN_INVALID" },
@@ -169,13 +177,9 @@ export function csrfMiddleware(): MiddlewareHandler {
 /**
  * Rate limiting middleware using Redis.
  */
-export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
+export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     try {
-      const { checkRateLimit } =
-        await import("../services/rate-limit/rate-limit-redis");
-      const { getRateLimitConfig } = await import("../constants/rate-limit.config");
-      
       const config = getRateLimitConfig(type);
       const ip =
         c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -185,11 +189,11 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
       const result = await checkRateLimit(ip, {
         maxRequests: config.maxRequests,
         window: config.window,
-        keyPrefix: config.keyPrefix
+        keyPrefix: config.keyPrefix,
       });
 
       if (!result) {
-        const resetTime = Date.now() + (config.window * 1000);
+        const resetTime = Date.now() + config.window * 1000;
         c.res.headers.set("X-Rate-Limit-Limit", String(config.maxRequests));
         c.res.headers.set("X-Rate-Limit-Remaining", "0");
         c.res.headers.set("X-Rate-Limit-Reset", String(resetTime));
@@ -201,19 +205,15 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
         );
       }
 
-      // Attach rate limit headers to be added after response
       c.set("rateLimitHeaders", {
         "X-Rate-Limit-Limit": String(config.maxRequests),
-        "X-Rate-Limit-Remaining": "1", // We don't track exact count with this simple implementation
-        "X-Rate-Limit-Reset": String(Date.now() + (config.window * 1000)),
+        "X-Rate-Limit-Remaining": "1",
+        "X-Rate-Limit-Reset": String(Date.now() + config.window * 1000),
       });
 
       await next();
 
-      // Add rate limit headers to response
-      const headers = c.get("rateLimitHeaders") as
-        | Record<string, string>
-        | undefined;
+      const headers = c.get("rateLimitHeaders");
       if (headers) {
         Object.entries(headers).forEach(([key, value]) => {
           c.res.headers.set(key, value);
@@ -221,7 +221,6 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
       }
     } catch (error) {
       console.error("Rate limit error:", error);
-      // Fail secure — block request when rate limiting is unavailable
       return c.json(
         {
           error: "Service temporarily unavailable",
@@ -238,7 +237,7 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
 /**
  * Validates request body against a Zod schema.
  */
-export function validateBody(schema: z.ZodSchema<any>): MiddlewareHandler {
+export function validateBody(schema: z.ZodSchema<any>): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     if (["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
       await next();
@@ -260,7 +259,6 @@ export function validateBody(schema: z.ZodSchema<any>): MiddlewareHandler {
         );
       }
 
-      // Store validated body for handler to use
       c.set("validatedBody", result.data);
       await next();
     } catch {
@@ -277,7 +275,7 @@ export function validateBody(schema: z.ZodSchema<any>): MiddlewareHandler {
 /**
  * Validates query parameters against a Zod schema.
  */
-export function validateQuery(schema: z.ZodSchema<any>): MiddlewareHandler {
+export function validateQuery(schema: z.ZodSchema<any>): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     const query = c.req.query();
     const result = schema.safeParse(query);

@@ -5,9 +5,11 @@ export const isSubscriptionType = (type: string): boolean => {
 // Aliases for compatibility
 export const isSubscriptionTier = isSubscriptionType;
 
-export const toSubscriptionTier = (value: unknown): string | null => {
+export const toSubscriptionTier = (
+  value: unknown,
+): "basic" | "pro" | "enterprise" | null => {
   if (typeof value === "string" && isSubscriptionType(value)) {
-    return value;
+    return value as "basic" | "pro" | "enterprise";
   }
   return null;
 };

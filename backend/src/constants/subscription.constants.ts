@@ -95,10 +95,10 @@ export function getTierConfig(
 ): SubscriptionTierConfig {
   return {
     name: TIER_NAMES[tier],
-    price: getStripePriceAmount(tier, billingCycle),
+    price: getStripePriceAmount(tier),
     billingCycle,
     features: BASE_TIER_FEATURES[tier],
-    stripePriceId: getStripePriceId(tier, billingCycle),
+    stripePriceId: getStripePriceId(tier),
   };
 }
 

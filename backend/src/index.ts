@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "./middleware/security-headers";
-import { getAllowedCorsOrigins } from "./utils/config/envUtil";
+import { getAllowedCorsOrigins, METRICS_SECRET } from "./utils/config/envUtil";
+import { getMetricsContent, isMetricsEnabled } from "./services/observability/metrics";
 
 // Route imports
 import healthRoutes from "./routes/health";
@@ -68,6 +69,23 @@ app.route("/api/csrf", csrfRoutes);
 // Standalone routes
 app.get("/api/live", (c) => c.json({ status: "ok" }));
 app.get("/api/ready", (c) => c.json({ status: "ready" }));
+
+// Prometheus metrics — protected by bearer token when METRICS_SECRET is set
+app.get("/api/metrics", async (c) => {
+  if (!isMetricsEnabled()) {
+    return c.json({ error: "Metrics not enabled" }, 404);
+  }
+  if (METRICS_SECRET) {
+    const auth = c.req.header("Authorization");
+    if (auth !== `Bearer ${METRICS_SECRET}`) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+  }
+  const content = await getMetricsContent();
+  return new Response(content, {
+    headers: { "Content-Type": "text/plain; version=0.0.4; charset=utf-8" },
+  });
+});
 
 // ─── Start Server ──────────────────────────────────────────────────────────────
 

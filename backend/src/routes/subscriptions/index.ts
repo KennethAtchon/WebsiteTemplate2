@@ -4,13 +4,19 @@ import {
   csrfMiddleware,
   rateLimiter,
 } from "../../middleware/protection";
+import type { HonoEnv } from "../../middleware/protection";
 import {
   FIREBASE_PROJECT_ID_SERVER,
   FIREBASE_PROJECT_ID,
   BASE_URL,
+  STRIPE_SECRET_KEY,
 } from "../../utils/config/envUtil";
+import { adminDb } from "../../services/firebase/admin";
+import { prisma } from "../../services/db/prisma";
+import { STRIPE_MAP } from "../../constants/stripe.constants";
+import Stripe from "stripe";
 
-const subscriptions = new Hono();
+const subscriptions = new Hono<HonoEnv>();
 
 // ─── GET /api/subscriptions/current ─────────────────────────────────────────
 
@@ -22,10 +28,6 @@ subscriptions.get(
     try {
       const auth = c.get("auth");
       const uid = auth.firebaseUser.uid;
-
-      const { adminDb } = await import("../../services/firebase/admin");
-      const { prisma } = await import("../../services/db/prisma");
-      const { STRIPE_MAP } = await import("../../constants/stripe.constants");
 
       const customerRef = adminDb.collection("customers").doc(uid);
       const subscriptionsSnapshot = await customerRef
@@ -121,8 +123,6 @@ subscriptions.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { prisma } = await import("../../services/db/prisma");
-      const { adminDb } = await import("../../services/firebase/admin");
 
       const dbUser = await prisma.user.findUnique({
         where: { id: auth.user.id },
@@ -252,21 +252,16 @@ subscriptions.post(
 
       if (!priceId) return c.json({ error: "priceId is required" }, 400);
 
-      const { STRIPE_SECRET_KEY } = await import("../../utils/config/envUtil");
       if (!STRIPE_SECRET_KEY)
         return c.json({ error: "Stripe not configured" }, 500);
 
-      const Stripe = (await import("stripe")).default;
       const stripe = new Stripe(STRIPE_SECRET_KEY, {
-        apiVersion: "2024-12-18.acacia",
+        apiVersion: "2025-02-24.acacia",
       });
 
       const origin = c.req.header("origin") || "http://localhost:5173";
       const baseUrl = BASE_URL !== "[BASE_URL]" ? BASE_URL : origin;
       const uid = auth.firebaseUser.uid;
-
-      const { adminDb } = await import("../../services/firebase/admin");
-      const { prisma } = await import("../../services/db/prisma");
 
       // Check trial eligibility
       let allowTrial = false;

@@ -4,15 +4,17 @@ import {
   csrfMiddleware,
   rateLimiter,
 } from "../../middleware/protection";
+import type { HonoEnv } from "../../middleware/protection";
+import { prisma } from "../../services/db/prisma";
+import { adminAuth } from "../../services/firebase/admin";
+import { FirebaseUserSync } from "../../services/firebase/sync";
 
-const users = new Hono();
+const users = new Hono<HonoEnv>();
 
 // ─── GET /api/users ───────────────────────────────────────────────────────────
 
 users.get("/", rateLimiter("admin"), authMiddleware("admin"), async (c) => {
   try {
-    const { prisma } = await import("../../services/db/prisma");
-
     const page = parseInt(c.req.query("page") || "1", 10);
     const limit = Math.min(parseInt(c.req.query("limit") || "50", 10), 100);
     const search = c.req.query("search");
@@ -64,8 +66,6 @@ users.post(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../../services/db/prisma");
-      const { FirebaseUserSync } = await import("../../services/firebase/sync");
       const { name, email, password, createInFirebase, timezone } =
         await c.req.json();
 
@@ -115,8 +115,6 @@ users.patch(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../../services/db/prisma");
-      const { FirebaseUserSync } = await import("../../services/firebase/sync");
       const {
         id,
         phone,
@@ -182,8 +180,6 @@ users.delete(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../../services/db/prisma");
-      const { FirebaseUserSync } = await import("../../services/firebase/sync");
       const { id, hardDelete = false } = await c.req.json();
 
       if (!id) return c.json({ error: "User id is required" }, 400);
@@ -225,7 +221,6 @@ users.get(
   authMiddleware("user"),
   async (c) => {
     try {
-      const { prisma } = await import("../../services/db/prisma");
       const now = new Date();
       const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const startOfLastMonth = new Date(
@@ -289,8 +284,6 @@ users.delete(
   authMiddleware("user"),
   async (c) => {
     try {
-      const { prisma } = await import("../../services/db/prisma");
-      const { adminAuth } = await import("../../services/firebase/admin");
       const auth = c.get("auth");
 
       const user = await prisma.user.findUnique({
@@ -335,7 +328,6 @@ users.get(
   authMiddleware("user"),
   async (c) => {
     try {
-      const { prisma } = await import("../../services/db/prisma");
       const auth = c.get("auth");
 
       const user = await prisma.user.findUnique({
@@ -380,7 +372,6 @@ users.post(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../../services/db/prisma");
       const { userId } = await c.req.json();
 
       if (!userId) return c.json({ error: "userId is required" }, 400);

@@ -4,8 +4,29 @@ import {
   csrfMiddleware,
   rateLimiter,
 } from "../../middleware/protection";
+import type { HonoEnv } from "../../middleware/protection";
+import { CalculatorService } from "../../features/calculator/services/calculator-service";
+import { VALID_CALCULATION_TYPES } from "../../features/calculator/types/calculator.types";
+import {
+  mortgageInputSchema,
+  loanInputSchema,
+  investmentInputSchema,
+  retirementInputSchema,
+  validateCalculatorInput,
+} from "../../features/calculator/types/calculator-validation";
+import {
+  hasFeatureAccess,
+  FEATURE_TIER_REQUIREMENTS,
+} from "../../utils/permissions/core-feature-permissions";
+import type { FeatureType } from "../../utils/permissions/core-feature-permissions";
+import {
+  getTierConfig,
+  toSubscriptionTier,
+} from "../../constants/subscription.constants";
+import { getMonthlyUsageCount } from "../../features/calculator/services/usage-service";
+import { prisma } from "../../services/db/prisma";
 
-const calculator = new Hono();
+const calculator = new Hono<HonoEnv>();
 
 /**
  * POST /api/calculator/calculate
@@ -21,29 +42,12 @@ calculator.post(
       const body = await c.req.json();
       const { type, inputs } = body;
 
-      const { CalculatorService } =
-        await import("../../features/calculator/services/calculator-service");
-      const { VALID_CALCULATION_TYPES, type: CalculationType } =
-        await import("../../features/calculator/types/calculator.types");
-      const {
-        mortgageInputSchema,
-        loanInputSchema,
-        investmentInputSchema,
-        retirementInputSchema,
-        validateCalculatorInput,
-      } = await import("../../features/calculator/types/calculator-validation");
-      const { hasFeatureAccess, FEATURE_TIER_REQUIREMENTS } =
-        await import("../../utils/permissions/core-feature-permissions");
-      const { getTierConfig, toSubscriptionTier } =
-        await import("../../constants/subscription.constants");
-      const { getMonthlyUsageCount } =
-        await import("../../features/calculator/services/usage-service");
-      const { prisma } = await import("../../services/db/prisma");
-
       // Validate calculation type
       if (!type || !VALID_CALCULATION_TYPES.includes(type)) {
         return c.json({ error: "Invalid calculation type" }, 400);
       }
+
+      const featureType = type as FeatureType;
 
       // Validate inputs based on type
       const schemaMap: Record<string, any> = {
@@ -67,8 +71,8 @@ calculator.post(
 
       // Check access permissions
       const stripeRole = toSubscriptionTier(auth.firebaseUser.stripeRole);
-      if (!hasFeatureAccess(stripeRole, type)) {
-        const requiredTier = FEATURE_TIER_REQUIREMENTS[type];
+      if (!hasFeatureAccess(stripeRole, featureType)) {
+        const requiredTier = FEATURE_TIER_REQUIREMENTS[featureType];
         if (!stripeRole) {
           return c.json(
             { error: "Active subscription required to use this calculator" },
@@ -84,7 +88,7 @@ calculator.post(
       }
 
       // Check usage limits
-      if (FEATURE_TIER_REQUIREMENTS[type] !== null && stripeRole) {
+      if (FEATURE_TIER_REQUIREMENTS[featureType] !== null && stripeRole) {
         const tierConfig = getTierConfig(stripeRole);
         const usageLimit =
           tierConfig.features.maxCalculationsPerMonth === -1
@@ -145,7 +149,6 @@ calculator.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { prisma } = await import("../../services/db/prisma");
 
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = parseInt(c.req.query("limit") || "20", 10);
@@ -191,10 +194,6 @@ calculator.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { getMonthlyUsageCount } =
-        await import("../../features/calculator/services/usage-service");
-      const { getTierConfig, toSubscriptionTier } =
-        await import("../../constants/subscription.constants");
 
       const usageCount = await getMonthlyUsageCount(auth.user.id);
       const stripeRole = toSubscriptionTier(auth.firebaseUser.stripeRole);
@@ -222,20 +221,13 @@ calculator.get(
   authMiddleware("user"),
   async (c) => {
     try {
-      const { VALID_CALCULATION_TYPES } =
-        await import("../../features/calculator/types/calculator.types");
-      const { hasFeatureAccess, FEATURE_TIER_REQUIREMENTS } =
-        await import("../../utils/permissions/core-feature-permissions");
-      const { toSubscriptionTier } =
-        await import("../../constants/subscription.constants");
-
       const auth = c.get("auth");
       const stripeRole = toSubscriptionTier(auth.firebaseUser.stripeRole);
 
-      const types = VALID_CALCULATION_TYPES.map((type: string) => ({
+      const types = VALID_CALCULATION_TYPES.map((type) => ({
         type,
-        hasAccess: hasFeatureAccess(stripeRole, type),
-        requiredTier: FEATURE_TIER_REQUIREMENTS[type],
+        hasAccess: hasFeatureAccess(stripeRole, type as FeatureType),
+        requiredTier: FEATURE_TIER_REQUIREMENTS[type as FeatureType],
       }));
 
       return c.json({ types });
@@ -256,7 +248,6 @@ calculator.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { prisma } = await import("../../services/db/prisma");
       const format = c.req.query("format") || "json";
 
       const history = await prisma.featureUsage.findMany({

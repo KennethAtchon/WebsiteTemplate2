@@ -4,8 +4,13 @@ import {
   csrfMiddleware,
   rateLimiter,
 } from "../../middleware/protection";
+import type { HonoEnv } from "../../middleware/protection";
+import { prisma } from "../../services/db/prisma";
+import { sendOrderConfirmationEmail } from "../../services/email/resend";
+import { storage } from "../../services/storage";
+import { generateSecureFilename } from "../../utils/validation/file-validation";
 
-const publicRoutes = new Hono();
+const publicRoutes = new Hono<HonoEnv>();
 
 // ─── GET /api/shared/contact-messages ────────────────────────────────────────
 
@@ -15,8 +20,6 @@ publicRoutes.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const { prisma } = await import("../../services/db/prisma");
-
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = Math.min(parseInt(c.req.query("limit") || "50", 10), 100);
       const search = c.req.query("search");
@@ -81,7 +84,6 @@ publicRoutes.get(
 
 publicRoutes.post("/contact-messages", rateLimiter("public"), async (c) => {
   try {
-    const { prisma } = await import("../../services/db/prisma");
     const data = await c.req.json();
     const { name, email, phone, subject, message } = data;
 
@@ -148,8 +150,6 @@ publicRoutes.post("/contact-messages", rateLimiter("public"), async (c) => {
 
 publicRoutes.post("/emails", rateLimiter("public"), async (c) => {
   try {
-    const { sendOrderConfirmationEmail } =
-      await import("../../services/email/resend");
     const body = await c.req.json();
     const {
       customerName,
@@ -227,12 +227,9 @@ publicRoutes.post(
         );
       }
 
-      const { storage } = await import("../../services/storage");
-      const { generateSecureFilename } =
-        await import("../../utils/validation/file-validation");
       const filename = generateSecureFilename(file.name);
       const buffer = Buffer.from(await file.arrayBuffer());
-      const url = await storage.upload(filename, buffer, file.type);
+      const url = await storage.uploadFile(buffer, filename, file.type);
 
       return c.json({ success: true, url, filename });
     } catch (error) {

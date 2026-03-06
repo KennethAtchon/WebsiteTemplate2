@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { authMiddleware, rateLimiter } from "../middleware/protection";
+import type { HonoEnv } from "../middleware/protection";
+import { generateCSRFToken } from "../services/csrf/csrf-protection";
 
-const app = new Hono();
+const app = new Hono<HonoEnv>();
 
 /**
  * GET /api/csrf
@@ -11,9 +13,6 @@ const app = new Hono();
 app.get("/", rateLimiter("public"), authMiddleware("user"), async (c) => {
   try {
     const auth = c.get("auth");
-    const { generateCSRFToken } =
-      await import("../../services/csrf/csrf-protection");
-
     const token = generateCSRFToken(auth.firebaseUser.uid);
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24h
 
