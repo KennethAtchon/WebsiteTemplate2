@@ -11,7 +11,10 @@
  * These logs are ALWAYS printed regardless of DEBUG_ENABLED or LOG_LEVEL settings
  */
 
-import { sanitizeObject, sanitizeString } from "@/utils/security/pii-sanitization";
+import {
+  sanitizeObject,
+  sanitizeString,
+} from "@/utils/security/pii-sanitization";
 import { IS_DEVELOPMENT } from "@/utils/config/envUtil";
 
 type SystemLogLevel = "info" | "warn" | "error" | "critical";
@@ -27,7 +30,7 @@ class SystemLogger {
     level: SystemLogLevel,
     message: string,
     context: SystemContext,
-    data?: any
+    data?: any,
   ): void {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
@@ -86,7 +89,7 @@ class SystemLogger {
         service: "app-monitoring",
         operation: `memory-${operation}`,
       },
-      data
+      data,
     );
   }
 
@@ -98,7 +101,7 @@ class SystemLogger {
         service: "redis-monitoring",
         operation,
       },
-      data
+      data,
     );
   }
 
@@ -106,7 +109,7 @@ class SystemLogger {
     level: SystemLogLevel,
     message: string,
     operation: string,
-    data?: any
+    data?: any,
   ) {
     this.formatSystemMessage(
       level,
@@ -115,7 +118,7 @@ class SystemLogger {
         service: "database-monitoring",
         operation,
       },
-      data
+      data,
     );
   }
 
@@ -123,7 +126,7 @@ class SystemLogger {
     level: SystemLogLevel,
     message: string,
     operation: string,
-    data?: any
+    data?: any,
   ) {
     this.formatSystemMessage(
       level,
@@ -132,7 +135,7 @@ class SystemLogger {
         service: "security",
         operation,
       },
-      data
+      data,
     );
   }
 
@@ -143,7 +146,7 @@ class SystemLogger {
         service: "rate-limiting",
         operation,
       },
-      data
+      data,
     );
   }
 
@@ -155,7 +158,7 @@ class SystemLogger {
         service: "authentication",
         operation,
       },
-      data
+      data,
     );
   }
 
@@ -166,7 +169,7 @@ class SystemLogger {
         service: "csrf-protection",
         operation,
       },
-      data
+      data,
     );
   }
 
@@ -177,7 +180,7 @@ class SystemLogger {
         service: "performance-monitoring",
         operation,
       },
-      data
+      data,
     );
   }
 
@@ -185,7 +188,7 @@ class SystemLogger {
     level: SystemLogLevel,
     message: string,
     operation: string,
-    data?: any
+    data?: any,
   ) {
     this.formatSystemMessage(
       level,
@@ -194,7 +197,7 @@ class SystemLogger {
         service: "app-lifecycle",
         operation,
       },
-      data
+      data,
     );
   }
 }
@@ -204,34 +207,34 @@ export const systemLogger = new SystemLogger();
 export const logSystemMemory = (
   message: string,
   operation: string,
-  data: any
+  data: any,
 ) => systemLogger.memory(message, operation, data);
 
 export const logRedisEvent = (
   level: SystemLogLevel,
   message: string,
   operation: string,
-  data?: any
+  data?: any,
 ) => systemLogger.redis(level, message, operation, data);
 
 export const logSecurityEvent = (
   level: SystemLogLevel,
   message: string,
   operation: string,
-  data?: any
+  data?: any,
 ) => systemLogger.security(level, message, operation, data);
 
 export const logAuthEvent = (
   level: SystemLogLevel,
   message: string,
   operation: string,
-  data?: any
+  data?: any,
 ) => systemLogger.auth(level, message, operation, data);
 
 export const logPerformanceEvent = (
   message: string,
   operation: string,
-  data?: any
+  data?: any,
 ) => systemLogger.performance(message, operation, data);
 
 export default systemLogger;

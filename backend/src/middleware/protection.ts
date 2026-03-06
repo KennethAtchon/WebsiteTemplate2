@@ -177,7 +177,9 @@ export function csrfMiddleware(): MiddlewareHandler<HonoEnv> {
 /**
  * Rate limiting middleware using Redis.
  */
-export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler<HonoEnv> {
+export function rateLimiter(
+  type: RateLimitType = "public",
+): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     try {
       const config = getRateLimitConfig(type);
@@ -237,7 +239,9 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler<H
 /**
  * Validates request body against a Zod schema.
  */
-export function validateBody(schema: z.ZodSchema<any>): MiddlewareHandler<HonoEnv> {
+export function validateBody(
+  schema: z.ZodSchema<any>,
+): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     if (["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
       await next();
@@ -275,7 +279,9 @@ export function validateBody(schema: z.ZodSchema<any>): MiddlewareHandler<HonoEn
 /**
  * Validates query parameters against a Zod schema.
  */
-export function validateQuery(schema: z.ZodSchema<any>): MiddlewareHandler<HonoEnv> {
+export function validateQuery(
+  schema: z.ZodSchema<any>,
+): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     const query = c.req.query();
     const result = schema.safeParse(query);

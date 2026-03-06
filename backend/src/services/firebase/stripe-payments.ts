@@ -14,7 +14,10 @@
  */
 
 import { adminDb } from "./admin";
-import { extractSubscriptionTier, convertFirestoreTimestamp } from "./subscription-helpers";
+import {
+  extractSubscriptionTier,
+  convertFirestoreTimestamp,
+} from "./subscription-helpers";
 import type { SubscriptionTier } from "@/constants/subscription.constants";
 
 export interface FirestoreSubscription {
@@ -94,9 +97,7 @@ export async function isUserInTrial(uid: string): Promise<boolean> {
  * Gets the Stripe customer ID for a Firebase user from Firestore.
  * Returns null if not found (user has never checked out).
  */
-export async function getStripeCustomerId(
-  uid: string,
-): Promise<string | null> {
+export async function getStripeCustomerId(uid: string): Promise<string | null> {
   const doc = await adminDb.collection("customers").doc(uid).get();
   return doc.data()?.stripeId ?? null;
 }

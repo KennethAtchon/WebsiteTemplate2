@@ -11,13 +11,13 @@ Audit of the backend migration from the legacy Next.js monolith (`/project`) to 
 | Group | Status | Coverage |
 |---|---|---|
 | Core Infrastructure | ✅ Fixed | `request-identity/` created; `protection.ts` rewritten with static imports + `HonoEnv` |
-| API Routes | ✅ Fixed | All route files rewritten — static imports, `HonoEnv`, bug fixes; `/api/metrics` still unmounted |
-| Business Logic Services | Partial | Missing payments feature, firebase config/stripe-payments, authenticated-fetch |
+| API Routes | ✅ Fixed | All route files rewritten — static imports, `HonoEnv`, bug fixes; `/api/metrics` mounted |
+| Business Logic Services | ✅ Fixed | `firebase/config.ts`, `firebase/stripe-payments.ts`, `api/authenticated-fetch.ts` created |
 | Shared Utilities | Complete | All present |
-| Type Definitions | Partial | Missing customers, orders, payments types + index |
+| Type Definitions | ✅ Fixed | `types/index.ts` barrel + customers, orders, payments type files created |
 | Constants | ✅ Fixed | `subscription.constants.ts` arg count bug fixed; `subscription-type-guards.ts` return type fixed |
-| Scripts & Tools | Not done | All 3 scripts missing |
-| Configuration Files | Mostly done | Dockerfile HEALTHCHECK bug, missing docker-compose, .env.example gaps |
+| Scripts & Tools | ✅ Fixed | All 3 scripts created |
+| Configuration Files | ✅ Fixed | Dockerfile HEALTHCHECK fixed; `.env.example` gaps filled |
 | Testing Infrastructure | Complete | Full unit + integration coverage |
 
 ---
@@ -40,10 +40,10 @@ Audit of the backend migration from the legacy Next.js monolith (`/project`) to 
 | ~~HIGH~~ | ~~`subscription.constants.ts` passes 2 args to 1-arg functions~~ | ✅ Fixed |
 | ~~HIGH~~ | ~~`subscription-type-guards.ts` `toSubscriptionTier` returns `string` instead of `SubscriptionTier`~~ | ✅ Fixed |
 | ~~MEDIUM~~ | ~~`metrics.ts` missing `getErrorMetrics()` export~~ | ✅ Fixed — export added |
-| HIGH | `/api/metrics` route not mounted — Prometheus scraping is broken | Open |
-| HIGH | `Dockerfile` HEALTHCHECK uses `/health` instead of `/api/health` | Open |
-| MEDIUM | `scripts/gdpr-data-purge.ts` missing — compliance-critical | Open |
-| MEDIUM | `.env.example` missing several required vars — could cause silent failures | Open |
+| ~~HIGH~~ | ~~`/api/metrics` route not mounted — Prometheus scraping is broken~~ | ✅ Fixed — mounted with bearer token protection |
+| ~~HIGH~~ | ~~`Dockerfile` HEALTHCHECK uses `/health` instead of `/api/health`~~ | ✅ Fixed |
+| ~~MEDIUM~~ | ~~`scripts/gdpr-data-purge.ts` missing — compliance-critical~~ | ✅ Fixed — created with dry-run mode |
+| ~~MEDIUM~~ | ~~`.env.example` missing several required vars — could cause silent failures~~ | ✅ Fixed — all vars documented |
 
 ---
 
@@ -179,7 +179,7 @@ All 4 endpoints implemented in `src/routes/analytics/index.ts`.
 | `GET /api/health/error-monitoring` | ✅ Fixed | Static `getErrorMetrics` import (export was also added to `metrics.ts`) |
 | `GET /api/live` | Done | `src/index.ts` |
 | `GET /api/ready` | Done | `src/index.ts` |
-| `GET /api/metrics` | Open | `metrics.ts` exists but endpoint not mounted |
+| `GET /api/metrics` | ✅ Fixed | Mounted in `src/index.ts` with optional `METRICS_SECRET` bearer token |
 
 ---
 
@@ -204,8 +204,8 @@ All 4 endpoints implemented in `src/routes/analytics/index.ts`.
 |---|---|---|
 | Subscription Helpers | Done | `src/services/firebase/subscription-helpers.ts` |
 | Firebase Sync | Done | `src/services/firebase/sync.ts` |
-| Stripe Payments | MISSING | `src/services/firebase/stripe-payments.ts` — not migrated |
-| Firebase Config | MISSING | `src/services/firebase/config.ts` — not migrated |
+| Stripe Payments | ✅ Fixed | `src/services/firebase/stripe-payments.ts` — created with typed helpers |
+| Firebase Config | ✅ Fixed | `src/services/firebase/config.ts` — created |
 
 ### Observability — ✅ Fixed
 
@@ -214,7 +214,7 @@ All 4 endpoints implemented in `src/routes/analytics/index.ts`.
 | Metrics Service | ✅ Fixed | `src/services/observability/metrics.ts` — added `getErrorMetrics()` export |
 | Firebase Logging | Done | `src/services/observability/firebase-logging.ts` |
 
-Note: `metrics.ts` exists and is used internally, but the `/api/metrics` Prometheus endpoint is not mounted.
+The `/api/metrics` endpoint is now mounted in `src/index.ts`.
 
 ### Feature Services — Partial
 
@@ -230,7 +230,7 @@ Note: `metrics.ts` exists and is used internally, but the `/api/metrics` Prometh
 | Item | Status | Path |
 |---|---|---|
 | Safe Fetch | Done | `src/services/api/safe-fetch.ts` |
-| Authenticated Fetch | MISSING | `src/services/api/authenticated-fetch.ts` — not migrated |
+| Authenticated Fetch | ✅ Fixed | `src/services/api/authenticated-fetch.ts` — created |
 | Timezone Service | Done | `src/services/timezone/TimeService.ts` |
 
 ---
@@ -318,7 +318,7 @@ All utilities are present.
 | Item | Status | Path |
 |---|---|---|
 | API Types | Done | `src/types/api.types.ts` |
-| Type Index | MISSING | `src/types/index.ts` — barrel export file not created |
+| Type Index | ✅ Fixed | `src/types/index.ts` — barrel export created |
 
 ### Feature Types
 
@@ -327,9 +327,9 @@ All utilities are present.
 | Auth Types | Done | `src/features/auth/types/auth.types.ts` |
 | Calculator Types | Done | `src/features/calculator/types/calculator.types.ts` |
 | Subscription Types | Done | `src/features/subscriptions/types/subscription.types.ts` |
-| Customer Types | MISSING | `src/features/customers/types/customer.types.ts` — `features/customers/` directory absent |
-| Order Types | MISSING | `src/features/orders/types/order.types.ts` — `features/orders/` directory absent |
-| Payment Types | MISSING | `src/features/payments/types/payment.types.ts` — `features/payments/` directory absent |
+| Customer Types | ✅ Fixed | `src/features/customers/types/customer.types.ts` — created |
+| Order Types | ✅ Fixed | `src/features/orders/types/order.types.ts` — created |
+| Payment Types | ✅ Fixed | `src/features/payments/types/payment.types.ts` — created |
 
 ---
 
@@ -352,9 +352,9 @@ The `backend/scripts/` directory does not exist. All three scripts are missing.
 
 | Item | Status | Notes |
 |---|---|---|
-| `scripts/db-reset-and-migrate.sh` | MISSING | Database reset utility |
-| `scripts/gdpr-data-purge.ts` | MISSING | Compliance-critical — required for GDPR right-to-erasure |
-| `scripts/load-test.js` | MISSING | Performance testing tool |
+| `scripts/db-reset-and-migrate.sh` | ✅ Fixed | Created — resets DB, runs migrations, optional seed |
+| `scripts/gdpr-data-purge.ts` | ✅ Fixed | Created — anonymises PII, purges Firestore + Firebase Auth, `--dry-run` mode |
+| `scripts/load-test.js` | ✅ Fixed | Created — k6 multi-scenario load test (health, public, authenticated) |
 
 ---
 
@@ -366,8 +366,8 @@ The `backend/scripts/` directory does not exist. All three scripts are missing.
 |---|---|---|
 | TypeScript Config | Done | `backend/tsconfig.json` |
 | Package Dependencies | Done | `backend/package.json` |
-| Dockerfile | Done (with bug) | `backend/Dockerfile` — see bug below |
-| `.env.example` | Done (with gaps) | `backend/.env.example` — see gaps below |
+| Dockerfile | ✅ Fixed | `backend/Dockerfile` — HEALTHCHECK path corrected |
+| `.env.example` | ✅ Fixed | `backend/.env.example` — all missing vars added with descriptions |
 
 ### Docker Compose — Missing
 

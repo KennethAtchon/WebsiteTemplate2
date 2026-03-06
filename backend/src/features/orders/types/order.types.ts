@@ -6,7 +6,12 @@
  * NOTE: These are one-time purchase orders only. Subscriptions live in Firestore.
  */
 
-export type OrderStatus = "pending" | "paid" | "completed" | "canceled" | "refunded";
+export type OrderStatus =
+  | "pending"
+  | "paid"
+  | "completed"
+  | "canceled"
+  | "refunded";
 
 export interface Order {
   id: string;

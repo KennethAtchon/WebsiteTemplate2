@@ -3,7 +3,10 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "./middleware/security-headers";
 import { getAllowedCorsOrigins, METRICS_SECRET } from "./utils/config/envUtil";
-import { getMetricsContent, isMetricsEnabled } from "./services/observability/metrics";
+import {
+  getMetricsContent,
+  isMetricsEnabled,
+} from "./services/observability/metrics";
 
 // Route imports
 import healthRoutes from "./routes/health";

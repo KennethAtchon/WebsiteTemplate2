@@ -35,6 +35,17 @@ export default [
       },
     },
   },
+  {
+    files: ["scripts/load-test.js"],
+    languageOptions: {
+      globals: {
+        __ENV: "readonly",
+      },
+    },
+    rules: {
+      "no-unused-vars": "off",
+    },
+  },
   prettier,
   {
     ignores: [

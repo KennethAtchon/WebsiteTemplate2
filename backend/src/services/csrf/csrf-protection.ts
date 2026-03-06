@@ -136,7 +136,10 @@ export async function extractCSRFToken(
     try {
       // Clone the request to avoid consuming the body
       const clonedRequest = request.clone();
-      const body = await clonedRequest.json() as { _token?: string; csrfToken?: string };
+      const body = (await clonedRequest.json()) as {
+        _token?: string;
+        csrfToken?: string;
+      };
       return body._token || body.csrfToken || null;
     } catch {
       // If we can't parse JSON, token not found in body
