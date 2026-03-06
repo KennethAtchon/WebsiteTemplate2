@@ -350,6 +350,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const pathname = location.pathname;
 
+  // Layout state for mobile navigation and help modal
+  const [layoutState, setLayoutState] = useState({
+    mobileNavOpen: false,
+    helpOpen: false,
+  });
+
+  const updateLayoutState = (updates: Partial<typeof layoutState>) => {
+    setLayoutState((prev) => ({ ...prev, ...updates }));
+  };
+
   const adminNavItems: AdminNavItem[] = [
     {
       href: "/admin/dashboard",

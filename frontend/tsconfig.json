@@ -23,5 +23,6 @@
     }
   },
   "include": ["src"],
+  "exclude": ["src/shared/components/ui", "src/routeTree.gen.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

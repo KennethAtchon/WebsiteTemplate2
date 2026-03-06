@@ -308,7 +308,10 @@ export function SubscriptionsList() {
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/admin/customers?userId=${sub.userId}`}>
+                        <Link
+                          to="/admin/customers"
+                          search={{ userId: sub.userId }}
+                        >
                           View Customer
                         </Link>
                       </Button>

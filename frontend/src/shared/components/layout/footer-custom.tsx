@@ -176,7 +176,7 @@ export default function FooterCustom() {
               </li>
               <li>
                 <Link
-                  to="/api/docs"
+                  to="/api-documentation"
                   className="text-gray-700 hover:text-teal-600"
                 >
                   {t("metadata_api_documentation_title")}

@@ -1,6 +1,10 @@
-import { adminAuth } from "./admin";
-import { prisma } from "@/shared/services/db/prisma";
+// import { adminAuth } from "./admin";
+// import { prisma } from "@/shared/services/db/prisma";
 import { debugLog } from "@/shared/utils/debug";
+
+// TODO: Implement these when backend services are available
+const adminAuth: any = null;
+const prisma: any = null;
 
 export interface SyncResult {
   success: boolean;
@@ -61,12 +65,12 @@ export class FirebaseUserSync {
         updateData.disabled = !updates.isActive;
 
       // Update Firebase user record
-      if (Object.keys(updateData).length > 0) {
+      if (Object.keys(updateData).length > 0 && adminAuth) {
         await adminAuth.updateUser(firebaseUid, updateData);
       }
 
       // Update custom claims for role changes
-      if (updates.role) {
+      if (updates.role && adminAuth) {
         await adminAuth.setCustomUserClaims(firebaseUid, {
           role: updates.role,
         });
@@ -101,15 +105,47 @@ export class FirebaseUserSync {
   ): Promise<SyncResult> {
     try {
       if (hardDelete) {
-        // Completely delete from Firebase
-        await adminAuth.deleteUser(firebaseUid);
-        return {
-          success: true,
-          action: "delete",
-          firebaseUid,
-        };
+        if (!adminAuth) {
+          return {
+            success: false,
+            action: "delete",
+            error: "Firebase admin not available",
+          };
+        }
+
+        try {
+          await adminAuth.deleteUser(firebaseUid);
+          return {
+            success: true,
+            action: "delete",
+            firebaseUid,
+          };
+        } catch (error) {
+          debugLog.error(
+            "Error syncing user deletion to Firebase",
+            {
+              service: "firebase-sync",
+              action: "delete",
+              firebaseUid,
+            },
+            error
+          );
+          return {
+            success: false,
+            action: "delete",
+            firebaseUid,
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
+        }
       } else {
         // Just disable the user
+        if (!adminAuth) {
+          return {
+            success: false,
+            action: "disable",
+            error: "Firebase admin not available",
+          };
+        }
         await adminAuth.updateUser(firebaseUid, { disabled: true });
         return {
           success: true,
@@ -145,6 +181,14 @@ export class FirebaseUserSync {
     role?: string;
     password?: string;
   }): Promise<SyncResult & { firebaseUid?: string }> {
+    if (!adminAuth) {
+      return {
+        success: false,
+        action: "create",
+        error: "Firebase admin not available",
+      };
+    }
+
     try {
       const createData: any = {
         email: userData.email,
@@ -188,6 +232,16 @@ export class FirebaseUserSync {
    * Syncs all database users to Firebase (for bulk operations)
    */
   static async syncAllUsers(): Promise<SyncResult[]> {
+    if (!adminAuth || !prisma) {
+      return [
+        {
+          success: false,
+          action: "sync",
+          error: "Firebase admin or Prisma not available",
+        },
+      ];
+    }
+
     try {
       const dbUsers = await prisma.user.findMany({
         where: {

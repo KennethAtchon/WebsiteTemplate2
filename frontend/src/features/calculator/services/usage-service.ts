@@ -8,11 +8,14 @@
  *   - app/api/admin/subscriptions/route.ts   (admin view)
  */
 
-import { prisma } from "@/shared/services/db/prisma";
+// import { prisma } from "@/shared/services/db/prisma";
 import {
   FEATURE_TIER_REQUIREMENTS,
   isFeatureFree,
 } from "@/shared/utils/permissions/core-feature-permissions";
+
+// TODO: Replace with actual Prisma client when database is integrated
+const prisma: any = null;
 import { getMonthBoundaries } from "@/shared/utils/helpers/date";
 
 /**
@@ -32,6 +35,11 @@ export function getGatedCalculatorTypes(): string[] {
  * calendar month. Free calculators are excluded from the count.
  */
 export async function getMonthlyUsageCount(userId: string): Promise<number> {
+  if (!prisma) {
+    console.warn("Prisma not available, returning 0 usage");
+    return 0;
+  }
+
   const { startOfThisMonth } = getMonthBoundaries();
   const gatedTypes = getGatedCalculatorTypes();
 

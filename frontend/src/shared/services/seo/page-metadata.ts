@@ -4,8 +4,8 @@
  * Utility for creating consistent page metadata with automatic canonical URL generation.
  */
 
-import { Metadata } from "next";
-import { generateBusinessMetadata } from "./metadata";
+// import { Metadata } from "next";
+import { generateBusinessMetadata, Metadata } from "./metadata";
 import { BASE_URL } from "@/shared/utils/config/envUtil";
 
 export interface CreatePageMetadataOptions {

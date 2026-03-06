@@ -471,7 +471,7 @@ export default function StripePaymentFallback() {
       }
     };
 
-    const formDataParam = searchParams.get("orderData");
+    const formDataParam = searchParams.orderData;
     if (formDataParam) {
       try {
         const decoded = JSON.parse(decodeURIComponent(formDataParam));
@@ -498,7 +498,7 @@ export default function StripePaymentFallback() {
 
       safeSetTimeout(() => {
         if (!isUnmountedRef.current) {
-          router.push(PATHS.checkout);
+          navigate({ to: PATHS.checkout });
         }
       }, TIMEOUTS.redirectDelay);
     }
@@ -510,7 +510,7 @@ export default function StripePaymentFallback() {
     processPayment,
     handleError,
     safeSetTimeout,
-    router,
+    navigate,
     t,
   ]);
 
@@ -523,7 +523,7 @@ export default function StripePaymentFallback() {
     setIsRetrying(false);
 
     // Re-trigger the effect by forcing a re-run
-    const formDataParam = searchParams.get("orderData");
+    const formDataParam = searchParams.orderData;
     if (formDataParam) {
       try {
         const decoded = JSON.parse(decodeURIComponent(formDataParam));
@@ -635,7 +635,7 @@ export default function StripePaymentFallback() {
 
               {/* Return to checkout button */}
               <Button
-                onClick={() => router.push(PATHS.checkout)}
+                onClick={() => navigate({ to: PATHS.checkout })}
                 variant={error.retryable ? "outline" : "default"}
                 className={
                   error.retryable

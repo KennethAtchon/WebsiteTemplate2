@@ -1,9 +1,13 @@
+import React from "react";
 import {
   createRouter,
   createRootRoute,
   createRoute,
 } from "@tanstack/react-router";
-import App from "../App";
+// import App from "../App";
+
+// TODO: This is a legacy manual router - use file-based routing instead
+const App = () => <div>Legacy Router - Use File-Based Routing</div>;
 
 // Import simple components
 import SimpleCalculator from "../features/calculator/components/SimpleCalculator";

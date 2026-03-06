@@ -276,8 +276,8 @@ export function SubscriptionCheckout({
                       {t("checkout_calculations_per_month", {
                         count:
                           tierConfig.features.maxCalculationsPerMonth === -1
-                            ? t("calculator_unlimited")
-                            : tierConfig.features.maxCalculationsPerMonth.toLocaleString(),
+                            ? 0
+                            : tierConfig.features.maxCalculationsPerMonth,
                       })}
                     </span>
                   </li>

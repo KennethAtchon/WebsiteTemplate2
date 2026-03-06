@@ -4,9 +4,60 @@
  * Generates SEO-optimized metadata using app constants (APP_NAME, etc.).
  */
 
-import { Metadata } from "next";
+// import { Metadata } from "next";
 import { APP_NAME, APP_DESCRIPTION } from "@/shared/constants/app.constants";
 import { BASE_URL, APP_ENV } from "@/shared/utils/config/envUtil";
+
+// TODO: Replace with proper Next.js Metadata type when Next.js is integrated
+export interface Metadata {
+  title?: string;
+  description?: string;
+  keywords?: string | string[];
+  canonical?: string;
+  authors?: Array<{ name: string }>;
+  creator?: string;
+  publisher?: string;
+  metadataBase?: URL;
+  openGraph?: {
+    title?: string;
+    description?: string;
+    url?: string;
+    siteName?: string;
+    images?: Array<{
+      url: string;
+      width?: number;
+      height?: number;
+      alt?: string;
+    }>;
+    locale?: string;
+    type?: string;
+  };
+  twitter?: {
+    card?: string;
+    title?: string;
+    description?: string;
+    images?: string[];
+    site?: string;
+    creator?: string;
+  };
+  robots?:
+    | string
+    | {
+        index?: boolean;
+        follow?: boolean;
+        googleBot?: {
+          index?: boolean;
+          follow?: boolean;
+          "max-video-preview"?: number;
+          "max-image-preview"?: string;
+          "max-snippet"?: number;
+        };
+      };
+  alternates?: {
+    canonical?: string;
+  };
+  other?: Record<string, string>;
+}
 
 export interface SEOConfig {
   title: string;

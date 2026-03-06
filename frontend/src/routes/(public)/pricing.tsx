@@ -124,7 +124,8 @@ function PricingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="text-lg px-8 h-12 shadow-lg">
                 <Link
-                  to={`/checkout?tier=${SUBSCRIPTION_TIERS.PRO}&billing=monthly`}
+                  to="/checkout"
+                  search={{ tier: SUBSCRIPTION_TIERS.PRO, billing: "monthly" }}
                 >
                   {t("home_hero_cta_start_trial")}
                   <ArrowRight className="ml-2 h-5 w-5" />

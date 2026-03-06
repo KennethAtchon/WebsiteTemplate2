@@ -243,14 +243,16 @@ export function CheckoutInteractive() {
         </Alert>
       )}
 
-      {checkoutType === "subscription" ? (
+      {checkoutType === "subscription" && tier ? (
         <SubscriptionCheckout
           tier={tier}
           billingCycle={billingCycle}
           onBillingCycleChange={setBillingCycle}
         />
-      ) : (
+      ) : checkoutType === "order" ? (
         <OrderCheckout initialItems={orderItems} />
+      ) : (
+        <div>Loading...</div>
       )}
     </>
   );

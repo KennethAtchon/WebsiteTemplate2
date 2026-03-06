@@ -316,7 +316,7 @@ export function OrderConfirmation({ orderId }: OrderConfirmationProps) {
           </Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <Link to="/therapies">
+          <Link to="/calculator">
             <ShoppingBag className="mr-2 h-5 w-5" />
             Browse More Therapies
           </Link>

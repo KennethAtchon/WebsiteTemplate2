@@ -1,11 +1,33 @@
 /**
  * Mock data and helper functions using Prisma types
  */
-import {
-  Order as PrismaOrder,
-  User as PrismaUser,
-  Prisma as _Prisma,
-} from "@/infrastructure/database/lib/generated/prisma";
+// import {
+//   Order as PrismaOrder,
+//   User as PrismaUser,
+//   Prisma as _Prisma,
+// } from "@/infrastructure/database/lib/generated/prisma";
+
+// TODO: Replace with actual Prisma types when database is integrated
+export interface PrismaOrder {
+  id: string;
+  userId: string;
+  status: string;
+  total: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PrismaUser {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Prisma {
+  // Add Prisma types as needed
+}
 
 // Extended types for UI components with computed fields
 export interface OrderWithDetails extends Omit<PrismaOrder, "user"> {

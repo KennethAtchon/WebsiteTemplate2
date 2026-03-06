@@ -98,8 +98,8 @@ export function OrderCreator({ sessionId }: OrderCreatorProps) {
 
         // Redirect to the same page but with order_id parameter
         navigate({
-          pathname: `/payment/success`,
-          search: `?session_id=${sessionId}&order_id=${orderId}`,
+          to: `/payment/success`,
+          search: { session_id: sessionId, order_id: orderId },
         });
       } catch (err) {
         debugLog.error(
@@ -121,7 +121,7 @@ export function OrderCreator({ sessionId }: OrderCreatorProps) {
     };
 
     createOrder();
-  }, [sessionId, user, router, authenticatedFetch]);
+  }, [sessionId, user, navigate, authenticatedFetch]);
 
   const handleRetry = () => {
     setError(null);
