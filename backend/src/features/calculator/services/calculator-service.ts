@@ -62,7 +62,7 @@ export class CalculatorService {
         principal,
         monthlyRate,
         numPayments,
-        monthlyPrincipalAndInterest
+        monthlyPrincipalAndInterest,
       );
 
       const calculationTime = Date.now() - startTime;
@@ -75,7 +75,7 @@ export class CalculatorService {
         },
         {
           calculationTime: `${calculationTime}ms`,
-        }
+        },
       );
 
       return {
@@ -95,7 +95,7 @@ export class CalculatorService {
           service: SERVICE_NAME,
           operation: "calculateMortgage",
         },
-        error
+        error,
       );
       throw new Error("Failed to calculate mortgage payment");
     }
@@ -126,7 +126,7 @@ export class CalculatorService {
         principal,
         monthlyRate,
         term,
-        monthlyPayment
+        monthlyPayment,
       );
 
       const calculationTime = Date.now() - startTime;
@@ -139,7 +139,7 @@ export class CalculatorService {
         },
         {
           calculationTime: `${calculationTime}ms`,
-        }
+        },
       );
 
       return {
@@ -155,7 +155,7 @@ export class CalculatorService {
           service: SERVICE_NAME,
           operation: "calculateLoan",
         },
-        error
+        error,
       );
       throw new Error("Failed to calculate loan payment");
     }
@@ -202,7 +202,7 @@ export class CalculatorService {
         monthlyContribution,
         monthlyRate,
         years,
-        compoundFrequency
+        compoundFrequency,
       );
 
       const calculationTime = Date.now() - startTime;
@@ -215,7 +215,7 @@ export class CalculatorService {
         },
         {
           calculationTime: `${calculationTime}ms`,
-        }
+        },
       );
 
       return {
@@ -231,7 +231,7 @@ export class CalculatorService {
           service: SERVICE_NAME,
           operation: "calculateInvestment",
         },
-        error
+        error,
       );
       throw new Error("Failed to calculate investment future value");
     }
@@ -292,21 +292,21 @@ export class CalculatorService {
       const recommendations: string[] = [];
       if (!isOnTrack && shortfall) {
         recommendations.push(
-          `You need to save an additional $${Math.round(shortfall).toLocaleString()} to meet your retirement goals.`
+          `You need to save an additional $${Math.round(shortfall).toLocaleString()} to meet your retirement goals.`,
         );
         const additionalMonthly = shortfall / totalMonths;
         recommendations.push(
-          `Consider increasing monthly contributions by $${Math.round(additionalMonthly).toLocaleString()}.`
+          `Consider increasing monthly contributions by $${Math.round(additionalMonthly).toLocaleString()}.`,
         );
       } else if (surplus) {
         recommendations.push(
-          `Great! You're on track with a surplus of $${Math.round(surplus).toLocaleString()}.`
+          `Great! You're on track with a surplus of $${Math.round(surplus).toLocaleString()}.`,
         );
       }
 
       if (yearsToRetirement < 10) {
         recommendations.push(
-          "Consider consulting a financial advisor as you approach retirement."
+          "Consider consulting a financial advisor as you approach retirement.",
         );
       }
 
@@ -320,7 +320,7 @@ export class CalculatorService {
         },
         {
           calculationTime: `${calculationTime}ms`,
-        }
+        },
       );
 
       return {
@@ -340,7 +340,7 @@ export class CalculatorService {
           service: SERVICE_NAME,
           operation: "calculateRetirement",
         },
-        error
+        error,
       );
       throw new Error("Failed to calculate retirement readiness");
     }
@@ -353,7 +353,7 @@ export class CalculatorService {
     principal: number,
     monthlyRate: number,
     numPayments: number,
-    monthlyPayment: number
+    monthlyPayment: number,
   ) {
     const schedule = [];
     let remainingBalance = principal;
@@ -382,7 +382,7 @@ export class CalculatorService {
     principal: number,
     monthlyRate: number,
     term: number,
-    monthlyPayment: number
+    monthlyPayment: number,
   ) {
     const schedule = [];
     let remainingBalance = principal;
@@ -412,7 +412,7 @@ export class CalculatorService {
     monthlyContribution: number,
     monthlyRate: number,
     years: number,
-    compoundFrequency: number
+    compoundFrequency: number,
   ) {
     const chart = [];
     let currentValue = initialInvestment;
@@ -449,23 +449,23 @@ export class CalculatorService {
    */
   static performCalculation(
     type: "mortgage",
-    inputs: MortgageInputs
+    inputs: MortgageInputs,
   ): CalculationResponse;
   static performCalculation(
     type: "loan",
-    inputs: LoanInputs
+    inputs: LoanInputs,
   ): CalculationResponse;
   static performCalculation(
     type: "investment",
-    inputs: InvestmentInputs
+    inputs: InvestmentInputs,
   ): CalculationResponse;
   static performCalculation(
     type: "retirement",
-    inputs: RetirementInputs
+    inputs: RetirementInputs,
   ): CalculationResponse;
   static performCalculation(
     type: CalculationType,
-    inputs: MortgageInputs | LoanInputs | InvestmentInputs | RetirementInputs
+    inputs: MortgageInputs | LoanInputs | InvestmentInputs | RetirementInputs,
   ): CalculationResponse {
     const startTime = Date.now();
     let results:

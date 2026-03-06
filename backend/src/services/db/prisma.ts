@@ -219,7 +219,7 @@ function createPrismaClient() {
                 operation,
                 duration,
                 error: error instanceof Error ? error.message : "Unknown error",
-              }
+              },
             );
 
             throw error;
@@ -318,7 +318,7 @@ function handleSlowQuery(
   model: string,
   operation: string,
   duration: number,
-  args: any
+  args: any,
 ) {
   const criticalThreshold = slowQueryThreshold * 10; // 1000ms
   const level = duration > criticalThreshold ? "error" : "warn";
@@ -335,7 +335,7 @@ function handleSlowQuery(
       duration: `${duration}ms`,
       threshold: `${slowQueryThreshold}ms`,
       args: sanitizeArgs(args),
-    }
+    },
   );
 }
 
@@ -362,14 +362,14 @@ function recordConnectionPoolMetric() {
   if (connectionPoolMetrics.length > maxMetricsHistory) {
     connectionPoolMetrics.splice(
       0,
-      connectionPoolMetrics.length - maxMetricsHistory
+      connectionPoolMetrics.length - maxMetricsHistory,
     );
   }
 
   recordConnectionPool(
     metric.activeConnections,
     metric.idleConnections,
-    CONNECTION_POOL_CONFIG.maxConnections
+    CONNECTION_POOL_CONFIG.maxConnections,
   );
 
   // Alert on high connection usage
@@ -390,7 +390,7 @@ function recordConnectionPoolMetric() {
         activeConnections: metric.activeConnections,
         usagePercent: `${Math.round(connectionUsagePercent)}%`,
         threshold: `${CONNECTION_POOL_CONFIG.connectionWarningThreshold * 100}%`,
-      }
+      },
     );
   }
 }
@@ -401,7 +401,7 @@ function getConnectionCount(): number {
   return Math.max(
     1,
     queryMetrics.filter((m) => Date.now() - m.timestamp.getTime() < 60000)
-      .length
+      .length,
   );
 }
 
@@ -409,7 +409,8 @@ function getActiveConnectionCount(): number {
   // Estimate based on recent query activity
   return Math.max(
     1,
-    queryMetrics.filter((m) => Date.now() - m.timestamp.getTime() < 5000).length
+    queryMetrics.filter((m) => Date.now() - m.timestamp.getTime() < 5000)
+      .length,
   );
 }
 
@@ -438,7 +439,7 @@ async function ensureConnectionHealth(): Promise<boolean> {
           attempt,
           maxRetries,
           error: error instanceof Error ? error.message : "Unknown error",
-        }
+        },
       );
 
       if (attempt === maxRetries) {
@@ -451,7 +452,7 @@ async function ensureConnectionHealth(): Promise<boolean> {
           {
             attempts: maxRetries,
             error: error instanceof Error ? error.message : "Unknown error",
-          }
+          },
         );
         return false;
       }
@@ -486,7 +487,7 @@ async function gracefulShutdown(): Promise<void> {
       },
       {
         error: error instanceof Error ? error.message : "Unknown error",
-      }
+      },
     );
   }
 }
@@ -511,7 +512,7 @@ function startConnectionPoolMonitoring() {
     },
     {
       interval: `${poolMetricsInterval / 1000}s`,
-    }
+    },
   );
 }
 
@@ -543,10 +544,10 @@ export function getQueryStats(minutes: number = 60) {
 
   const totalTime = recentMetrics.reduce((sum, m) => sum + m.duration, 0);
   const slowQueries = recentMetrics.filter(
-    (m) => m.duration > slowQueryThreshold
+    (m) => m.duration > slowQueryThreshold,
   );
   const errorQueries = recentMetrics.filter((m) =>
-    m.operation.includes("ERROR")
+    m.operation.includes("ERROR"),
   );
 
   const topSlowQueries = recentMetrics
@@ -571,7 +572,7 @@ export function getQueryStats(minutes: number = 60) {
 export function getConnectionPoolStats(minutes: number = 60) {
   const cutoff = new Date(Date.now() - minutes * 60 * 1000);
   const recentMetrics = connectionPoolMetrics.filter(
-    (m) => m.timestamp >= cutoff
+    (m) => m.timestamp >= cutoff,
   );
 
   if (recentMetrics.length === 0) {
@@ -586,14 +587,14 @@ export function getConnectionPoolStats(minutes: number = 60) {
 
   const avgActive = Math.round(
     recentMetrics.reduce((sum, m) => sum + m.activeConnections, 0) /
-      recentMetrics.length
+      recentMetrics.length,
   );
   const avgIdle = Math.round(
     recentMetrics.reduce((sum, m) => sum + m.idleConnections, 0) /
-      recentMetrics.length
+      recentMetrics.length,
   );
   const peakConnections = Math.max(
-    ...recentMetrics.map((m) => m.totalConnections)
+    ...recentMetrics.map((m) => m.totalConnections),
   );
 
   return {
@@ -603,7 +604,7 @@ export function getConnectionPoolStats(minutes: number = 60) {
     averageIdleConnections: avgIdle,
     peakConnections,
     poolUtilization: Math.round(
-      (avgActive / CONNECTION_POOL_CONFIG.maxConnections) * 100
+      (avgActive / CONNECTION_POOL_CONFIG.maxConnections) * 100,
     ),
   };
 }
@@ -672,7 +673,7 @@ const enhancedPrisma = new Proxy(prisma, {
               const isHealthy = await ensureConnectionHealth();
               if (!isHealthy) {
                 throw new Error(
-                  "Database connection is unhealthy. Please try again."
+                  "Database connection is unhealthy. Please try again.",
                 );
               }
 
@@ -682,8 +683,8 @@ const enhancedPrisma = new Proxy(prisma, {
                   setTimeout(() => {
                     reject(
                       new Error(
-                        `Database query timed out after ${CONNECTION_POOL_CONFIG.queryTimeout}ms`
-                      )
+                        `Database query timed out after ${CONNECTION_POOL_CONFIG.queryTimeout}ms`,
+                      ),
                     );
                   }, CONNECTION_POOL_CONFIG.queryTimeout);
                 });
@@ -691,7 +692,7 @@ const enhancedPrisma = new Proxy(prisma, {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
                 const queryPromise = (modelMethod as Function).apply(
                   modelTarget,
-                  args
+                  args,
                 );
 
                 return await Promise.race([queryPromise, timeoutPromise]);
@@ -713,7 +714,7 @@ const enhancedPrisma = new Proxy(prisma, {
                       model: String(prop),
                       method: String(modelProp),
                       error: error.message,
-                    }
+                    },
                   );
                 }
                 throw error;

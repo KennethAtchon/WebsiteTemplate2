@@ -20,7 +20,7 @@ describe("encryption key validation", () => {
   test("encrypt throws when ENCRYPTION_KEY is empty", () => {
     process.env.ENCRYPTION_KEY = "";
     expect(() => encrypt("x")).toThrow(
-      "Environment variable ENCRYPTION_KEY is required but not set"
+      "Environment variable ENCRYPTION_KEY is required but not set",
     );
   });
 });

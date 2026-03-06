@@ -21,13 +21,10 @@ calculator.post(
       const body = await c.req.json();
       const { type, inputs } = body;
 
-      const { CalculatorService } = await import(
-        "../../features/calculator/services/calculator-service"
-      );
-      const {
-        VALID_CALCULATION_TYPES,
-        type: CalculationType,
-      } = await import("../../features/calculator/types/calculator.types");
+      const { CalculatorService } =
+        await import("../../features/calculator/services/calculator-service");
+      const { VALID_CALCULATION_TYPES, type: CalculationType } =
+        await import("../../features/calculator/types/calculator.types");
       const {
         mortgageInputSchema,
         loanInputSchema,
@@ -35,17 +32,12 @@ calculator.post(
         retirementInputSchema,
         validateCalculatorInput,
       } = await import("../../features/calculator/types/calculator-validation");
-      const {
-        hasFeatureAccess,
-        FEATURE_TIER_REQUIREMENTS,
-      } = await import("../../utils/permissions/core-feature-permissions");
-      const {
-        getTierConfig,
-        toSubscriptionTier,
-      } = await import("../../constants/subscription.constants");
-      const { getMonthlyUsageCount } = await import(
-        "../../features/calculator/services/usage-service"
-      );
+      const { hasFeatureAccess, FEATURE_TIER_REQUIREMENTS } =
+        await import("../../utils/permissions/core-feature-permissions");
+      const { getTierConfig, toSubscriptionTier } =
+        await import("../../constants/subscription.constants");
+      const { getMonthlyUsageCount } =
+        await import("../../features/calculator/services/usage-service");
       const { prisma } = await import("../../services/db/prisma");
 
       // Validate calculation type
@@ -62,13 +54,14 @@ calculator.post(
       };
 
       const schema = schemaMap[type];
-      if (!schema) return c.json({ error: "Unsupported calculation type" }, 400);
+      if (!schema)
+        return c.json({ error: "Unsupported calculation type" }, 400);
 
       const validation = validateCalculatorInput(schema, inputs);
       if (!validation.success) {
         return c.json(
           { error: `Invalid ${type} inputs`, details: validation.details },
-          400
+          400,
         );
       }
 
@@ -79,14 +72,14 @@ calculator.post(
         if (!stripeRole) {
           return c.json(
             { error: "Active subscription required to use this calculator" },
-            403
+            403,
           );
         }
         return c.json(
           {
             error: `This calculation type requires ${requiredTier} tier or higher. Your current plan: ${stripeRole}.`,
           },
-          403
+          403,
         );
       }
 
@@ -106,7 +99,7 @@ calculator.post(
                 error:
                   "Monthly calculation limit reached. Please upgrade your plan.",
               },
-              403
+              403,
             );
           }
         }
@@ -115,14 +108,12 @@ calculator.post(
       // Perform calculation
       const result = CalculatorService.performCalculation(
         type,
-        validation.data
+        validation.data,
       );
 
       // Save calculation history
       try {
-        const serializedResults = JSON.parse(
-          JSON.stringify(result.results)
-        );
+        const serializedResults = JSON.parse(JSON.stringify(result.results));
         await prisma.featureUsage.create({
           data: {
             userId: auth.user.id,
@@ -141,7 +132,7 @@ calculator.post(
       console.error("Calculation error:", error);
       return c.json({ error: "Failed to perform calculation" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -176,13 +167,18 @@ calculator.get(
 
       return c.json({
         history,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       });
     } catch (error) {
       console.error("Failed to fetch history:", error);
       return c.json({ error: "Failed to fetch calculation history" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -195,13 +191,10 @@ calculator.get(
   async (c) => {
     try {
       const auth = c.get("auth");
-      const { getMonthlyUsageCount } = await import(
-        "../../features/calculator/services/usage-service"
-      );
-      const {
-        getTierConfig,
-        toSubscriptionTier,
-      } = await import("../../constants/subscription.constants");
+      const { getMonthlyUsageCount } =
+        await import("../../features/calculator/services/usage-service");
+      const { getTierConfig, toSubscriptionTier } =
+        await import("../../constants/subscription.constants");
 
       const usageCount = await getMonthlyUsageCount(auth.user.id);
       const stripeRole = toSubscriptionTier(auth.firebaseUser.stripeRole);
@@ -217,7 +210,7 @@ calculator.get(
       console.error("Failed to fetch usage:", error);
       return c.json({ error: "Failed to fetch usage" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -229,16 +222,12 @@ calculator.get(
   authMiddleware("user"),
   async (c) => {
     try {
-      const { VALID_CALCULATION_TYPES } = await import(
-        "../../features/calculator/types/calculator.types"
-      );
-      const {
-        hasFeatureAccess,
-        FEATURE_TIER_REQUIREMENTS,
-      } = await import("../../utils/permissions/core-feature-permissions");
-      const { toSubscriptionTier } = await import(
-        "../../constants/subscription.constants"
-      );
+      const { VALID_CALCULATION_TYPES } =
+        await import("../../features/calculator/types/calculator.types");
+      const { hasFeatureAccess, FEATURE_TIER_REQUIREMENTS } =
+        await import("../../utils/permissions/core-feature-permissions");
+      const { toSubscriptionTier } =
+        await import("../../constants/subscription.constants");
 
       const auth = c.get("auth");
       const stripeRole = toSubscriptionTier(auth.firebaseUser.stripeRole);
@@ -254,7 +243,7 @@ calculator.get(
       console.error("Failed to fetch types:", error);
       return c.json({ error: "Failed to fetch calculator types" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -280,7 +269,7 @@ calculator.get(
           "Date,Type,Inputs,Results,Time(ms)",
           ...history.map(
             (h: any) =>
-              `${h.createdAt.toISOString()},${h.featureType},"${JSON.stringify(h.inputData)}","${JSON.stringify(h.resultData)}",${h.usageTimeMs}`
+              `${h.createdAt.toISOString()},${h.featureType},"${JSON.stringify(h.inputData)}","${JSON.stringify(h.resultData)}",${h.usageTimeMs}`,
           ),
         ];
         return new Response(csvRows.join("\n"), {
@@ -296,7 +285,7 @@ calculator.get(
       console.error("Failed to export:", error);
       return c.json({ error: "Failed to export calculations" }, 500);
     }
-  }
+  },
 );
 
 export default calculator;

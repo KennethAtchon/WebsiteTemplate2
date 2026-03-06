@@ -68,13 +68,13 @@ export class TimeService {
     const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/;
     if (!isoRegex.test(dateString)) {
       throw new Error(
-        `Invalid ISO format: ${dateString}. Expected ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)`
+        `Invalid ISO format: ${dateString}. Expected ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)`,
       );
     }
 
     // Parse components to validate exact date values
     const match = dateString.match(
-      /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d{3})?Z?$/
+      /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d{3})?Z?$/,
     );
     if (match) {
       const [, year, month, day, hour, minute, second] = match;
@@ -88,22 +88,22 @@ export class TimeService {
       // Validate ranges
       if (monthNum < 1 || monthNum > 12) {
         throw new Error(
-          `Invalid ISO format: ${dateString}. Month must be 01-12`
+          `Invalid ISO format: ${dateString}. Month must be 01-12`,
         );
       }
       if (hourNum > 23) {
         throw new Error(
-          `Invalid ISO format: ${dateString}. Hour must be 00-23`
+          `Invalid ISO format: ${dateString}. Hour must be 00-23`,
         );
       }
       if (minuteNum > 59) {
         throw new Error(
-          `Invalid ISO format: ${dateString}. Minute must be 00-59`
+          `Invalid ISO format: ${dateString}. Minute must be 00-59`,
         );
       }
       if (secondNum > 59) {
         throw new Error(
-          `Invalid ISO format: ${dateString}. Second must be 00-59`
+          `Invalid ISO format: ${dateString}. Second must be 00-59`,
         );
       }
 
@@ -111,7 +111,7 @@ export class TimeService {
       const daysInMonth = new Date(yearNum, monthNum, 0).getDate();
       if (dayNum < 1 || dayNum > daysInMonth) {
         throw new Error(
-          `Invalid ISO format: ${dateString}. Day ${dayNum} is not valid for month ${monthNum}`
+          `Invalid ISO format: ${dateString}. Day ${dayNum} is not valid for month ${monthNum}`,
         );
       }
     }
@@ -119,7 +119,7 @@ export class TimeService {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
       throw new Error(
-        `Invalid ISO format: ${dateString}. Date value is not valid`
+        `Invalid ISO format: ${dateString}. Date value is not valid`,
       );
     }
   }
@@ -130,7 +130,7 @@ export class TimeService {
   private static validateTimezone(timezone: string): void {
     if (!this.isValidTimezone(timezone)) {
       throw new Error(
-        `Invalid timezone: ${timezone}. Must be a valid IANA timezone identifier.`
+        `Invalid timezone: ${timezone}. Must be a valid IANA timezone identifier.`,
       );
     }
   }
@@ -151,7 +151,7 @@ export class TimeService {
       return utcDate.toISOString();
     } catch (error) {
       throw new Error(
-        `Failed to convert local time to UTC: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to convert local time to UTC: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -173,7 +173,7 @@ export class TimeService {
       return format(localDate, "yyyy-MM-dd'T'HH:mm:ss.SSS");
     } catch (error) {
       throw new Error(
-        `Failed to convert UTC to local time: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to convert UTC to local time: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -188,7 +188,7 @@ export class TimeService {
   static formatWithLabel(
     time: string,
     timezone: string,
-    formatString = "MMM d, yyyy 'at' h:mm a zzz"
+    formatString = "MMM d, yyyy 'at' h:mm a zzz",
   ): string {
     this.validateISOFormat(time);
     this.validateTimezone(timezone);
@@ -199,7 +199,7 @@ export class TimeService {
       return format(zonedDate, formatString);
     } catch (error) {
       throw new Error(
-        `Failed to format time with label: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to format time with label: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -225,7 +225,7 @@ export class TimeService {
       return timeZonePart?.value || "Unknown";
     } catch (error) {
       throw new Error(
-        `Failed to get timezone abbreviation: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to get timezone abbreviation: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -244,7 +244,7 @@ export class TimeService {
       return localTime.toISOString();
     } catch (error) {
       throw new Error(
-        `Failed to get current time in timezone: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to get current time in timezone: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -274,11 +274,11 @@ export class TimeService {
       // Common DST indicators (not exhaustive, but covers major cases)
       const dstKeywords = ["daylight", "summer", "dst"];
       return dstKeywords.some((keyword) =>
-        timeZoneName.toLowerCase().includes(keyword)
+        timeZoneName.toLowerCase().includes(keyword),
       );
     } catch (error) {
       throw new Error(
-        `Failed to check DST status: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to check DST status: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -306,7 +306,7 @@ export class TimeService {
   static getTimezoneOffset(
     timezone1: string,
     timezone2: string,
-    date?: Date
+    date?: Date,
   ): number {
     this.validateTimezone(timezone1);
     this.validateTimezone(timezone2);
@@ -321,7 +321,7 @@ export class TimeService {
       return Math.round((time1 - time2) / (1000 * 60));
     } catch (error) {
       throw new Error(
-        `Failed to calculate timezone offset: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to calculate timezone offset: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -334,7 +334,7 @@ export class TimeService {
    */
   static getDSTTransitions(
     timezone: string,
-    year?: number
+    year?: number,
   ): { spring?: Date; fall?: Date } {
     this.validateTimezone(timezone);
 

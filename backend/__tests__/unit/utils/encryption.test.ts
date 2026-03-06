@@ -11,7 +11,7 @@ describe("encryption", () => {
     const encrypted = encrypt(plain);
     expect(encrypted).not.toBe(plain);
     expect(encrypted).toMatch(
-      /^[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+$/
+      /^[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+$/,
     );
     const decrypted = decrypt(encrypted);
     expect(decrypted).toBe(plain);

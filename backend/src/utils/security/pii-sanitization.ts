@@ -131,7 +131,7 @@ function isValidEmail(email: string): boolean {
  */
 export function sanitizeString(
   text: string,
-  config: SanitizationConfig = {}
+  config: SanitizationConfig = {},
 ): string {
   if (!text || typeof text !== "string") return text;
 
@@ -193,7 +193,7 @@ export function sanitizeString(
       (existing) =>
         (match.start >= existing.start && match.start < existing.end) ||
         (match.end > existing.start && match.end <= existing.end) ||
-        (match.start <= existing.start && match.end >= existing.end)
+        (match.start <= existing.start && match.end >= existing.end),
     );
 
     if (!hasOverlap) {
@@ -263,7 +263,7 @@ export function sanitizeObject(obj: any, depth = 0, maxDepth = 5): any {
           typeof value === "string"
             ? sanitizeString(value)
             : sanitizeObject(value, depth + 1, maxDepth),
-        ])
+        ]),
       ),
     };
   }
@@ -281,7 +281,7 @@ export function sanitizeObject(obj: any, depth = 0, maxDepth = 5): any {
 
     // Check if the field name indicates sensitive data
     const isSensitiveField = SENSITIVE_FIELD_PATTERNS.some((pattern) =>
-      lowerKey.includes(pattern.toLowerCase())
+      lowerKey.includes(pattern.toLowerCase()),
     );
 
     // Special case: plain 'id' field with numeric value is usually safe

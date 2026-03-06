@@ -141,14 +141,14 @@ describe("global-error-handler", () => {
         withTimeout(
           new Promise((r) => setTimeout(() => r(1), 100)),
           10,
-          "slow op"
-        )
+          "slow op",
+        ),
       ).rejects.toThrow(/slow op.*10ms/);
     });
 
     it("rejects with inner error when promise rejects", async () => {
       await expect(
-        withTimeout(Promise.reject(new Error("inner")), 5000)
+        withTimeout(Promise.reject(new Error("inner")), 5000),
       ).rejects.toThrow("inner");
     });
   });

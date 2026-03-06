@@ -14,7 +14,7 @@ const _currencyAmountSchema = z
   .max(999999.99, "Amount cannot exceed $999,999.99")
   .refine(
     (value) => Number.isFinite(value) && value > 0,
-    "Amount must be a finite positive number"
+    "Amount must be a finite positive number",
   );
 
 const quantitySchema = z
@@ -29,9 +29,9 @@ export const uuidSchema = z
   .refine(
     (value) =>
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        value
+        value,
       ),
-    "Invalid UUID format"
+    "Invalid UUID format",
   );
 
 const phoneNumberSchema = z
@@ -42,7 +42,7 @@ const phoneNumberSchema = z
   .transform((val) => val.replace(/\D/g, ""))
   .refine(
     (val) => val.length >= 10 && val.length <= 15,
-    "Phone number must be 10-15 digits"
+    "Phone number must be 10-15 digits",
   );
 
 const emailSchema = z
@@ -68,7 +68,7 @@ const nameSchema = z
   .max(100, "Name cannot exceed 100 characters")
   .regex(
     /^[a-zA-Z\s\-'\.]+$/,
-    "Name can only contain letters, spaces, hyphens, apostrophes, and periods"
+    "Name can only contain letters, spaces, hyphens, apostrophes, and periods",
   )
   .refine((val) => {
     // Reject SQL injection patterns
@@ -89,7 +89,7 @@ const orderStatusSchema = z.enum(
   ["pending", "confirmed", "processing", "completed", "cancelled", "refunded"],
   {
     message: "Invalid order status",
-  }
+  },
 );
 
 const futureDateTimeSchema = z.iso
@@ -125,7 +125,7 @@ export const createOrderSchema = z
         z.object({
           therapyId: uuidSchema,
           quantity: quantitySchema,
-        })
+        }),
       )
       .min(1, "At least one therapy must be specified")
       .max(20, "Cannot order more than 20 different therapies"),
@@ -146,14 +146,14 @@ export const createOrderSchema = z
     (data) => {
       const totalQuantity = data.therapies.reduce(
         (sum, t) => sum + t.quantity,
-        0
+        0,
       );
       return totalQuantity <= 200; // Max 200 total items
     },
     {
       message: "Total quantity of all therapies cannot exceed 200",
       path: ["therapies"],
-    }
+    },
   );
 
 export const createCustomerOrderSchema = z.object({
@@ -166,7 +166,7 @@ export const createCustomerOrderSchema = z.object({
     .max(999999.99, "Amount cannot exceed $999,999.99")
     .refine(
       (value) => Number.isFinite(value) && value > 0,
-      "Amount must be a finite positive number"
+      "Amount must be a finite positive number",
     ),
   status: orderStatusSchema.optional().default("pending"),
   stripeSessionId: z
@@ -184,7 +184,7 @@ export const updateOrderSchema = z
         z.object({
           therapyId: uuidSchema,
           quantity: quantitySchema,
-        })
+        }),
       )
       .optional(),
     notes: notesSchema,
@@ -194,7 +194,7 @@ export const updateOrderSchema = z
       if (data.therapies) {
         const totalQuantity = data.therapies.reduce(
           (sum, t) => sum + t.quantity,
-          0
+          0,
         );
         return totalQuantity <= 200;
       }
@@ -203,7 +203,7 @@ export const updateOrderSchema = z
     {
       message: "Total quantity of all therapies cannot exceed 200",
       path: ["therapies"],
-    }
+    },
   );
 
 export const updateProfileSchema = z.object({
@@ -239,7 +239,7 @@ export const fileUploadSchema = z.object({
       .string()
       .regex(
         /^[a-zA-Z0-9][a-zA-Z0-9!#$&\-\^_]*\/[a-zA-Z0-9][a-zA-Z0-9!#$&\-\^_.]*$/,
-        "Invalid MIME type"
+        "Invalid MIME type",
       ),
   }),
   category: z
@@ -296,7 +296,7 @@ export const createTimeSlotSchema = z
     {
       message: "End time must be after start time",
       path: ["endTime"],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -308,12 +308,12 @@ export const createTimeSlotSchema = z
     {
       message: "Time slot cannot exceed 8 hours",
       path: ["endTime"],
-    }
+    },
   );
 
 export const validateCurrencyAmount = (
   amount: number,
-  context: string
+  context: string,
 ): boolean => {
   if (!Number.isFinite(amount)) {
     throw new Error(`${context}: Amount must be a finite number`);
@@ -323,7 +323,7 @@ export const validateCurrencyAmount = (
   }
   if (Math.round(amount * 100) !== amount * 100) {
     throw new Error(
-      `${context}: Amount cannot have more than 2 decimal places`
+      `${context}: Amount cannot have more than 2 decimal places`,
     );
   }
   if (amount > 999999.99) {
@@ -345,7 +345,7 @@ export const sanitizeFinancialData = (data: any) => {
 export function validateInput<T>(
   schema: z.ZodSchema<T>,
   input: unknown,
-  context: string
+  context: string,
 ):
   | { success: true; data: T }
   | { success: false; error: string; details?: any } {
@@ -369,7 +369,7 @@ export function validateInput<T>(
 
       const errorMessage = error.issues
         .map((e) =>
-          e.path.length > 0 ? `${e.path.join(".")}: ${e.message}` : e.message
+          e.path.length > 0 ? `${e.path.join(".")}: ${e.message}` : e.message,
         )
         .join(", ");
 
@@ -382,7 +382,7 @@ export function validateInput<T>(
 
     console.error(
       `[VALIDATION] Unexpected validation error in ${context}:`,
-      error
+      error,
     );
     return { success: false, error: "Invalid input format" };
   }

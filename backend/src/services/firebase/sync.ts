@@ -41,7 +41,7 @@ export class FirebaseUserSync {
       name?: string;
       role?: string;
       isActive?: boolean;
-    }
+    },
   ): Promise<SyncResult> {
     if (!firebaseUid || firebaseUid.trim() === "") {
       return {
@@ -81,7 +81,7 @@ export class FirebaseUserSync {
       debugLog.error(
         "Error syncing user update to Firebase",
         { service: "firebase-sync", action: "update", firebaseUid },
-        error
+        error,
       );
       return {
         success: false,
@@ -97,7 +97,7 @@ export class FirebaseUserSync {
    */
   static async syncUserDelete(
     firebaseUid: string,
-    hardDelete: boolean = false
+    hardDelete: boolean = false,
   ): Promise<SyncResult> {
     try {
       if (hardDelete) {
@@ -125,7 +125,7 @@ export class FirebaseUserSync {
           action: hardDelete ? "delete" : "disable",
           firebaseUid,
         },
-        error
+        error,
       );
       return {
         success: false,
@@ -174,7 +174,7 @@ export class FirebaseUserSync {
       debugLog.error(
         "Error syncing user creation to Firebase",
         { service: "firebase-sync", action: "create" },
-        error
+        error,
       );
       return {
         success: false,
@@ -252,7 +252,7 @@ export class FirebaseUserSync {
       debugLog.error(
         "Error in bulk sync",
         { service: "firebase-sync", action: "bulk_sync" },
-        error
+        error,
       );
       return [
         {
@@ -269,7 +269,7 @@ export class FirebaseUserSync {
  * Build Firebase update data from user updates
  */
 function _buildFirebaseUpdateData(
-  updates: UserUpdateData
+  updates: UserUpdateData,
 ): Record<string, unknown> {
   const updateData: Record<string, unknown> = {};
 
@@ -284,7 +284,7 @@ function _buildFirebaseUpdateData(
  * Build Firebase create data from user data
  */
 function _buildFirebaseCreateData(
-  userData: UserCreateData
+  userData: UserCreateData,
 ): Record<string, unknown> {
   const createData: Record<string, unknown> = {
     email: userData.email,

@@ -50,7 +50,7 @@ async function fetchSchema(): Promise<{ models: any[] } | null> {
       debugLog.error(
         "Error fetching schema",
         { service: "prisma-introspection", operation: "fetchSchema" },
-        error
+        error,
       );
       return null;
     } finally {
@@ -63,7 +63,7 @@ async function fetchSchema(): Promise<{ models: any[] } | null> {
 
 // Extract field information from fetched schema
 async function getPrismaFieldInfo(
-  modelName: string
+  modelName: string,
 ): Promise<{ fields: string[]; fieldsInfo: Record<string, FieldInfo> }> {
   try {
     const schema = await fetchSchema();
@@ -72,7 +72,7 @@ async function getPrismaFieldInfo(
       debugLog.warn(
         `Schema not available for model ${modelName}`,
         { service: "prisma-introspection", operation: "getPrismaFieldInfo" },
-        { modelName }
+        { modelName },
       );
       return { fields: [], fieldsInfo: {} };
     }
@@ -83,7 +83,7 @@ async function getPrismaFieldInfo(
       debugLog.warn(
         `Model ${modelName} not found in schema`,
         { service: "prisma-introspection", operation: "getPrismaFieldInfo" },
-        { modelName }
+        { modelName },
       );
       return { fields: [], fieldsInfo: {} };
     }
@@ -115,7 +115,7 @@ async function getPrismaFieldInfo(
     debugLog.error(
       `Error extracting fields for ${modelName}`,
       { service: "prisma-introspection", operation: "getPrismaFieldInfo" },
-      error
+      error,
     );
     return { fields: [], fieldsInfo: {} };
   }
@@ -137,14 +137,14 @@ export async function getTableConfigs(): Promise<TableConfig[]> {
         apiEndpoint: config.apiEndpoint,
         fieldsInfo,
       };
-    })
+    }),
   );
 
   return configs;
 }
 
 export async function generateExpectedParams(
-  modelName: string
+  modelName: string,
 ): Promise<Record<string, string>> {
   const { fieldsInfo } = await getPrismaFieldInfo(modelName);
   const params: Record<string, string> = {};

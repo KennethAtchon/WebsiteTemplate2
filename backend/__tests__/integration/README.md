@@ -87,7 +87,7 @@ describe("GET /api/customer/profile", () => {
         headers: {
           Authorization: "Bearer valid-token",
         },
-      }
+      },
     );
 
     const response = await GET(request);

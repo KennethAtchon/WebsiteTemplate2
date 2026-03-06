@@ -61,10 +61,7 @@ export const ERROR_MESSAGES = {
   EXTERNAL_SERVICE_ERROR: "External service error",
 } as const;
 
-type ApiHandler = (
-  request: Request,
-  context?: any
-) => Promise<Response>;
+type ApiHandler = (request: Request, context?: any) => Promise<Response>;
 
 /**
  * Optional hook to intercept errors before default classification.
@@ -89,7 +86,7 @@ export function withApiErrorHandling(
     allowedMethods?: string[];
     /** Called before default error classification. Return a response to override, or null to use defaults. */
     customErrorHandler?: CustomErrorHandler;
-  } = {}
+  } = {},
 ): ApiHandler {
   const { timeoutMs = 30000, allowedMethods, customErrorHandler } = options;
 
@@ -106,7 +103,7 @@ export function withApiErrorHandling(
         url: request.url,
         userAgent: request.headers.get("user-agent"),
         ip: getClientIp(request),
-      }
+      },
     );
 
     try {
@@ -117,14 +114,14 @@ export function withApiErrorHandling(
             code: "METHOD_NOT_ALLOWED",
             allowedMethods,
           },
-          { status: 405 }
+          { status: 405 },
         );
       }
 
       const response = await withTimeout(
         handler(request, context),
         timeoutMs,
-        "API request timeout"
+        "API request timeout",
       );
 
       const duration = Date.now() - startTime;
@@ -136,7 +133,7 @@ export function withApiErrorHandling(
           method: request.method,
           statusCode: response.status,
           duration,
-        }
+        },
       );
 
       return response;
@@ -161,7 +158,7 @@ export function withApiErrorHandling(
           errorId: structuredError?.id,
           error: err.message,
           stack: err.stack,
-        }
+        },
       );
 
       if (customErrorHandler) {
@@ -189,14 +186,14 @@ function classifyAndRespond(error: Error): Response {
     return createErrorResponse(
       ERROR_MESSAGES.DATABASE_ERROR,
       503,
-      "DATABASE_ERROR"
+      "DATABASE_ERROR",
     );
   }
   if (message.includes("unauthorized") || message.includes("auth")) {
     return createErrorResponse(
       ERROR_MESSAGES.UNAUTHORIZED,
       401,
-      "UNAUTHORIZED"
+      "UNAUTHORIZED",
     );
   }
   if (message.includes("forbidden") || message.includes("access denied")) {
@@ -214,7 +211,7 @@ function classifyAndRespond(error: Error): Response {
     return createErrorResponse(
       ERROR_MESSAGES.RATE_LIMITED,
       429,
-      "RATE_LIMITED"
+      "RATE_LIMITED",
     );
   }
   if (message.includes("timeout") || message.includes("timed out")) {
@@ -229,7 +226,7 @@ function classifyAndRespond(error: Error): Response {
     return createErrorResponse(
       ERROR_MESSAGES.EXTERNAL_SERVICE_ERROR,
       502,
-      "EXTERNAL_SERVICE_ERROR"
+      "EXTERNAL_SERVICE_ERROR",
     );
   }
   if (message.includes("not found") || message.includes("does not exist")) {
@@ -256,7 +253,7 @@ export function withStandardErrorHandling(handler: ApiHandler): ApiHandler {
 export async function safeAsyncOperation<T>(
   operation: () => Promise<T>,
   context: string,
-  timeoutMs: number = 10000
+  timeoutMs: number = 10000,
 ): Promise<T> {
   try {
     return await withTimeout(operation(), timeoutMs, `${context} timeout`);

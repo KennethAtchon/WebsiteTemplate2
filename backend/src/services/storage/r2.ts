@@ -23,7 +23,7 @@ if (
 ) {
   debugLog.warn(
     "R2 configuration is incomplete. R2 functionality will be disabled",
-    { service: "r2-storage" }
+    { service: "r2-storage" },
   );
 }
 
@@ -39,7 +39,7 @@ const s3Client = new S3Client({
 export async function uploadFile(
   file: File | Buffer,
   key: string,
-  contentType: string
+  contentType: string,
 ): Promise<string> {
   if (!R2_BUCKET_NAME) {
     throw new Error("R2_BUCKET_NAME is not configured");
@@ -67,7 +67,7 @@ export async function uploadFile(
     debugLog.error(
       "Error uploading to R2",
       { service: "r2-storage", key: finalKey },
-      error
+      error,
     );
     throw new Error("Failed to upload file to R2 storage");
   }
@@ -88,7 +88,7 @@ export async function deleteFile(key: string): Promise<void> {
     debugLog.error(
       "Error deleting from R2",
       { service: "r2-storage", key: finalKey },
-      error
+      error,
     );
     throw new Error("Failed to delete file from R2 storage");
   }
@@ -96,7 +96,7 @@ export async function deleteFile(key: string): Promise<void> {
 
 export async function getFileUrl(
   key: string,
-  expiresIn = 3600
+  expiresIn = 3600,
 ): Promise<string> {
   // Add /testing prefix in development mode
   const finalKey = APP_ENV === "development" ? `testing/${key}` : key;
@@ -114,7 +114,7 @@ export async function getFileUrl(
     debugLog.error(
       "Error generating signed URL",
       { service: "r2-storage", key: finalKey },
-      error
+      error,
     );
     throw new Error("Failed to generate signed URL");
   }

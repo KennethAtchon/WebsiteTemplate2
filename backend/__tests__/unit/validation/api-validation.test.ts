@@ -300,10 +300,10 @@ describe("api-validation", () => {
   describe("adminVerifySchema", () => {
     test("requires non-empty adminCode", () => {
       expect(adminVerifySchema.safeParse({ adminCode: "" }).success).toBe(
-        false
+        false,
       );
       expect(adminVerifySchema.safeParse({ adminCode: "code" }).success).toBe(
-        true
+        true,
       );
     });
   });
@@ -458,7 +458,7 @@ describe("api-validation", () => {
   describe("orderBySessionQuerySchema", () => {
     test("requires session_id", () => {
       expect(
-        orderBySessionQuerySchema.safeParse({ session_id: "cs_123" }).success
+        orderBySessionQuerySchema.safeParse({ session_id: "cs_123" }).success,
       ).toBe(true);
       expect(orderBySessionQuerySchema.safeParse({}).success).toBe(false);
     });

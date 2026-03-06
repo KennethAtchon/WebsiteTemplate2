@@ -119,7 +119,7 @@ describe("search-validation", () => {
   describe("idSchema", () => {
     test("accepts valid UUID", () => {
       expect(
-        idSchema.safeParse("123e4567-e89b-12d3-a456-426614174000").success
+        idSchema.safeParse("123e4567-e89b-12d3-a456-426614174000").success,
       ).toBe(true);
     });
     test("rejects invalid UUID", () => {
@@ -133,7 +133,7 @@ describe("search-validation", () => {
     });
     test("rejects SQL injection in email", () => {
       expect(
-        emailSchema.safeParse("a@b.co'; DROP TABLE users;--").success
+        emailSchema.safeParse("a@b.co'; DROP TABLE users;--").success,
       ).toBe(false);
     });
   });
@@ -145,7 +145,7 @@ describe("search-validation", () => {
       const result = validateSearchInput(
         schema,
         { page: "1", limit: "20" },
-        "test"
+        "test",
       );
       expect(result.success).toBe(true);
       if (result.success) expect(result.data).toBeDefined();

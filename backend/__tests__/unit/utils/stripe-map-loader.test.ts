@@ -60,7 +60,7 @@ describe("stripe-map-loader", () => {
 
     test("pro costs more than basic", () => {
       expect(getStripePriceAmount("pro")).toBeGreaterThan(
-        getStripePriceAmount("basic")
+        getStripePriceAmount("basic"),
       );
     });
 

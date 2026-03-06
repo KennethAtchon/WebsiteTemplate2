@@ -38,7 +38,7 @@ const RATE_LIMIT_PATH_SEGMENTS = new Map<RateLimitType, readonly string[]>([
 
 function pathMatchesSegments(
   pathname: string,
-  segments: readonly string[]
+  segments: readonly string[],
 ): boolean {
   return segments.some((seg) => pathname.includes(seg));
 }
@@ -82,7 +82,7 @@ async function getRateLimitKey(request: NextRequest): Promise<string> {
 export async function applyRateLimit(
   request: NextRequest,
   customType?: RateLimitType,
-  customConfig?: { window?: number; maxRequests?: number; keyPrefix?: string }
+  customConfig?: { window?: number; maxRequests?: number; keyPrefix?: string },
 ): Promise<NextResponse | null> {
   try {
     // Get rate limit key (now async)
@@ -115,7 +115,7 @@ export async function applyRateLimit(
         limitType,
         config,
         method: request.method,
-      }
+      },
     );
 
     // Check rate limit using the user/session/IP key
@@ -150,14 +150,14 @@ export async function applyRateLimit(
         systemLogger.rateLimit(
           "Rate limit exceeded (ALERT)",
           "applyRateLimit",
-          logData
+          logData,
         );
       } else {
         // Use warn level for non-alertable rate limits
         systemLogger.rateLimit(
           "Rate limit exceeded",
           "applyRateLimit",
-          logData
+          logData,
         );
       }
 
@@ -175,7 +175,7 @@ export async function applyRateLimit(
             "X-RateLimit-Type": limitType,
             "Retry-After": (config.window ?? 60).toString(),
           },
-        }
+        },
       );
     }
 
@@ -188,7 +188,7 @@ export async function applyRateLimit(
         service: "rate-limiter",
         operation: "applyRateLimit",
       },
-      error
+      error,
     );
 
     // SECURITY FIX (SEC-003): Fail secure - block requests when rate limiting is unavailable
@@ -203,7 +203,7 @@ export async function applyRateLimit(
         headers: {
           "Retry-After": "60", // Suggest retry after 60 seconds
         },
-      }
+      },
     );
   }
 }
@@ -214,7 +214,7 @@ export async function applyRateLimit(
 export async function applyUserBasedRateLimit(
   request: NextRequest,
   userId?: string,
-  limitType?: RateLimitType
+  limitType?: RateLimitType,
 ): Promise<NextResponse | null> {
   const ip = getClientIp(request);
   const pathname = new URL(request.url).pathname;
@@ -253,7 +253,7 @@ export async function applyUserBasedRateLimit(
             ip,
             pathname,
             limitType: rateLimitType,
-          }
+          },
         );
 
         return NextResponse.json(
@@ -271,7 +271,7 @@ export async function applyUserBasedRateLimit(
               "X-RateLimit-Type": `user_${rateLimitType}`,
               "Retry-After": (userConfig.window ?? 60).toString(),
             },
-          }
+          },
         );
       }
     }
@@ -285,7 +285,7 @@ export async function applyUserBasedRateLimit(
         service: "rate-limiter",
         operation: "applyUserBasedRateLimit",
       },
-      error
+      error,
     );
 
     // Fallback to IP-based rate limiting
@@ -298,7 +298,7 @@ export async function applyUserBasedRateLimit(
  */
 export function getRateLimitHeaders(
   limitType: RateLimitType,
-  remaining?: number
+  remaining?: number,
 ): Record<string, string> {
   const config = getRateLimitConfig(limitType);
 

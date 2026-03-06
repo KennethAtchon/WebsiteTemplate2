@@ -37,7 +37,7 @@ export interface PaginatedResponse<T> {
  */
 export function parsePaginationParams(
   searchParams: PaginationParams,
-  options: PaginationOptions = {}
+  options: PaginationOptions = {},
 ): { page: number; limit: number; skip: number; search: string } {
   const { defaultLimit = 20, maxLimit = 100, minLimit = 1 } = options;
 
@@ -68,7 +68,7 @@ export function createPaginationMeta(
   totalCount: number,
   page: number,
   limit: number,
-  resultCount: number
+  resultCount: number,
 ): PaginationMeta {
   const totalPages = Math.ceil(totalCount / limit);
   const hasMore = page < totalPages;
@@ -95,7 +95,7 @@ export function createPaginatedResponse<T>(
   data: T[],
   totalCount: number,
   page: number,
-  limit: number
+  limit: number,
 ): PaginatedResponse<T> {
   const pagination = createPaginationMeta(totalCount, page, limit, data.length);
 
@@ -110,7 +110,7 @@ export function createPaginatedResponse<T>(
  */
 export function createSearchConditions(
   search: string,
-  fields: string[]
+  fields: string[],
 ): Record<string, any> | undefined {
   if (!search || search.length < 2) return undefined;
 
@@ -139,7 +139,7 @@ export function createSearchConditions(
 export function createDateRangeConditions(
   dateFrom?: string | null,
   dateTo?: string | null,
-  dateField = "createdAt"
+  dateField = "createdAt",
 ): Record<string, any> | undefined {
   if (!dateFrom && !dateTo) return undefined;
 

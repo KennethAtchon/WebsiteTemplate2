@@ -33,13 +33,13 @@ export function encrypt(text: string): string {
   const cipher = crypto.createCipheriv(
     ENCRYPTION_CONFIG.ALGORITHM,
     Buffer.from(getEncryptionKey()),
-    iv
+    iv,
   );
 
   let encrypted = cipher.update(
     text,
     ENCRYPTION_CONFIG.ENCODING.INPUT,
-    ENCRYPTION_CONFIG.ENCODING.OUTPUT
+    ENCRYPTION_CONFIG.ENCODING.OUTPUT,
   );
   encrypted += cipher.final(ENCRYPTION_CONFIG.ENCODING.OUTPUT);
   const tag = cipher.getAuthTag();
@@ -63,14 +63,14 @@ export function decrypt(data: string): string {
   const decipher = crypto.createDecipheriv(
     ENCRYPTION_CONFIG.ALGORITHM,
     Buffer.from(getEncryptionKey()),
-    iv
+    iv,
   );
 
   decipher.setAuthTag(tag);
   let decrypted = decipher.update(
     encrypted,
     ENCRYPTION_CONFIG.ENCODING.OUTPUT,
-    ENCRYPTION_CONFIG.ENCODING.INPUT
+    ENCRYPTION_CONFIG.ENCODING.INPUT,
   );
   decrypted += decipher.final(ENCRYPTION_CONFIG.ENCODING.INPUT);
 

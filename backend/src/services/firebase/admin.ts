@@ -22,7 +22,7 @@ function initializeFirebaseAdmin(): void {
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error(
       "Missing required Firebase Admin environment variables: " +
-        "NEXT_PUBLIC_FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY"
+        "NEXT_PUBLIC_FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY",
     );
   }
 

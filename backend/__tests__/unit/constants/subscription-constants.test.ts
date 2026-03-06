@@ -40,13 +40,13 @@ describe("subscription.constants", () => {
     test("returns true when tier has format", () => {
       expect(tierHasExportFormat(SUBSCRIPTION_TIERS.PRO, "pdf")).toBe(true);
       expect(tierHasExportFormat(SUBSCRIPTION_TIERS.ENTERPRISE, "api")).toBe(
-        true
+        true,
       );
     });
 
     test("returns false when tier does not have format", () => {
       expect(tierHasExportFormat(SUBSCRIPTION_TIERS.BASIC, "excel")).toBe(
-        false
+        false,
       );
     });
   });
@@ -70,13 +70,13 @@ describe("subscription.constants", () => {
   describe("getTierDescription", () => {
     test("returns descriptions for each tier", () => {
       expect(getTierDescription(SUBSCRIPTION_TIERS.BASIC)).toBe(
-        "Basic and higher"
+        "Basic and higher",
       );
       expect(getTierDescription(SUBSCRIPTION_TIERS.PRO)).toBe(
-        "Pro and Enterprise"
+        "Pro and Enterprise",
       );
       expect(getTierDescription(SUBSCRIPTION_TIERS.ENTERPRISE)).toBe(
-        "Enterprise"
+        "Enterprise",
       );
     });
 

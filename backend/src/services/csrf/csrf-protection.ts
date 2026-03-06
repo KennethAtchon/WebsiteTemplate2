@@ -30,7 +30,7 @@ export function generateCSRFToken(firebaseUID: string): string {
   const cipher = createCipheriv(
     "aes-256-gcm",
     Buffer.from(CSRF_SECRET, "hex"),
-    iv
+    iv,
   );
 
   let encrypted = cipher.update(payload, "utf8", "hex");
@@ -66,7 +66,7 @@ export function validateCSRFToken(token: string, expectedUID: string): boolean {
     const decipher = createDecipheriv(
       "aes-256-gcm",
       Buffer.from(CSRF_SECRET, "hex"),
-      iv
+      iv,
     );
     decipher.setAuthTag(authTag);
 
@@ -100,7 +100,7 @@ export function validateCSRFToken(token: string, expectedUID: string): boolean {
     debugLog.error(
       "CSRF token validation error",
       { service: "csrf-protection" },
-      error
+      error,
     );
     return false;
   }
@@ -110,7 +110,7 @@ export function validateCSRFToken(token: string, expectedUID: string): boolean {
  * Extracts CSRF token from request headers or body
  */
 export async function extractCSRFToken(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<string | null> {
   // Check X-CSRF-Token header first
   const headerToken = request.headers.get("X-CSRF-Token");
@@ -152,7 +152,7 @@ export async function extractCSRFToken(
  */
 export async function requireCSRFToken(
   request: NextRequest,
-  firebaseUID: string
+  firebaseUID: string,
 ): Promise<boolean> {
   const method = request.method.toUpperCase();
 

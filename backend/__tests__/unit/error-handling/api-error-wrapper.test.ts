@@ -32,7 +32,7 @@ describe("api-error-wrapper", () => {
 
     it("exports ERROR_MESSAGES", () => {
       expect(ERROR_MESSAGES.INTERNAL_ERROR).toBe(
-        "An internal server error occurred"
+        "An internal server error occurred",
       );
       expect(ERROR_MESSAGES.UNAUTHORIZED).toBe("Authentication required");
       expect(ERROR_MESSAGES.NOT_FOUND).toBe("Resource not found");
@@ -42,7 +42,7 @@ describe("api-error-wrapper", () => {
   describe("withApiErrorHandling", () => {
     it("returns handler response when handler succeeds", async () => {
       const handler = async (_req: any) =>
-        ((global as any).Response).json({ ok: true }, { status: 200 });
+        (global as any).Response.json({ ok: true }, { status: 200 });
       const wrapped = withApiErrorHandling(handler);
       const req = new (global as any).Request("https://example.com/api");
       const res = await wrapped(req);
@@ -53,11 +53,13 @@ describe("api-error-wrapper", () => {
 
     it("returns 405 when method not in allowedMethods", async () => {
       const handler = async (_req: any) =>
-        ((global as any).Response).json({}, { status: 200 });
+        (global as any).Response.json({}, { status: 200 });
       const wrapped = withApiErrorHandling(handler, {
         allowedMethods: ["POST"],
       });
-      const req = new (global as any).Request("https://example.com/api", { method: "GET" });
+      const req = new (global as any).Request("https://example.com/api", {
+        method: "GET",
+      });
       const res = await wrapped(req);
       expect(res.status).toBe(405);
       const data = await res.json();
@@ -68,7 +70,7 @@ describe("api-error-wrapper", () => {
     it("returns timeout error when handler exceeds timeout", async () => {
       const handler = async (_req: any) => {
         await new Promise((r) => setTimeout(r, 100));
-        return ((global as any).Response).json({});
+        return (global as any).Response.json({});
       };
       const wrapped = withApiErrorHandling(handler, { timeoutMs: 10 });
       const req = new (global as any).Request("https://example.com/api");
@@ -79,9 +81,9 @@ describe("api-error-wrapper", () => {
     });
 
     it("uses customErrorHandler when it returns a response", async () => {
-      const customResponse = ((global as any).Response).json(
+      const customResponse = (global as any).Response.json(
         { custom: true },
-        { status: 418 }
+        { status: 418 },
       );
       const customErrorHandler = () => customResponse;
       const handler = async (_req: any) => {
@@ -117,7 +119,9 @@ describe("api-error-wrapper", () => {
         throw new Error("Prisma connection pool timeout");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(503);
       const data = await res.json();
       expect(data.error).toBe(ERROR_MESSAGES.DATABASE_ERROR);
@@ -128,7 +132,9 @@ describe("api-error-wrapper", () => {
         throw new Error("Unauthorized");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(401);
       expect((await res.json()).error).toBe(ERROR_MESSAGES.UNAUTHORIZED);
     });
@@ -138,7 +144,9 @@ describe("api-error-wrapper", () => {
         throw new Error("Access denied");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(403);
       expect((await res.json()).error).toBe(ERROR_MESSAGES.FORBIDDEN);
     });
@@ -148,7 +156,9 @@ describe("api-error-wrapper", () => {
         throw new Error("Invalid email format");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(400);
       expect((await res.json()).error).toBe("Invalid email format");
     });
@@ -158,7 +168,9 @@ describe("api-error-wrapper", () => {
         throw new Error("Rate limit exceeded");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(429);
       expect((await res.json()).error).toBe(ERROR_MESSAGES.RATE_LIMITED);
     });
@@ -168,7 +180,9 @@ describe("api-error-wrapper", () => {
         throw new Error("Request timed out");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(504);
       expect((await res.json()).error).toBe(ERROR_MESSAGES.TIMEOUT);
     });
@@ -178,10 +192,12 @@ describe("api-error-wrapper", () => {
         throw new Error("Fetch failed");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(502);
       expect((await res.json()).error).toBe(
-        ERROR_MESSAGES.EXTERNAL_SERVICE_ERROR
+        ERROR_MESSAGES.EXTERNAL_SERVICE_ERROR,
       );
     });
 
@@ -190,7 +206,9 @@ describe("api-error-wrapper", () => {
         throw new Error("Resource not found");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(404);
       expect((await res.json()).error).toBe(ERROR_MESSAGES.NOT_FOUND);
     });
@@ -200,7 +218,9 @@ describe("api-error-wrapper", () => {
         throw new Error("Something broke");
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(500);
       expect((await res.json()).error).toBe(ERROR_MESSAGES.INTERNAL_ERROR);
     });
@@ -210,7 +230,9 @@ describe("api-error-wrapper", () => {
         throw "string error";
       };
       const wrapped = withApiErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(500);
     });
   });
@@ -218,9 +240,11 @@ describe("api-error-wrapper", () => {
   describe("withStandardErrorHandling", () => {
     it("wraps handler and returns response on success", async () => {
       const handler = async (_req: any) =>
-        ((global as any).Response).json({ done: true });
+        (global as any).Response.json({ done: true });
       const wrapped = withStandardErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ done: true });
     });
@@ -230,7 +254,9 @@ describe("api-error-wrapper", () => {
         throw new Error("unhandled");
       };
       const wrapped = withStandardErrorHandling(handler);
-      const res = await wrapped(new (global as any).Request("https://example.com/api"));
+      const res = await wrapped(
+        new (global as any).Request("https://example.com/api"),
+      );
       expect(res.status).toBe(500);
     });
   });
@@ -245,7 +271,7 @@ describe("api-error-wrapper", () => {
       await expect(
         safeAsyncOperation(async () => {
           throw new Error("fail");
-        }, "test")
+        }, "test"),
       ).rejects.toThrow("fail");
     });
 
@@ -254,8 +280,8 @@ describe("api-error-wrapper", () => {
         safeAsyncOperation(
           () => new Promise((r) => setTimeout(() => r(1), 200)),
           "test",
-          10
-        )
+          10,
+        ),
       ).rejects.toThrow(/timeout/);
     });
   });
@@ -265,20 +291,20 @@ describe("api-error-wrapper", () => {
       const value = await withTimeout(
         Promise.resolve(42),
         1000,
-        "test timeout"
+        "test timeout",
       );
       expect(value).toBe(42);
     });
 
     it("rejects when promise exceeds timeout", async () => {
       await expect(
-        withTimeout(new Promise((r) => setTimeout(() => r(1), 100)), 10, "op")
+        withTimeout(new Promise((r) => setTimeout(() => r(1), 100)), 10, "op"),
       ).rejects.toThrow(/op.*10ms/);
     });
 
     it("rejects with inner error when promise rejects", async () => {
       await expect(
-        withTimeout(Promise.reject(new Error("inner")), 5000, "op")
+        withTimeout(Promise.reject(new Error("inner")), 5000, "op"),
       ).rejects.toThrow("inner");
     });
   });

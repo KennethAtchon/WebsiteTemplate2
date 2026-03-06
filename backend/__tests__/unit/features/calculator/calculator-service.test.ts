@@ -68,7 +68,7 @@ describe("CalculatorService", () => {
             loanAmount: 200_000,
             interestRate: 5,
             loanTerm: 30,
-          })
+          }),
         ).toThrow("Failed to calculate mortgage payment");
       } finally {
         (global as any).Math.pow = orig;
@@ -100,7 +100,7 @@ describe("CalculatorService", () => {
             principal: 10_000,
             interestRate: 5,
             term: 24,
-          })
+          }),
         ).toThrow("Failed to calculate loan payment");
       } finally {
         (global as any).Math.pow = orig;
@@ -145,7 +145,7 @@ describe("CalculatorService", () => {
             initialInvestment: 5000,
             annualInterestRate: 6,
             years: 10,
-          })
+          }),
         ).toThrow("Failed to calculate investment future value");
       } finally {
         (global as any).Math.pow = orig;
@@ -201,7 +201,7 @@ describe("CalculatorService", () => {
             monthlyContribution: 500,
             annualReturnRate: 6,
             expectedRetirementSpending: 5000,
-          })
+          }),
         ).toThrow("Failed to calculate retirement readiness");
       } finally {
         (global as any).Math.pow = orig;
@@ -242,7 +242,7 @@ describe("CalculatorService", () => {
       };
       const response = CalculatorService.performCalculation(
         "investment",
-        inputs
+        inputs,
       );
       expect(response.type).toBe("investment");
       expect(response.results).toHaveProperty("futureValue");
@@ -259,7 +259,7 @@ describe("CalculatorService", () => {
       };
       const response = CalculatorService.performCalculation(
         "retirement",
-        inputs
+        inputs,
       );
       expect(response.type).toBe("retirement");
       expect(response.results).toHaveProperty("isOnTrack");
@@ -269,8 +269,8 @@ describe("CalculatorService", () => {
       expect(() =>
         CalculatorService.performCalculation(
           "invalid" as "mortgage",
-          { loanAmount: 1, interestRate: 1, loanTerm: 1 } as MortgageInputs
-        )
+          { loanAmount: 1, interestRate: 1, loanTerm: 1 } as MortgageInputs,
+        ),
       ).toThrow(/Unsupported calculation type/);
     });
   });

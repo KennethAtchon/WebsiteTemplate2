@@ -69,7 +69,7 @@ export async function sendEmail(options: EmailOptions) {
       hasKey: !!RESEND_API_KEY,
       keyLength: RESEND_API_KEY?.length || 0,
       keyPrefix: RESEND_API_KEY?.substring(0, 10) || "undefined",
-    }
+    },
   );
 
   if (!RESEND_API_KEY) {
@@ -83,7 +83,7 @@ export async function sendEmail(options: EmailOptions) {
         to: options.to,
         subject: options.subject,
         from: options.from || `${BUSINESS_NAME} <${SENDING_EMAIL}>`,
-      }
+      },
     );
     return { success: true, id: "dev-mode" };
   }
@@ -100,7 +100,7 @@ export async function sendEmail(options: EmailOptions) {
     debugLog.error(
       "Email validation failed",
       { service: "resend" },
-      { invalidEmails }
+      { invalidEmails },
     );
     return { success: false, error };
   }
@@ -113,7 +113,7 @@ export async function sendEmail(options: EmailOptions) {
         to: options.to,
         subject: options.subject,
         from: options.from || `${BUSINESS_NAME} <${SENDING_EMAIL}>`,
-      }
+      },
     );
 
     const emailPayload = {
@@ -151,11 +151,11 @@ export async function sendEmail(options: EmailOptions) {
           status: response.status,
           statusText: response.statusText,
           error: errorDetails,
-        }
+        },
       );
 
       throw new Error(
-        `Resend API error (${response.status}): ${errorDetails.message || errorText}`
+        `Resend API error (${response.status}): ${errorDetails.message || errorText}`,
       );
     }
 
@@ -163,7 +163,7 @@ export async function sendEmail(options: EmailOptions) {
     debugLog.info(
       "Email sent successfully",
       { service: "resend" },
-      { emailId: result.id }
+      { emailId: result.id },
     );
     return { success: true, id: result.id };
   } catch (error) {
@@ -221,7 +221,7 @@ function loadEmailTemplate(): string {
     } else {
       debugLog.warn(
         `Email template not found at ${TEMPLATE_PATH}. Using fallback template`,
-        { service: "resend" }
+        { service: "resend" },
       );
       return generateFallbackTemplate();
     }
@@ -229,7 +229,7 @@ function loadEmailTemplate(): string {
     debugLog.error(
       "Error reading email template",
       { service: "resend" },
-      error
+      error,
     );
     debugLog.warn("Using fallback email template", { service: "resend" });
     return generateFallbackTemplate();
@@ -245,58 +245,58 @@ function populateTemplate(template: string, data: OrderEmailData): string {
   // Replace basic template variables
   populatedTemplate = populatedTemplate.replace(
     /\{\{CUSTOMER_NAME\}\}/g,
-    data.customerName
+    data.customerName,
   );
   populatedTemplate = populatedTemplate.replace(
     /\{\{CUSTOMER_EMAIL\}\}/g,
-    data.customerEmail
+    data.customerEmail,
   );
   populatedTemplate = populatedTemplate.replace(
     /\{\{ORDER_ID_SHORT\}\}/g,
-    data.orderId.slice(-ORDER_ID_DISPLAY_LENGTH).toUpperCase()
+    data.orderId.slice(-ORDER_ID_DISPLAY_LENGTH).toUpperCase(),
   );
   populatedTemplate = populatedTemplate.replace(
     /\{\{ADDRESS\}\}/g,
-    data.address
+    data.address,
   );
   populatedTemplate = populatedTemplate.replace(
     /\{\{TOTAL_AMOUNT\}\}/g,
-    data.totalAmount
+    data.totalAmount,
   );
 
   // Brand placeholders (from app.constants)
   populatedTemplate = populatedTemplate.replace(/\{\{APP_NAME\}\}/g, APP_NAME);
   populatedTemplate = populatedTemplate.replace(
     /\{\{SUPPORT_EMAIL\}\}/g,
-    SUPPORT_EMAIL
+    SUPPORT_EMAIL,
   );
   populatedTemplate = populatedTemplate.replace(
     /\{\{SUPPORT_PHONE\}\}/g,
-    SUPPORT_PHONE
+    SUPPORT_PHONE,
   );
 
   // Handle optional sections
   const phoneSection = generatePhoneSection(data.phone);
   populatedTemplate = populatedTemplate.replace(
     /\{\{PHONE_SECTION\}\}/g,
-    phoneSection
+    phoneSection,
   );
 
   // Generate dynamic sections
   const therapiesList = generateTherapiesList(data.therapies || data.products);
   populatedTemplate = populatedTemplate.replace(
     /\{\{THERAPIES_LIST\}\}/g,
-    therapiesList
+    therapiesList,
   );
   populatedTemplate = populatedTemplate.replace(
     /\{\{PRODUCTS_LIST\}\}/g,
-    therapiesList
+    therapiesList,
   );
 
   const notesSection = generateNotesSection(data.notes);
   populatedTemplate = populatedTemplate.replace(
     /\{\{NOTES_SECTION\}\}/g,
-    notesSection
+    notesSection,
   );
 
   return populatedTemplate;
@@ -443,7 +443,7 @@ function generatePhoneSection(phone?: string): string {
 }
 
 function generateTherapiesList(
-  therapies?: OrderEmailData["therapies"] | OrderEmailData["products"]
+  therapies?: OrderEmailData["therapies"] | OrderEmailData["products"],
 ): string {
   if (!therapies || therapies.length === 0) {
     return '<div class="therapy-item"><span>No items</span></div>';
@@ -458,7 +458,7 @@ function generateTherapiesList(
       </div>
       <span class="therapy-price">$${(parseFloat(therapy.price) * therapy.quantity).toFixed(2)}</span>
     </div>
-  `
+  `,
     )
     .join("");
 }

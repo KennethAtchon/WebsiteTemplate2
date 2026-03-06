@@ -25,7 +25,9 @@ describe("file-validation", () => {
       const result = await validateFile(file);
       expect(result.isValid).toBe(false);
       expect(
-        result.errors.some((e) => e.includes("type") || e.includes("extension"))
+        result.errors.some(
+          (e) => e.includes("type") || e.includes("extension"),
+        ),
       ).toBe(true);
     });
 
@@ -100,7 +102,9 @@ describe("file-validation", () => {
       const result = await validateFile(file, { maxSizeBytes: 1024 * 1024 });
       expect(result.isValid).toBe(false);
       expect(
-        result.errors.some((e) => e.includes("signature") || e.includes("MIME"))
+        result.errors.some(
+          (e) => e.includes("signature") || e.includes("MIME"),
+        ),
       ).toBe(true);
     });
 

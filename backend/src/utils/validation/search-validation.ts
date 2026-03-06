@@ -15,7 +15,7 @@ const _searchTermSchema = z
   .regex(/^[a-zA-Z0-9\s\-_.@]+$/, "Search term contains invalid characters")
   .refine(
     (value) => !containsSqlInjectionPatterns(value),
-    "Invalid search pattern detected"
+    "Invalid search pattern detected",
   );
 
 // Pagination parameters validation
@@ -59,15 +59,15 @@ export const customerSearchSchema = z.object({
     })
     .refine(
       (value) => !value || (value.length >= 2 && value.length <= 100),
-      "Search term must be between 2 and 100 characters"
+      "Search term must be between 2 and 100 characters",
     )
     .refine(
       (value) => !value || /^[a-zA-Z0-9\s\-_.@]+$/.test(value),
-      "Search term contains invalid characters"
+      "Search term contains invalid characters",
     )
     .refine(
       (value) => !value || !containsSqlInjectionPatterns(value),
-      "Invalid search pattern detected"
+      "Invalid search pattern detected",
     ),
 });
 
@@ -85,15 +85,15 @@ export const orderSearchSchema = z.object({
     })
     .refine(
       (value) => !value || (value.length >= 1 && value.length <= 100),
-      "Search term must be between 1 and 100 characters"
+      "Search term must be between 1 and 100 characters",
     )
     .refine(
       (value) => !value || /^[a-zA-Z0-9\s\-_.@]+$/.test(value),
-      "Search term contains invalid characters"
+      "Search term contains invalid characters",
     )
     .refine(
       (value) => !value || !containsSqlInjectionPatterns(value),
-      "Invalid search pattern detected"
+      "Invalid search pattern detected",
     ),
   customerId: z
     .union([z.string(), z.null(), z.undefined()])
@@ -107,9 +107,9 @@ export const orderSearchSchema = z.object({
       (value) =>
         !value ||
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-          value
+          value,
         ),
-      "Customer ID must be a valid UUID"
+      "Customer ID must be a valid UUID",
     ),
 });
 
@@ -124,15 +124,15 @@ export const userSearchSchema = z.object({
     .transform((val) => val?.trim() || "")
     .refine(
       (value) => !value || (value.length >= 2 && value.length <= 100),
-      "Search term must be between 2 and 100 characters"
+      "Search term must be between 2 and 100 characters",
     )
     .refine(
       (value) => !value || /^[a-zA-Z0-9\s\-_.@]+$/.test(value),
-      "Search term contains invalid characters"
+      "Search term contains invalid characters",
     )
     .refine(
       (value) => !value || !containsSqlInjectionPatterns(value),
-      "Invalid search pattern detected"
+      "Invalid search pattern detected",
     ),
 });
 
@@ -152,7 +152,7 @@ export const idSchema = z
   .uuid("ID must be a valid UUID")
   .refine(
     (value) => !containsSqlInjectionPatterns(value),
-    "Invalid ID format detected"
+    "Invalid ID format detected",
   );
 
 // Email validation with security checks
@@ -162,7 +162,7 @@ export const emailSchema = z
   .max(255, "Email must be less than 255 characters")
   .refine(
     (value) => !containsSqlInjectionPatterns(value),
-    "Invalid email pattern detected"
+    "Invalid email pattern detected",
   );
 
 /**
@@ -223,7 +223,7 @@ function containsSqlInjectionPatterns(input: string): boolean {
 export function validateSearchInput(
   schema: z.ZodType<any>,
   input: unknown,
-  context: string
+  context: string,
 ): { success: true; data: any } | { success: false; error: string } {
   try {
     const data = schema.parse(input);
@@ -252,7 +252,7 @@ export function validateSearchInput(
 
     console.error(
       `[SECURITY] Unexpected validation error in ${context}:`,
-      error
+      error,
     );
     return { success: false, error: "Invalid input" };
   }

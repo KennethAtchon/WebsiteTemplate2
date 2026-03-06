@@ -7,7 +7,7 @@ export interface StorageService {
   uploadFile(
     file: File | Buffer,
     path: string,
-    contentType: string
+    contentType: string,
   ): Promise<string>;
   deleteFile(url: string): Promise<void>;
   getPublicUrl(path: string): string;
@@ -17,7 +17,7 @@ class R2Storage implements StorageService {
   async uploadFile(
     file: File | Buffer,
     path: string,
-    contentType: string
+    contentType: string,
   ): Promise<string> {
     return r2.uploadFile(file, path, contentType);
   }

@@ -80,7 +80,7 @@ class DatabasePerformanceMonitor {
         {
           service: "db-performance-monitor",
           operation: "setup",
-        }
+        },
       );
     }
   }
@@ -116,7 +116,7 @@ class DatabasePerformanceMonitor {
         duration: `${duration}ms`,
         threshold: `${this.thresholds.slowQueryThreshold}ms`,
         params: this.sanitizeArgs(event.params),
-      }
+      },
     );
 
     // In production, you might want to send this to an external monitoring service
@@ -146,7 +146,7 @@ class DatabasePerformanceMonitor {
             service: "db-performance-monitor",
             operation: "connection-pool-check",
           },
-          error
+          error,
         );
       }
     }, 30000);
@@ -200,7 +200,7 @@ class DatabasePerformanceMonitor {
           this.handleConnectionPoolAlert(
             "CRITICAL",
             metrics,
-            utilizationPercentage
+            utilizationPercentage,
           );
         } else if (
           utilizationPercentage > this.thresholds.connectionPoolWarningThreshold
@@ -208,7 +208,7 @@ class DatabasePerformanceMonitor {
           this.handleConnectionPoolAlert(
             "WARNING",
             metrics,
-            utilizationPercentage
+            utilizationPercentage,
           );
         }
       }
@@ -219,7 +219,7 @@ class DatabasePerformanceMonitor {
           service: "db-performance-monitor",
           operation: "connection-pool-stats",
         },
-        error
+        error,
       );
     }
   }
@@ -232,7 +232,7 @@ class DatabasePerformanceMonitor {
 
     if (this.connectionMetrics.length > this.maxMetricsHistory) {
       this.connectionMetrics = this.connectionMetrics.slice(
-        -this.maxMetricsHistory
+        -this.maxMetricsHistory,
       );
     }
   }
@@ -243,7 +243,7 @@ class DatabasePerformanceMonitor {
   private handleConnectionPoolAlert(
     level: "WARNING" | "CRITICAL",
     metrics: ConnectionPoolMetrics,
-    utilization: number
+    utilization: number,
   ) {
     const logLevel = level === "CRITICAL" ? "error" : "warn";
 
@@ -263,7 +263,7 @@ class DatabasePerformanceMonitor {
           level === "CRITICAL"
             ? `${this.thresholds.connectionPoolCriticalThreshold}%`
             : `${this.thresholds.connectionPoolWarningThreshold}%`,
-      }
+      },
     );
 
     if (level === "CRITICAL") {
@@ -296,7 +296,7 @@ class DatabasePerformanceMonitor {
         alertType: type,
         data,
         action: "IMMEDIATE_ATTENTION_REQUIRED",
-      }
+      },
     );
   }
 
@@ -314,7 +314,7 @@ class DatabasePerformanceMonitor {
   public getQueryStats(minutes: number = 60) {
     const cutoff = new Date(Date.now() - minutes * 60 * 1000);
     const recentMetrics = this.queryMetrics.filter(
-      (m) => m.timestamp >= cutoff
+      (m) => m.timestamp >= cutoff,
     );
 
     if (recentMetrics.length === 0) {
@@ -329,10 +329,10 @@ class DatabasePerformanceMonitor {
 
     const totalTime = recentMetrics.reduce((sum, m) => sum + m.duration, 0);
     const slowQueries = recentMetrics.filter(
-      (m) => m.duration > this.thresholds.slowQueryThreshold
+      (m) => m.duration > this.thresholds.slowQueryThreshold,
     );
     const errorQueries = recentMetrics.filter((m) =>
-      m.operation.includes("ERROR")
+      m.operation.includes("ERROR"),
     );
 
     const topSlowQueries = recentMetrics
@@ -407,7 +407,7 @@ class DatabasePerformanceMonitor {
 export const dbPerformanceMonitor = new DatabasePerformanceMonitor(
   new PrismaClient({
     log: ["query", "info", "warn", "error"],
-  })
+  }),
 );
 
 export default dbPerformanceMonitor;

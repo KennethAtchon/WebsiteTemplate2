@@ -62,7 +62,7 @@ export const checkoutValidationSchema = z.object({
     .max(100, "Name must be less than 100 characters")
     .regex(
       /^[a-zA-ZÀ-ÿ\u0100-\u017F\s'-]+$/,
-      "Name can only contain letters, spaces, hyphens, and apostrophes"
+      "Name can only contain letters, spaces, hyphens, and apostrophes",
     )
     .refine((val) => {
       // Reject SQL injection patterns
@@ -102,7 +102,7 @@ export const checkoutValidationSchema = z.object({
     .transform((val) => val.replace(/\D/g, ""))
     .refine(
       (val) => val.length >= 10 && val.length <= 11,
-      "Phone number must be 10-11 digits"
+      "Phone number must be 10-11 digits",
     ),
 
   contactMethod: z.enum(["email", "phone", "text"], {
@@ -122,7 +122,7 @@ export const checkoutValidationSchema = z.object({
     .max(100, "City must be less than 100 characters")
     .regex(
       /^[a-zA-Z\s\-'\.]+$/,
-      "City can only contain letters, spaces, hyphens, apostrophes, and periods"
+      "City can only contain letters, spaces, hyphens, apostrophes, and periods",
     ),
 
   state: z
@@ -131,7 +131,7 @@ export const checkoutValidationSchema = z.object({
     .regex(/^[A-Z]{2}$/, "State must be uppercase abbreviation (e.g., CA, NY)")
     .refine(
       (val) => US_STATES.includes(val as any),
-      "Please enter a valid US state abbreviation"
+      "Please enter a valid US state abbreviation",
     ),
 
   zip: z
@@ -140,7 +140,7 @@ export const checkoutValidationSchema = z.object({
     .max(10, "ZIP code must be less than 10 characters")
     .regex(
       /^\d{5}(-\d{4})?$/,
-      "ZIP code must be in format 12345 or 12345-1234"
+      "ZIP code must be in format 12345 or 12345-1234",
     ),
 
   // Additional Information
@@ -155,7 +155,7 @@ export const checkoutValidationSchema = z.object({
     .boolean()
     .refine(
       (val) => val === true,
-      "You must agree to the terms and conditions"
+      "You must agree to the terms and conditions",
     ),
 });
 

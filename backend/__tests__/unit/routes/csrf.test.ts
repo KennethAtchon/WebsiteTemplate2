@@ -36,7 +36,7 @@ describe("CSRF expires timestamp logic", () => {
     const expires = new Date(futureMs).toISOString();
     const diff = new Date(expires).getTime() - Date.now();
     expect(diff).toBeGreaterThan(23 * 60 * 60 * 1000); // > 23h
-    expect(diff).toBeLessThan(25 * 60 * 60 * 1000);    // < 25h
+    expect(diff).toBeLessThan(25 * 60 * 60 * 1000); // < 25h
   });
 });
 

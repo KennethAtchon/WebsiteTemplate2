@@ -45,7 +45,7 @@ customer.get(
         if (auth.firebaseUser?.uid) {
           const fbUser = await adminAuth.getUser(auth.firebaseUser.uid);
           isOAuthUser = !fbUser.providerData.some(
-            (p: any) => p.providerId === "password"
+            (p: any) => p.providerId === "password",
           );
         }
       } catch {
@@ -57,7 +57,7 @@ customer.get(
       console.error("Failed to fetch profile:", error);
       return c.json({ error: "Failed to fetch profile" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -80,7 +80,7 @@ customer.put(
       if (email !== undefined && email !== auth.user.email) {
         const fbUser = await adminAuth.getUser(auth.firebaseUser.uid);
         const hasEmailProvider = fbUser.providerData.some(
-          (p: any) => p.providerId === "password"
+          (p: any) => p.providerId === "password",
         );
 
         if (!hasEmailProvider) {
@@ -90,7 +90,7 @@ customer.put(
                 "Cannot change email for OAuth accounts. Update through your OAuth provider.",
               code: "OAUTH_EMAIL_CHANGE_NOT_ALLOWED",
             },
-            400
+            400,
           );
         }
 
@@ -98,7 +98,7 @@ customer.put(
           await adminAuth.getUserByEmail(email);
           return c.json(
             { error: "Email already in use", code: "EMAIL_ALREADY_EXISTS" },
-            400
+            400,
           );
         } catch (e: any) {
           if (e.code !== "auth/user-not-found") throw e;
@@ -117,7 +117,7 @@ customer.put(
       if (Object.keys(updateData).length === 0) {
         return c.json(
           { error: "No fields to update", code: "NO_FIELDS_PROVIDED" },
-          400
+          400,
         );
       }
 
@@ -136,18 +136,21 @@ customer.put(
         },
       });
 
-      return c.json({ message: "Profile updated successfully", profile: updatedUser });
+      return c.json({
+        message: "Profile updated successfully",
+        profile: updatedUser,
+      });
     } catch (error: any) {
       if (error?.code === "P2002") {
         return c.json(
           { error: "Email already exists", code: "EMAIL_ALREADY_EXISTS" },
-          400
+          400,
         );
       }
       console.error("Failed to update profile:", error);
       return c.json({ error: "Failed to update profile" }, 500);
     }
-  }
+  },
 );
 
 // ─── Orders ────────────────────────────────────────────────────────────────────
@@ -191,7 +194,7 @@ customer.get(
       console.error("Failed to fetch orders:", error);
       return c.json({ error: "Failed to fetch orders" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -220,7 +223,7 @@ customer.post(
       console.error("Failed to create order:", error);
       return c.json({ error: "Failed to create order" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -246,7 +249,7 @@ customer.get(
       console.error("Failed to fetch order:", error);
       return c.json({ error: "Failed to fetch order" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -260,8 +263,7 @@ customer.get(
     try {
       const auth = c.get("auth");
       const sessionId = c.req.query("sessionId");
-      if (!sessionId)
-        return c.json({ error: "sessionId is required" }, 400);
+      if (!sessionId) return c.json({ error: "sessionId is required" }, 400);
 
       const { prisma } = await import("../../services/db/prisma");
 
@@ -275,7 +277,7 @@ customer.get(
       console.error("Failed to fetch order by session:", error);
       return c.json({ error: "Failed to fetch order" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -300,7 +302,7 @@ customer.get(
       console.error("Failed to fetch total revenue:", error);
       return c.json({ error: "Failed to fetch total revenue" }, 500);
     }
-  }
+  },
 );
 
 /**
@@ -327,7 +329,7 @@ customer.post(
       console.error("Failed to fix Stripe customer:", error);
       return c.json({ error: "Failed to fix Stripe customer" }, 500);
     }
-  }
+  },
 );
 
 export default customer;

@@ -24,7 +24,7 @@ interface RateLimitResult {
 
 export async function checkRateLimit(
   ip: string,
-  options?: RateLimitOptions
+  options?: RateLimitOptions,
 ): Promise<boolean> {
   try {
     const redis = getRedisConnection();
@@ -57,7 +57,7 @@ export async function checkRateLimit(
     debugLog.error(
       "Rate limit check failed",
       { service: "rate-limit", ip },
-      error
+      error,
     );
     // SECURITY FIX (SEC-003): Fail secure - block requests when rate limiting is unavailable
     // This prevents DoS attacks during Redis outages
@@ -67,7 +67,7 @@ export async function checkRateLimit(
 
 export async function checkRateLimitWithDetails(
   ip: string,
-  options?: RateLimitOptions
+  options?: RateLimitOptions,
 ): Promise<RateLimitResult> {
   try {
     const redis = getRedisConnection();
@@ -118,7 +118,7 @@ export async function checkRateLimitWithDetails(
     debugLog.error(
       "Rate limit check with details failed",
       { service: "rate-limit", ip },
-      error
+      error,
     );
     // SECURITY FIX (SEC-003): Fail secure - block requests when rate limiting is unavailable
     return {

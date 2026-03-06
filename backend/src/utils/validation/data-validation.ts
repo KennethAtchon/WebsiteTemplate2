@@ -22,7 +22,7 @@ const PHONE_MAX_DIGITS = 11;
  * Safe date parsing that won't throw errors
  */
 export function safeParseDate(
-  dateString: string | Date | null | undefined
+  dateString: string | Date | null | undefined,
 ): Date | null {
   if (!dateString) return null;
 
@@ -52,7 +52,7 @@ export function safeParseDate(
  */
 export function safeFormatTimeWithTimezone(
   dateString: string | Date | null | undefined,
-  timezone: string
+  timezone: string,
 ): string {
   if (!dateString) return FALLBACK_MESSAGES.INVALID_TIME;
 
@@ -62,7 +62,7 @@ export function safeFormatTimeWithTimezone(
     return TimeService.formatWithLabel(
       TimeService.fromUTC(utcString, timezone),
       timezone,
-      "h:mm a zzz"
+      "h:mm a zzz",
     );
   } catch {
     return FALLBACK_MESSAGES.INVALID_TIME;
@@ -74,7 +74,7 @@ export function safeFormatTimeWithTimezone(
  */
 export function safeFormatDateWithTimezone(
   dateString: string | Date | null | undefined,
-  timezone: string
+  timezone: string,
 ): string {
   if (!dateString) return FALLBACK_MESSAGES.INVALID_DATE;
 
@@ -84,7 +84,7 @@ export function safeFormatDateWithTimezone(
     return TimeService.formatWithLabel(
       TimeService.fromUTC(utcString, timezone),
       timezone,
-      "MMMM d, yyyy zzz"
+      "MMMM d, yyyy zzz",
     );
   } catch {
     return FALLBACK_MESSAGES.INVALID_DATE;
@@ -95,7 +95,7 @@ export function safeFormatDateWithTimezone(
  * Validate staff object
  */
 export function validateStaff(
-  staff: unknown
+  staff: unknown,
 ): staff is { id: string; name: string } {
   return !!(
     staff &&
@@ -178,7 +178,7 @@ export function safeFormatPrice(price: unknown): string {
  */
 export function validateApiResponse(
   response: unknown,
-  expectedFields: string[]
+  expectedFields: string[],
 ): boolean {
   if (!response || typeof response !== "object" || response === null) {
     return false;
@@ -195,7 +195,7 @@ export function validateApiResponse(
  */
 export function safeJsonParse<T>(
   jsonString: string | null | undefined,
-  fallback: T
+  fallback: T,
 ): T {
   if (!jsonString || typeof jsonString !== "string") return fallback;
 

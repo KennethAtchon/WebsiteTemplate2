@@ -20,7 +20,7 @@ declare const global: typeof globalThis & {
       };
       formatWithLabel: {
         mockImplementation: (
-          fn: (a: string, b: string, c: string) => string
+          fn: (a: string, b: string, c: string) => string,
         ) => void;
       };
     };
@@ -32,7 +32,7 @@ describe("date helpers", () => {
     const t = global.__testMocks__?.timeService;
     if (t) {
       t.formatWithLabel.mockImplementation(
-        (_d: string, _tz: string, fmt: string) => `Formatted: ${fmt}`
+        (_d: string, _tz: string, fmt: string) => `Formatted: ${fmt}`,
       );
       t.fromUTC.mockImplementation((utc: string) => utc);
       t.getBrowserTimezone.mockReturnValue("America/New_York");
@@ -54,7 +54,7 @@ describe("date helpers", () => {
       const result = safeFormatDateWithTimezone(
         "2024-06-15T12:00:00.000Z",
         "UTC",
-        "yyyy-MM-dd"
+        "yyyy-MM-dd",
       );
       expect(result).toBe("2024-06-15");
     });
@@ -69,7 +69,7 @@ describe("date helpers", () => {
       const result = safeFormatDateWithTimezone(
         "2024-06-15T12:00:00.000Z",
         "America/New_York",
-        "MMM dd"
+        "MMM dd",
       );
       // With mock: "Formatted: MMM dd"; with real TimeService: formatted date string
       expect(typeof result).toBe("string");
@@ -82,11 +82,11 @@ describe("date helpers", () => {
       });
       const result = safeFormatDateWithTimezone(
         "2024-06-15T12:00:00.000Z",
-        "America/New_York"
+        "America/New_York",
       );
       // With mock throwing: "N/A"; with real TimeService: formatted date
       expect(
-        ["N/A", "Jun 15, 2024"].includes(result) || result.length > 0
+        ["N/A", "Jun 15, 2024"].includes(result) || result.length > 0,
       ).toBe(true);
     });
   });

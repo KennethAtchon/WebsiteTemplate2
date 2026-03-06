@@ -123,7 +123,7 @@ export type CalculationType = keyof typeof CALCULATOR_CONFIG;
  * Valid calculation types array (derived from config)
  */
 export const VALID_CALCULATION_TYPES: readonly CalculationType[] = Object.keys(
-  CALCULATOR_CONFIG
+  CALCULATOR_CONFIG,
 ) as CalculationType[];
 
 /**
@@ -134,7 +134,7 @@ export const CALCULATOR_TIER_REQUIREMENTS = Object.fromEntries(
   Object.entries(CALCULATOR_CONFIG).map(([key, config]) => [
     key,
     config.tierRequirement,
-  ])
+  ]),
 ) as Record<CalculationType, SubscriptionTier | null>;
 
 /**
@@ -154,7 +154,7 @@ export function getCalculatorConfig(type: CalculationType): CalculatorMetadata {
  */
 export function getAllCalculatorConfigs(): CalculatorMetadata[] {
   return Object.values(CALCULATOR_CONFIG).sort(
-    (a, b) => a.displayOrder - b.displayOrder
+    (a, b) => a.displayOrder - b.displayOrder,
   );
 }
 
@@ -197,7 +197,7 @@ export function getCalculatorIcon(type: CalculationType): LucideIcon {
  * Get calculator tier requirement by type
  */
 export function getCalculatorTierRequirement(
-  type: CalculationType
+  type: CalculationType,
 ): SubscriptionTier | null {
   return CALCULATOR_CONFIG[type].tierRequirement;
 }
@@ -206,7 +206,7 @@ export function getCalculatorTierRequirement(
  * Get calculators available in a specific tier
  */
 export function getCalculatorsForTier(
-  tier: SubscriptionTier
+  tier: SubscriptionTier,
 ): CalculationType[] {
   return (Object.keys(CALCULATOR_CONFIG) as CalculationType[]).filter(
     (type) => {
@@ -218,7 +218,7 @@ export function getCalculatorsForTier(
       // Check if tier is in availableIn array
       // Use type assertion since we know tier is a valid SubscriptionTier
       return (config.availableIn as readonly SubscriptionTier[]).includes(tier);
-    }
+    },
   );
 }
 

@@ -55,7 +55,7 @@ const nameSchema = z
   .max(100, "Name must be less than 100 characters")
   .regex(
     /^[a-zA-ZÀ-ÿ\u00C0-\u017F\s\-'\.]+$/,
-    "Name can only contain letters, spaces, hyphens, apostrophes, and periods"
+    "Name can only contain letters, spaces, hyphens, apostrophes, and periods",
   )
   .trim()
   .refine((name) => {

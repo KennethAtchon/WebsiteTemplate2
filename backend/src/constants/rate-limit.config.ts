@@ -183,7 +183,7 @@ export function getAlertableRateLimitConfigs(): Array<
  */
 export function calculateRemainingRequests(
   type: RateLimitType,
-  currentRequests: number
+  currentRequests: number,
 ): number {
   const config = getRateLimitConfig(type);
   return Math.max(0, config.maxRequests - currentRequests);

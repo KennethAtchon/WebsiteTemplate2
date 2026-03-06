@@ -12,7 +12,7 @@ app.get("/api/live", (c) =>
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     response_time_ms: 0,
-  })
+  }),
 );
 
 describe("GET /api/live", () => {

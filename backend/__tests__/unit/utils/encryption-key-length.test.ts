@@ -20,7 +20,7 @@ describe("encryption key length", () => {
   test("encrypt throws when ENCRYPTION_KEY length is not 32", () => {
     process.env.ENCRYPTION_KEY = "short";
     expect(() => encrypt("x")).toThrow(
-      "ENCRYPTION_KEY must be 32 characters (256 bits) for AES-256-GCM"
+      "ENCRYPTION_KEY must be 32 characters (256 bits) for AES-256-GCM",
     );
   });
 });

@@ -9,7 +9,7 @@ function getEnvVar(
   name: string,
   required = true,
   defaultValue?: string,
-  value?: string
+  value?: string,
 ): string {
   const envValue = value !== undefined ? value : process.env[name];
 
@@ -29,7 +29,7 @@ function getEnvVar(
 function getEnvVarAsBoolean(
   name: string,
   defaultValue = false,
-  value?: string
+  value?: string,
 ): boolean {
   const envValue = value !== undefined ? value : process.env[name];
   if (!envValue) return defaultValue;
@@ -39,7 +39,7 @@ function getEnvVarAsBoolean(
 function _getEnvVarAsNumber(
   name: string,
   defaultValue?: number,
-  value?: string
+  value?: string,
 ): number | undefined {
   const envValue = value !== undefined ? value : process.env[name];
   if (!envValue) return defaultValue;
@@ -50,7 +50,7 @@ function _getEnvVarAsNumber(
 function getEnvVarAsArray(
   name: string,
   defaultValue: string[] = [],
-  value?: string
+  value?: string,
 ): string[] {
   const envValue = value !== undefined ? value : process.env[name];
   if (!envValue) return defaultValue;
@@ -74,7 +74,7 @@ export const IS_TEST = APP_ENV === "test";
 export const DATABASE_URL = getEnvVar("DATABASE_URL", false);
 export const ENABLE_DB_HEALTH_CHECKS = getEnvVarAsBoolean(
   "ENABLE_DB_HEALTH_CHECKS",
-  false
+  false,
 );
 
 // ============================================================================
@@ -88,8 +88,14 @@ export const REDIS_URL = getEnvVar("REDIS_URL", false);
 export const FIREBASE_API_KEY = getEnvVar("FIREBASE_API_KEY", true);
 export const FIREBASE_AUTH_DOMAIN = getEnvVar("FIREBASE_AUTH_DOMAIN", true);
 export const FIREBASE_PROJECT_ID = getEnvVar("FIREBASE_PROJECT_ID", true);
-export const FIREBASE_STORAGE_BUCKET = getEnvVar("FIREBASE_STORAGE_BUCKET", true);
-export const FIREBASE_MESSAGING_SENDER_ID = getEnvVar("FIREBASE_MESSAGING_SENDER_ID", true);
+export const FIREBASE_STORAGE_BUCKET = getEnvVar(
+  "FIREBASE_STORAGE_BUCKET",
+  true,
+);
+export const FIREBASE_MESSAGING_SENDER_ID = getEnvVar(
+  "FIREBASE_MESSAGING_SENDER_ID",
+  true,
+);
 export const FIREBASE_APP_ID = getEnvVar("FIREBASE_APP_ID", true);
 
 // ============================================================================
@@ -105,7 +111,7 @@ export const CSRF_SECRET = getEnvVar("CSRF_SECRET", true);
 export const ENCRYPTION_KEY = getEnvVar("ENCRYPTION_KEY", false);
 export const ADMIN_SPECIAL_CODE_HASH = getEnvVar(
   "ADMIN_SPECIAL_CODE_HASH",
-  false
+  false,
 );
 
 // ============================================================================
@@ -121,12 +127,12 @@ export const RESEND_API_KEY = getEnvVar("RESEND_API_KEY", false);
 export const RESEND_FROM_EMAIL = getEnvVar(
   "RESEND_FROM_EMAIL",
   false,
-  "[FROM_EMAIL]"
+  "[FROM_EMAIL]",
 );
 export const RESEND_REPLY_TO_EMAIL = getEnvVar(
   "RESEND_REPLY_TO_EMAIL",
   false,
-  "[REPLY_TO_EMAIL]"
+  "[REPLY_TO_EMAIL]",
 );
 
 // ============================================================================
@@ -152,7 +158,7 @@ export const CORS_ALLOWED_ORIGINS = getEnvVarAsArray("CORS_ALLOWED_ORIGINS", [
 /** Enable Prometheus metrics collection and /api/metrics endpoint. Default: true in production. */
 export const METRICS_ENABLED = getEnvVarAsBoolean(
   "METRICS_ENABLED",
-  !IS_DEVELOPMENT
+  !IS_DEVELOPMENT,
 );
 /** Optional bearer token required to access GET /api/metrics. Set in production for Grafana Cloud scraper. */
 export const METRICS_SECRET = getEnvVar("METRICS_SECRET", false);
@@ -161,20 +167,16 @@ export const METRICS_SECRET = getEnvVar("METRICS_SECRET", false);
 // Debug & Logging
 // ============================================================================
 export const DEBUG_ENABLED = getEnvVarAsBoolean("DEBUG_ENABLED", false);
-export const LOG_LEVEL = getEnvVar(
-  "LOG_LEVEL",
-  false,
-  "debug"
-) as "debug" | "info" | "warn" | "error";
+export const LOG_LEVEL = getEnvVar("LOG_LEVEL", false, "debug") as
+  | "debug"
+  | "info"
+  | "warn"
+  | "error";
 
 // ============================================================================
 // SEO & Metadata
 // ============================================================================
-export const BASE_URL = getEnvVar(
-  "BASE_URL",
-  false,
-  "http://localhost:3001"
-);
+export const BASE_URL = getEnvVar("BASE_URL", false, "http://localhost:3001");
 
 // ============================================================================
 // Package Info
@@ -182,7 +184,7 @@ export const BASE_URL = getEnvVar(
 export const PACKAGE_VERSION = getEnvVar(
   "npm_package_version",
   false,
-  "unknown"
+  "unknown",
 );
 
 // ============================================================================
@@ -198,7 +200,7 @@ export const IS_CI = getEnvVarAsBoolean("CI", false);
 export const E2E_BASE_URL = getEnvVar(
   "E2E_BASE_URL",
   false,
-  "http://localhost:3000"
+  "http://localhost:3000",
 );
 
 // ============================================================================
@@ -207,7 +209,7 @@ export const E2E_BASE_URL = getEnvVar(
 export const FIREBASE_PROJECT_ID_SERVER = getEnvVar(
   "FIREBASE_PROJECT_ID",
   false,
-  FIREBASE_PROJECT_ID // Fallback to client-side project ID
+  FIREBASE_PROJECT_ID, // Fallback to client-side project ID
 );
 
 // ============================================================================

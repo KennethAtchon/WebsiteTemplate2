@@ -43,7 +43,7 @@ export interface ProtectionOptions {
  * Verifies the Bearer token and attaches the user to the context.
  */
 export function authMiddleware(
-  level: "user" | "admin" = "user"
+  level: "user" | "admin" = "user",
 ): MiddlewareHandler {
   return async (c, next) => {
     const authHeader = c.req.header("Authorization");
@@ -51,7 +51,7 @@ export function authMiddleware(
     if (!authHeader?.startsWith("Bearer ")) {
       return c.json(
         { error: "Authentication required", code: "AUTH_REQUIRED" },
-        401
+        401,
       );
     }
 
@@ -76,7 +76,7 @@ export function authMiddleware(
       if (level === "admin" && user.role !== "admin") {
         return c.json(
           { error: "Admin access required", code: "ADMIN_REQUIRED" },
-          403
+          403,
         );
       }
 
@@ -98,7 +98,7 @@ export function authMiddleware(
       console.error("Auth middleware error:", error);
       return c.json(
         { error: "Invalid or expired token", code: "INVALID_TOKEN" },
-        401
+        401,
       );
     }
   };
@@ -131,7 +131,7 @@ export function csrfMiddleware(): MiddlewareHandler {
           error: "Authentication required for CSRF validation",
           code: "AUTH_REQUIRED",
         },
-        401
+        401,
       );
     }
 
@@ -141,16 +141,15 @@ export function csrfMiddleware(): MiddlewareHandler {
       const decodedToken = await adminAuth.verifyIdToken(token, true);
       const firebaseUID = decodedToken.uid;
 
-      const { requireCSRFToken } = await import(
-        "../services/csrf/csrf-protection"
-      );
+      const { requireCSRFToken } =
+        await import("../services/csrf/csrf-protection");
       const csrfHeader = c.req.header("X-CSRF-Token") || "";
 
       const isValid = await requireCSRFToken(csrfHeader, firebaseUID);
       if (!isValid) {
         return c.json(
           { error: "CSRF token validation failed", code: "CSRF_TOKEN_INVALID" },
-          403
+          403,
         );
       }
 
@@ -159,7 +158,7 @@ export function csrfMiddleware(): MiddlewareHandler {
       console.error("CSRF validation error:", error);
       return c.json(
         { error: "Invalid authentication token", code: "INVALID_TOKEN" },
-        401
+        401,
       );
     }
   };
@@ -173,9 +172,8 @@ export function csrfMiddleware(): MiddlewareHandler {
 export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
   return async (c, next) => {
     try {
-      const { checkRateLimit } = await import(
-        "../services/rate-limit/rate-limit-redis"
-      );
+      const { checkRateLimit } =
+        await import("../services/rate-limit/rate-limit-redis");
       const ip =
         c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
         c.req.header("x-real-ip") ||
@@ -191,7 +189,7 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
 
         return c.json(
           { error: "Too many requests", code: "RATE_LIMIT_EXCEEDED" },
-          429
+          429,
         );
       }
 
@@ -217,8 +215,11 @@ export function rateLimiter(type: RateLimitType = "public"): MiddlewareHandler {
       console.error("Rate limit error:", error);
       // Fail secure — block request when rate limiting is unavailable
       return c.json(
-        { error: "Service temporarily unavailable", code: "SERVICE_UNAVAILABLE" },
-        503
+        {
+          error: "Service temporarily unavailable",
+          code: "SERVICE_UNAVAILABLE",
+        },
+        503,
       );
     }
   };
@@ -247,7 +248,7 @@ export function validateBody(schema: z.ZodSchema<any>): MiddlewareHandler {
             code: "VALIDATION_ERROR",
             details: result.error.flatten(),
           },
-          422
+          422,
         );
       }
 
@@ -257,7 +258,7 @@ export function validateBody(schema: z.ZodSchema<any>): MiddlewareHandler {
     } catch {
       return c.json(
         { error: "Invalid JSON in request body", code: "INVALID_JSON" },
-        400
+        400,
       );
     }
   };
@@ -280,7 +281,7 @@ export function validateQuery(schema: z.ZodSchema<any>): MiddlewareHandler {
           code: "VALIDATION_ERROR",
           details: result.error.flatten(),
         },
-        422
+        422,
       );
     }
 
@@ -301,7 +302,7 @@ export function jsonError(
   c: Context,
   message: string,
   status: number,
-  extra?: Record<string, unknown>
+  extra?: Record<string, unknown>,
 ) {
   return c.json({ error: message, ...extra }, status as any);
 }
@@ -313,7 +314,7 @@ export function jsonNotFound(c: Context, message = "Not found") {
 export function jsonBadRequest(
   c: Context,
   message = "Bad request",
-  extra?: Record<string, unknown>
+  extra?: Record<string, unknown>,
 ) {
   return jsonError(c, message, 400, extra);
 }
@@ -321,7 +322,7 @@ export function jsonBadRequest(
 export function jsonForbidden(
   c: Context,
   message = "Forbidden",
-  extra?: Record<string, unknown>
+  extra?: Record<string, unknown>,
 ) {
   return jsonError(c, message, 403, extra);
 }
@@ -329,7 +330,7 @@ export function jsonForbidden(
 export function jsonInternalError(
   c: Context,
   message = "Internal server error",
-  _error?: unknown
+  _error?: unknown,
 ) {
   return jsonError(c, message, 500, { code: "INTERNAL_ERROR" });
 }

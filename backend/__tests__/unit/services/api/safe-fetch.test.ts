@@ -24,7 +24,7 @@ describe("safe-fetch", () => {
           new Response(JSON.stringify({ data: 1 }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
-          })
+          }),
         ) as any;
 
       const res = await safeFetch("https://api.example.com/data", {
@@ -68,7 +68,7 @@ describe("safe-fetch", () => {
           retryAttempts: 1,
           retryDelay: 10,
           logRequests: false,
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -82,7 +82,7 @@ describe("safe-fetch", () => {
           retryAttempts: 0,
           logRequests: false,
           validateResponse: (r) => r.status < 400,
-        })
+        }),
       ).rejects.toThrow();
     });
   });
@@ -105,11 +105,11 @@ describe("safe-fetch", () => {
           new Response(JSON.stringify({ foo: "bar" }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
-          })
+          }),
         ) as any;
 
       const data = await publicFetchJson<{ foo: string }>(
-        "https://api.example.com/"
+        "https://api.example.com/",
       );
       expect(data).toEqual({ foo: "bar" });
     });
@@ -120,11 +120,11 @@ describe("safe-fetch", () => {
           new Response(JSON.stringify({ error: "Not found" }), {
             status: 404,
             headers: { "Content-Type": "application/json" },
-          })
+          }),
         ) as any;
 
       await expect(
-        publicFetchJson("https://api.example.com/")
+        publicFetchJson("https://api.example.com/"),
       ).rejects.toThrow();
     });
   });
@@ -135,7 +135,7 @@ describe("safe-fetch", () => {
         Promise.resolve(new Response("{}", { status: 200 })) as any;
 
       const res = await externalServiceFetch.stripe(
-        "https://api.stripe.com/v1/customers"
+        "https://api.stripe.com/v1/customers",
       );
       expect(res.ok).toBe(true);
     });
@@ -145,7 +145,7 @@ describe("safe-fetch", () => {
         Promise.resolve(new Response("{}", { status: 200 })) as any;
 
       const res = await externalServiceFetch.zoom(
-        "https://api.zoom.us/v2/users/me"
+        "https://api.zoom.us/v2/users/me",
       );
       expect(res.ok).toBe(true);
     });
@@ -155,7 +155,7 @@ describe("safe-fetch", () => {
         Promise.resolve(new Response("{}", { status: 200 })) as any;
 
       const res = await externalServiceFetch.firebase(
-        "https://identitytoolkit.googleapis.com/v1/accounts"
+        "https://identitytoolkit.googleapis.com/v1/accounts",
       );
       expect(res.ok).toBe(true);
     });
@@ -165,7 +165,7 @@ describe("safe-fetch", () => {
         Promise.resolve(new Response("{}", { status: 200 })) as any;
 
       const res = await externalServiceFetch.general(
-        "https://api.example.com/"
+        "https://api.example.com/",
       );
       expect(res.ok).toBe(true);
     });
@@ -186,7 +186,7 @@ describe("safe-fetch", () => {
           retryDelay: 10,
           logRequests: false,
           retryOn: () => false,
-        })
+        }),
       ).rejects.toThrow();
       expect(attempts).toBe(1);
     });
@@ -197,7 +197,7 @@ describe("safe-fetch", () => {
         attempts++;
         if (attempts === 1) {
           return Promise.reject(
-            Object.assign(new Error("timeout"), { name: "AbortError" })
+            Object.assign(new Error("timeout"), { name: "AbortError" }),
           );
         }
         return Promise.resolve(new Response("ok", { status: 200 })) as any;

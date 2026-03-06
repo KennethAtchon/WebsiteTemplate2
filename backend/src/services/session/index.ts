@@ -1,6 +1,6 @@
 /**
  * Session Management Service
- * 
+ *
  * This service handles session-related operations for the backend.
  * Note: With Firebase Auth (ADR-002), most session management is handled by Firebase.
  * This service is for any additional session-related functionality needed.

@@ -23,7 +23,7 @@ export const FEATURE_TIER_REQUIREMENTS = CALCULATOR_TIER_REQUIREMENTS;
 
 /** Get the required tier for a feature type. null = free (not gated). */
 export function getRequiredTierForFeature(
-  featureType: FeatureType
+  featureType: FeatureType,
 ): SubscriptionTier | null {
   return FEATURE_TIER_REQUIREMENTS[featureType];
 }
@@ -36,7 +36,7 @@ export function isFeatureFree(featureType: FeatureType): boolean {
 /** Check if a user tier has access to a feature type. */
 export function hasFeatureAccess(
   userTier: SubscriptionTier | null | undefined,
-  featureType: FeatureType
+  featureType: FeatureType,
 ): boolean {
   const requiredTier = FEATURE_TIER_REQUIREMENTS[featureType];
   if (requiredTier === null) return true;
@@ -47,7 +47,7 @@ export function hasFeatureAccess(
 /** Check if user tier meets required tier (hierarchy: Enterprise > Pro > Basic). */
 export function hasTierAccess(
   userTier: SubscriptionTier | null | undefined,
-  requiredTier: SubscriptionTier
+  requiredTier: SubscriptionTier,
 ): boolean {
   if (!userTier) return false;
   const tierHierarchy: Record<SubscriptionTier, number> = {
@@ -60,11 +60,11 @@ export function hasTierAccess(
 
 /** Get all feature types accessible to a user tier. */
 export function getAccessibleFeatures(
-  userTier: SubscriptionTier | null | undefined
+  userTier: SubscriptionTier | null | undefined,
 ): FeatureType[] {
   if (!userTier) {
     return (Object.keys(FEATURE_TIER_REQUIREMENTS) as FeatureType[]).filter(
-      (t) => isFeatureFree(t)
+      (t) => isFeatureFree(t),
     );
   }
   return getCalculatorsForTier(userTier);

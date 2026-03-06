@@ -44,12 +44,15 @@ analytics.options("/search-performance", (c) => c.body(null, 200));
 analytics.post("/web-vitals", rateLimiter("public"), async (c) => {
   try {
     const data = await c.req.json();
-    console.info("[analytics] web-vitals:", JSON.stringify({
-      metric: data.name,
-      value: data.value,
-      rating: data.rating,
-      url: data.url,
-    }));
+    console.info(
+      "[analytics] web-vitals:",
+      JSON.stringify({
+        metric: data.name,
+        value: data.value,
+        rating: data.rating,
+        url: data.url,
+      }),
+    );
     return c.json({ success: true, message: "Web vital metric recorded" });
   } catch {
     return c.json({ success: false }, 500);

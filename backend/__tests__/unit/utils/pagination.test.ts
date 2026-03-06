@@ -28,17 +28,17 @@ describe("pagination utilities", () => {
     test("should use custom defaultLimit and maxLimit", () => {
       const result = parsePaginationParams(
         { page: "1", limit: "500" },
-        { defaultLimit: 10, maxLimit: 50 }
+        { defaultLimit: 10, maxLimit: 50 },
       );
       expect(result.limit).toBe(50);
     });
 
     test("should clamp limit to minLimit and maxLimit", () => {
       expect(
-        parsePaginationParams({ limit: "0" }, { minLimit: 5, maxLimit: 100 })
+        parsePaginationParams({ limit: "0" }, { minLimit: 5, maxLimit: 100 }),
       ).toMatchObject({ limit: 5 });
       expect(
-        parsePaginationParams({ limit: "200" }, { maxLimit: 100 })
+        parsePaginationParams({ limit: "200" }, { maxLimit: 100 }),
       ).toMatchObject({ limit: 100 });
     });
 
@@ -160,7 +160,7 @@ describe("pagination utilities", () => {
       const cond = createDateRangeConditions(
         "2024-01-01",
         "2024-12-31",
-        "updatedAt"
+        "updatedAt",
       );
       expect(cond).toEqual({
         updatedAt: {

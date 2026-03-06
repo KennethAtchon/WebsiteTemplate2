@@ -1,53 +1,59 @@
 import { Hono } from "hono";
-import { authMiddleware, csrfMiddleware, rateLimiter } from "../middleware/protection";
+import {
+  authMiddleware,
+  csrfMiddleware,
+  rateLimiter,
+} from "../../middleware/protection";
 
 const users = new Hono();
 
 // ─── GET /api/users ───────────────────────────────────────────────────────────
 
-users.get(
-  "/",
-  rateLimiter("admin"),
-  authMiddleware("admin"),
-  async (c) => {
-    try {
-      const { prisma } = await import("../services/db/prisma");
+users.get("/", rateLimiter("admin"), authMiddleware("admin"), async (c) => {
+  try {
+    const { prisma } = await import("../services/db/prisma");
 
-      const page = parseInt(c.req.query("page") || "1", 10);
-      const limit = Math.min(parseInt(c.req.query("limit") || "50", 10), 100);
-      const search = c.req.query("search");
-      const includeDeleted = c.req.query("includeDeleted") === "true";
-      const skip = (page - 1) * limit;
+    const page = parseInt(c.req.query("page") || "1", 10);
+    const limit = Math.min(parseInt(c.req.query("limit") || "50", 10), 100);
+    const search = c.req.query("search");
+    const includeDeleted = c.req.query("includeDeleted") === "true";
+    const skip = (page - 1) * limit;
 
-      const where: any = includeDeleted ? {} : { isDeleted: false };
-      if (search) {
-        where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { email: { contains: search, mode: "insensitive" } },
-        ];
-      }
-
-      const [allUsers, total] = await Promise.all([
-        prisma.user.findMany({
-          where,
-          orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
-          take: limit,
-          skip,
-        }),
-        prisma.user.count({ where }),
-      ]);
-
-      const totalPages = Math.ceil(total / limit);
-      return c.json({
-        users: allUsers,
-        pagination: { page, limit, total, totalPages, hasMore: page < totalPages, hasPrevious: page > 1 },
-      });
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-      return c.json({ error: "Failed to fetch users" }, 500);
+    const where: any = includeDeleted ? {} : { isDeleted: false };
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+      ];
     }
+
+    const [allUsers, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
+        take: limit,
+        skip,
+      }),
+      prisma.user.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    return c.json({
+      users: allUsers,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasMore: page < totalPages,
+        hasPrevious: page > 1,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    return c.json({ error: "Failed to fetch users" }, 500);
   }
-);
+});
 
 // ─── POST /api/users ──────────────────────────────────────────────────────────
 
@@ -60,20 +66,36 @@ users.post(
     try {
       const { prisma } = await import("../services/db/prisma");
       const { FirebaseUserSync } = await import("../services/firebase/sync");
-      const { name, email, password, createInFirebase, timezone } = await c.req.json();
+      const { name, email, password, createInFirebase, timezone } =
+        await c.req.json();
 
       let firebaseUid: string | null = null;
 
       if (createInFirebase) {
-        const syncResult = await FirebaseUserSync.syncUserCreate({ email, name, password, role: "user" });
+        const syncResult = await FirebaseUserSync.syncUserCreate({
+          email,
+          name,
+          password,
+          role: "user",
+        });
         if (!syncResult.success) {
-          return c.json({ error: `Failed to create Firebase user: ${syncResult.error}` }, 500);
+          return c.json(
+            { error: `Failed to create Firebase user: ${syncResult.error}` },
+            500,
+          );
         }
         firebaseUid = syncResult.firebaseUid || null;
       }
 
       const newUser = await prisma.user.create({
-        data: { name, email, firebaseUid, role: "user", isActive: true, timezone: timezone || "UTC" },
+        data: {
+          name,
+          email,
+          firebaseUid,
+          role: "user",
+          isActive: true,
+          timezone: timezone || "UTC",
+        },
       });
 
       return c.json(newUser, 201);
@@ -81,7 +103,7 @@ users.post(
       console.error("Failed to create user:", error);
       return c.json({ error: "Failed to create user" }, 500);
     }
-  }
+  },
 );
 
 // ─── PATCH /api/users ─────────────────────────────────────────────────────────
@@ -95,7 +117,17 @@ users.patch(
     try {
       const { prisma } = await import("../services/db/prisma");
       const { FirebaseUserSync } = await import("../services/firebase/sync");
-      const { id, phone, address, role, name, password, email, isActive, timezone } = await c.req.json();
+      const {
+        id,
+        phone,
+        address,
+        role,
+        name,
+        password,
+        email,
+        isActive,
+        timezone,
+      } = await c.req.json();
 
       if (!id) return c.json({ error: "User id is required" }, 400);
 
@@ -124,8 +156,11 @@ users.patch(
         if (isActive !== undefined) syncData.isActive = isActive;
 
         if (Object.keys(syncData).length > 0) {
-          await FirebaseUserSync.syncUserUpdate(existingUser.firebaseUid, syncData as any).catch(
-            (err) => console.warn("Failed to sync user update to Firebase:", err)
+          await FirebaseUserSync.syncUserUpdate(
+            existingUser.firebaseUid,
+            syncData as any,
+          ).catch((err) =>
+            console.warn("Failed to sync user update to Firebase:", err),
           );
         }
       }
@@ -135,7 +170,7 @@ users.patch(
       console.error("Failed to update user:", error);
       return c.json({ error: "Failed to update user" }, 500);
     }
-  }
+  },
 );
 
 // ─── DELETE /api/users ────────────────────────────────────────────────────────
@@ -163,17 +198,23 @@ users.delete(
       }
 
       if (existingUser.firebaseUid) {
-        await FirebaseUserSync.syncUserDelete(existingUser.firebaseUid, hardDelete).catch(
-          (err) => console.warn("Failed to sync user deletion to Firebase:", err)
+        await FirebaseUserSync.syncUserDelete(
+          existingUser.firebaseUid,
+          hardDelete,
+        ).catch((err) =>
+          console.warn("Failed to sync user deletion to Firebase:", err),
         );
       }
 
-      return c.json({ success: true, message: hardDelete ? "User deleted permanently" : "User deactivated" });
+      return c.json({
+        success: true,
+        message: hardDelete ? "User deleted permanently" : "User deactivated",
+      });
     } catch (error) {
       console.error("Failed to delete user:", error);
       return c.json({ error: "Failed to delete user" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/users/customers-count ──────────────────────────────────────────
@@ -187,28 +228,56 @@ users.get(
       const { prisma } = await import("../services/db/prisma");
       const now = new Date();
       const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const startOfLastMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() - 1,
+        1,
+      );
       const endOfLastMonth = new Date(startOfThisMonth.getTime() - 1);
 
-      const [totalCustomers, thisMonthCustomers, lastMonthCustomers] = await Promise.all([
-        prisma.user.count({ where: { role: "user", isActive: true, isDeleted: false } }),
-        prisma.user.count({ where: { role: "user", isActive: true, isDeleted: false, createdAt: { gte: startOfThisMonth, lte: now } } }),
-        prisma.user.count({ where: { role: "user", isActive: true, isDeleted: false, createdAt: { gte: startOfLastMonth, lte: endOfLastMonth } } }),
-      ]);
+      const [totalCustomers, thisMonthCustomers, lastMonthCustomers] =
+        await Promise.all([
+          prisma.user.count({
+            where: { role: "user", isActive: true, isDeleted: false },
+          }),
+          prisma.user.count({
+            where: {
+              role: "user",
+              isActive: true,
+              isDeleted: false,
+              createdAt: { gte: startOfThisMonth, lte: now },
+            },
+          }),
+          prisma.user.count({
+            where: {
+              role: "user",
+              isActive: true,
+              isDeleted: false,
+              createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
+            },
+          }),
+        ]);
 
       let percentChange = 0;
       if (lastMonthCustomers > 0) {
-        percentChange = ((thisMonthCustomers - lastMonthCustomers) / lastMonthCustomers) * 100;
+        percentChange =
+          ((thisMonthCustomers - lastMonthCustomers) / lastMonthCustomers) *
+          100;
       } else if (thisMonthCustomers > 0) {
         percentChange = 100;
       }
 
-      return c.json({ totalCustomers, thisMonthCustomers, lastMonthCustomers, percentChange });
+      return c.json({
+        totalCustomers,
+        thisMonthCustomers,
+        lastMonthCustomers,
+        percentChange,
+      });
     } catch (error) {
       console.error("Failed to fetch customers count:", error);
       return c.json({ error: "Failed to fetch customers count" }, 500);
     }
-  }
+  },
 );
 
 // ─── DELETE /api/users/delete-account ────────────────────────────────────────
@@ -246,14 +315,16 @@ users.delete(
 
       try {
         await adminAuth.deleteUser(auth.firebaseUser.uid);
-      } catch { /* Best-effort Firebase deletion */ }
+      } catch {
+        /* Best-effort Firebase deletion */
+      }
 
       return c.json({ success: true, message: "Account deleted successfully" });
     } catch (error) {
       console.error("Failed to delete account:", error);
       return c.json({ error: "Failed to delete account" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/users/export-data ───────────────────────────────────────────────
@@ -269,7 +340,15 @@ users.get(
 
       const user = await prisma.user.findUnique({
         where: { id: auth.user.id },
-        select: { id: true, name: true, email: true, phone: true, address: true, timezone: true, createdAt: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          address: true,
+          timezone: true,
+          createdAt: true,
+        },
       });
 
       const orders = await prisma.order.findMany({
@@ -289,7 +368,7 @@ users.get(
       console.error("Failed to export data:", error);
       return c.json({ error: "Failed to export data" }, 500);
     }
-  }
+  },
 );
 
 // ─── POST /api/users/object-to-processing ────────────────────────────────────
@@ -316,7 +395,7 @@ users.post(
       console.error("Failed to update user processing status:", error);
       return c.json({ error: "Failed to update user" }, 500);
     }
-  }
+  },
 );
 
 export default users;

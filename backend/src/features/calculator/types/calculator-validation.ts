@@ -70,7 +70,7 @@ export const loanInputSchema = z.object({
 export const investmentInputSchema = z.object({
   initialInvestment: positiveNumberSchema.min(
     0,
-    "Initial investment cannot be negative"
+    "Initial investment cannot be negative",
   ),
   monthlyContribution: positiveNumberSchema.optional(),
   annualInterestRate: percentageSchema,
@@ -98,16 +98,16 @@ export const retirementInputSchema = z
       .max(100, "Retirement age cannot exceed 100"),
     currentSavings: positiveNumberSchema.min(
       0,
-      "Current savings cannot be negative"
+      "Current savings cannot be negative",
     ),
     monthlyContribution: positiveNumberSchema.min(
       0,
-      "Monthly contribution cannot be negative"
+      "Monthly contribution cannot be negative",
     ),
     annualReturnRate: percentageSchema,
     expectedRetirementSpending: positiveNumberSchema.min(
       1,
-      "Expected retirement spending must be at least $1"
+      "Expected retirement spending must be at least $1",
     ),
     lifeExpectancy: positiveIntegerSchema
       .min(50, "Life expectancy must be at least 50")
@@ -123,7 +123,7 @@ export const retirementInputSchema = z
     {
       message: "Life expectancy must be greater than retirement age",
       path: ["lifeExpectancy"],
-    }
+    },
   );
 
 /**
@@ -146,7 +146,7 @@ export const calculationRequestSchema = z.object({
  */
 export function validateCalculatorInput<T extends z.ZodTypeAny>(
   schema: T,
-  input: unknown
+  input: unknown,
 ):
   | { success: true; data: z.infer<T> }
   | { success: false; error: string; details: z.ZodIssue[] } {

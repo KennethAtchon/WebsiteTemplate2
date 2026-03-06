@@ -1,6 +1,10 @@
 import { Hono } from "hono";
-import { authMiddleware, csrfMiddleware, rateLimiter } from "../middleware/protection";
-import { ADMIN_SPECIAL_CODE_HASH } from "../utils/config/envUtil";
+import {
+  authMiddleware,
+  csrfMiddleware,
+  rateLimiter,
+} from "../../middleware/protection";
+import { ADMIN_SPECIAL_CODE_HASH } from "../../utils/config/envUtil";
 import { createHash } from "crypto";
 
 const admin = new Hono();
@@ -13,8 +17,12 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     const auth = c.get("auth");
-    return c.json({ success: true, message: "Admin access verified", user: auth.user });
-  }
+    return c.json({
+      success: true,
+      message: "Admin access verified",
+      user: auth.user,
+    });
+  },
 );
 
 // ─── POST /api/admin/verify ───────────────────────────────────────────────────
@@ -31,11 +39,16 @@ admin.post(
       if (!adminCode) return c.json({ error: "Admin code is required" }, 400);
 
       if (!ADMIN_SPECIAL_CODE_HASH) {
-        return c.json({ error: "Admin verification not properly configured" }, 500);
+        return c.json(
+          { error: "Admin verification not properly configured" },
+          500,
+        );
       }
 
       const hashedInput = createHash("sha256").update(adminCode).digest("hex");
-      const trueAdminHash = createHash("sha256").update(ADMIN_SPECIAL_CODE_HASH).digest("hex");
+      const trueAdminHash = createHash("sha256")
+        .update(ADMIN_SPECIAL_CODE_HASH)
+        .digest("hex");
 
       if (hashedInput !== trueAdminHash) {
         return c.json({ error: "Invalid admin code" }, 403);
@@ -51,7 +64,7 @@ admin.post(
         create: {
           firebaseUid: uid,
           email: auth.firebaseUser.email || "",
-          name: auth.firebaseUser.name as string || "Admin User",
+          name: (auth.firebaseUser.name as string) || "Admin User",
           role: "admin",
           isActive: true,
         },
@@ -60,12 +73,15 @@ admin.post(
 
       await adminAuth.setCustomUserClaims(uid, { role: "admin" });
 
-      return c.json({ success: true, message: "Admin role granted successfully" });
+      return c.json({
+        success: true,
+        message: "Admin role granted successfully",
+      });
     } catch (error) {
       console.error("Admin verification error:", error);
       return c.json({ error: "Admin verification failed" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/analytics ─────────────────────────────────────────────────
@@ -77,12 +93,12 @@ admin.get(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { getMonthBoundaries, calculatePercentChange } = await import(
-        "../utils/helpers/date"
-      );
+      const { getMonthBoundaries, calculatePercentChange } =
+        await import("../utils/helpers/date");
 
       const now = new Date();
-      const { startOfThisMonth, startOfLastMonth, endOfLastMonth } = getMonthBoundaries();
+      const { startOfThisMonth, startOfLastMonth, endOfLastMonth } =
+        getMonthBoundaries();
 
       const [
         totalCustomers,
@@ -97,40 +113,71 @@ admin.get(
           where: { role: "user", Orders: { some: { status: "paid" } } },
         }),
         prisma.user.count({
-          where: { role: "user", createdAt: { gte: startOfLastMonth, lte: endOfLastMonth } },
+          where: {
+            role: "user",
+            createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
+          },
         }),
         prisma.user.count({
           where: {
             role: "user",
             createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-            Orders: { some: { status: "paid", createdAt: { gte: startOfLastMonth, lte: endOfLastMonth } } },
+            Orders: {
+              some: {
+                status: "paid",
+                createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
+              },
+            },
           },
-        }),
-        prisma.user.count({
-          where: { role: "user", createdAt: { gte: startOfThisMonth, lte: now } },
         }),
         prisma.user.count({
           where: {
             role: "user",
             createdAt: { gte: startOfThisMonth, lte: now },
-            Orders: { some: { status: "paid", createdAt: { gte: startOfThisMonth, lte: now } } },
+          },
+        }),
+        prisma.user.count({
+          where: {
+            role: "user",
+            createdAt: { gte: startOfThisMonth, lte: now },
+            Orders: {
+              some: {
+                status: "paid",
+                createdAt: { gte: startOfThisMonth, lte: now },
+              },
+            },
           },
         }),
       ]);
 
-      const conversionRate = totalCustomers > 0 ? (customersWithPaidOrders / totalCustomers) * 100 : 0;
-      const lastMonthConversionRate = lastMonthCustomers > 0
-        ? (lastMonthCustomersWithPaidOrders / lastMonthCustomers) * 100 : 0;
-      const thisMonthConversionRate = thisMonthCustomers > 0
-        ? (thisMonthCustomersWithPaidOrders / thisMonthCustomers) * 100 : 0;
-      const percentChange = calculatePercentChange(lastMonthConversionRate, thisMonthConversionRate);
+      const conversionRate =
+        totalCustomers > 0
+          ? (customersWithPaidOrders / totalCustomers) * 100
+          : 0;
+      const lastMonthConversionRate =
+        lastMonthCustomers > 0
+          ? (lastMonthCustomersWithPaidOrders / lastMonthCustomers) * 100
+          : 0;
+      const thisMonthConversionRate =
+        thisMonthCustomers > 0
+          ? (thisMonthCustomersWithPaidOrders / thisMonthCustomers) * 100
+          : 0;
+      const percentChange = calculatePercentChange(
+        lastMonthConversionRate,
+        thisMonthConversionRate,
+      );
 
-      return c.json({ conversionRate, lastMonthConversionRate, thisMonthConversionRate, percentChange });
+      return c.json({
+        conversionRate,
+        lastMonthConversionRate,
+        thisMonthConversionRate,
+        percentChange,
+      });
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
       return c.json({ error: "Failed to fetch analytics data" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/customers ─────────────────────────────────────────────────
@@ -157,8 +204,14 @@ admin.get(
         prisma.user.findMany({
           where,
           select: {
-            id: true, name: true, email: true, phone: true, address: true,
-            createdAt: true, updatedAt: true, isActive: true,
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            address: true,
+            createdAt: true,
+            updatedAt: true,
+            isActive: true,
           },
           orderBy: { createdAt: "desc" },
           take: limit,
@@ -176,16 +229,22 @@ admin.get(
           isActive: c.isActive !== undefined ? c.isActive : true,
         })),
         pagination: {
-          total, page, limit, totalPages,
-          hasMore: page < totalPages, hasPrevious: page > 1,
-          showing: customers.length, from: skip + 1, to: skip + customers.length,
+          total,
+          page,
+          limit,
+          totalPages,
+          hasMore: page < totalPages,
+          hasPrevious: page > 1,
+          showing: customers.length,
+          from: skip + 1,
+          to: skip + customers.length,
         },
       });
     } catch (error) {
       console.error("Failed to fetch customers:", error);
       return c.json({ error: "Failed to fetch customers" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/orders ────────────────────────────────────────────────────
@@ -197,7 +256,8 @@ admin.get(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { formatOrderResponse } = await import("../utils/helpers/order-helpers");
+      const { formatOrderResponse } =
+        await import("../utils/helpers/order-helpers");
 
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = Math.min(parseInt(c.req.query("limit") || "20", 10), 100);
@@ -230,16 +290,22 @@ admin.get(
       return c.json({
         orders: orders.map(formatOrderResponse),
         pagination: {
-          total, page, limit, totalPages,
-          hasMore: page < totalPages, hasPrevious: page > 1,
-          showing: orders.length, from: skip + 1, to: skip + orders.length,
+          total,
+          page,
+          limit,
+          totalPages,
+          hasMore: page < totalPages,
+          hasPrevious: page > 1,
+          showing: orders.length,
+          from: skip + 1,
+          to: skip + orders.length,
         },
       });
     } catch (error) {
       console.error("Failed to fetch orders:", error);
       return c.json({ error: "Failed to fetch orders" }, 500);
     }
-  }
+  },
 );
 
 // ─── POST /api/admin/orders ───────────────────────────────────────────────────
@@ -252,7 +318,8 @@ admin.post(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { formatOrderResponse } = await import("../utils/helpers/order-helpers");
+      const { formatOrderResponse } =
+        await import("../utils/helpers/order-helpers");
       const body = await c.req.json();
       const { userId, totalAmount, status } = body;
 
@@ -270,7 +337,7 @@ admin.post(
       console.error("Failed to create order:", error);
       return c.json({ error: "Failed to create order" }, 500);
     }
-  }
+  },
 );
 
 // ─── PUT /api/admin/orders ────────────────────────────────────────────────────
@@ -283,7 +350,8 @@ admin.put(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { formatOrderResponse } = await import("../utils/helpers/order-helpers");
+      const { formatOrderResponse } =
+        await import("../utils/helpers/order-helpers");
       const body = await c.req.json();
       const { id, userId, totalAmount, status } = body;
 
@@ -305,7 +373,7 @@ admin.put(
       console.error("Failed to update order:", error);
       return c.json({ error: "Failed to update order" }, 500);
     }
-  }
+  },
 );
 
 // ─── DELETE /api/admin/orders ─────────────────────────────────────────────────
@@ -318,7 +386,8 @@ admin.delete(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { formatOrderResponse } = await import("../utils/helpers/order-helpers");
+      const { formatOrderResponse } =
+        await import("../utils/helpers/order-helpers");
       const body = await c.req.json();
       const { id, deletedBy } = body;
 
@@ -329,7 +398,11 @@ admin.delete(
 
       const order = await prisma.order.update({
         where: { id },
-        data: { isDeleted: true, deletedAt: new Date(), deletedBy: deletedBy || "admin" },
+        data: {
+          isDeleted: true,
+          deletedAt: new Date(),
+          deletedBy: deletedBy || "admin",
+        },
         include: { user: true },
       });
 
@@ -338,7 +411,7 @@ admin.delete(
       console.error("Failed to delete order:", error);
       return c.json({ error: "Failed to delete order" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/orders/:id ────────────────────────────────────────────────
@@ -350,10 +423,14 @@ admin.get(
   async (c) => {
     try {
       const { prisma } = await import("../services/db/prisma");
-      const { formatOrderResponse } = await import("../utils/helpers/order-helpers");
+      const { formatOrderResponse } =
+        await import("../utils/helpers/order-helpers");
       const id = c.req.param("id");
 
-      const order = await prisma.order.findUnique({ where: { id }, include: { user: true } });
+      const order = await prisma.order.findUnique({
+        where: { id },
+        include: { user: true },
+      });
       if (!order) return c.json({ error: "Order not found" }, 404);
 
       return c.json({ order: formatOrderResponse(order) });
@@ -361,7 +438,7 @@ admin.get(
       console.error("Failed to fetch order:", error);
       return c.json({ error: "Failed to fetch order" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/subscriptions ────────────────────────────────────────────
@@ -374,13 +451,12 @@ admin.get(
     try {
       const { adminDb } = await import("../services/firebase/admin");
       const { prisma } = await import("../services/db/prisma");
-      const { extractSubscriptionTier, convertFirestoreTimestamp } = await import(
-        "../services/firebase/subscription-helpers"
-      );
-      const { getTierConfig } = await import("../constants/subscription.constants");
-      const { getMonthlyUsageCount } = await import(
-        "../features/calculator/services/usage-service"
-      );
+      const { extractSubscriptionTier, convertFirestoreTimestamp } =
+        await import("../services/firebase/subscription-helpers");
+      const { getTierConfig } =
+        await import("../constants/subscription.constants");
+      const { getMonthlyUsageCount } =
+        await import("../features/calculator/services/usage-service");
 
       const page = parseInt(c.req.query("page") || "1", 10);
       const limit = parseInt(c.req.query("limit") || "50", 10);
@@ -392,7 +468,9 @@ admin.get(
       const allSubscriptions: any[] = [];
 
       for (const customerDoc of customersSnapshot.docs) {
-        const subscriptionsSnapshot = await customerDoc.ref.collection("subscriptions").get();
+        const subscriptionsSnapshot = await customerDoc.ref
+          .collection("subscriptions")
+          .get();
 
         for (const subDoc of subscriptionsSnapshot.docs) {
           const subData = subDoc.data();
@@ -408,34 +486,58 @@ admin.get(
           let usageLimit: number | null = null;
           if (dbUser) {
             try {
-              const tierConfig = getTierConfig(tierFromMetadata as "basic" | "pro" | "enterprise");
-              usageLimit = tierConfig.features.maxCalculationsPerMonth === -1
-                ? null : tierConfig.features.maxCalculationsPerMonth;
+              const tierConfig = getTierConfig(
+                tierFromMetadata as "basic" | "pro" | "enterprise",
+              );
+              usageLimit =
+                tierConfig.features.maxCalculationsPerMonth === -1
+                  ? null
+                  : tierConfig.features.maxCalculationsPerMonth;
               usageCount = await getMonthlyUsageCount(dbUser.id);
-            } catch { /* skip usage on error */ }
+            } catch {
+              /* skip usage on error */
+            }
           }
 
           const subscription = {
             id: subDoc.id,
             userId: customerDoc.id,
-            user: dbUser || { id: customerDoc.id, name: subData.metadata?.userEmail || "Unknown", email: subData.metadata?.userEmail || "" },
+            user: dbUser || {
+              id: customerDoc.id,
+              name: subData.metadata?.userEmail || "Unknown",
+              email: subData.metadata?.userEmail || "",
+            },
             tier: tierFromMetadata,
             status: subData.status || "incomplete",
             stripeCustomerId: subData.customer,
             stripeSubscriptionId: subData.id,
             usageCount,
             usageLimit,
-            currentPeriodStart: convertFirestoreTimestamp(subData.current_period_start),
-            currentPeriodEnd: convertFirestoreTimestamp(subData.current_period_end),
-            createdAt: subData.created ? convertFirestoreTimestamp(subData.created) || subDoc.createTime?.toDate() || new Date() : subDoc.createTime?.toDate() || new Date(),
-            updatedAt: subData.updated ? convertFirestoreTimestamp(subData.updated) || subDoc.updateTime?.toDate() || new Date() : subDoc.updateTime?.toDate() || new Date(),
+            currentPeriodStart: convertFirestoreTimestamp(
+              subData.current_period_start,
+            ),
+            currentPeriodEnd: convertFirestoreTimestamp(
+              subData.current_period_end,
+            ),
+            createdAt: subData.created
+              ? convertFirestoreTimestamp(subData.created) ||
+                subDoc.createTime?.toDate() ||
+                new Date()
+              : subDoc.createTime?.toDate() || new Date(),
+            updatedAt: subData.updated
+              ? convertFirestoreTimestamp(subData.updated) ||
+                subDoc.updateTime?.toDate() ||
+                new Date()
+              : subDoc.updateTime?.toDate() || new Date(),
           };
 
-          if (status && status !== "all" && subscription.status !== status) continue;
+          if (status && status !== "all" && subscription.status !== status)
+            continue;
           if (tier && tier !== "all" && subscription.tier !== tier) continue;
           if (search) {
             const q = search.toLowerCase();
-            const matches = subscription.userId.toLowerCase().includes(q) ||
+            const matches =
+              subscription.userId.toLowerCase().includes(q) ||
               subscription.stripeCustomerId?.toLowerCase().includes(q) ||
               subscription.stripeSubscriptionId?.toLowerCase().includes(q) ||
               subscription.user?.email?.toLowerCase().includes(q);
@@ -446,27 +548,41 @@ admin.get(
         }
       }
 
-      allSubscriptions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      allSubscriptions.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      );
 
       const total = allSubscriptions.length;
       const skip = (page - 1) * limit;
-      const paginated = allSubscriptions.slice(skip, skip + limit).map((sub) => ({
-        ...sub,
-        currentPeriodStart: sub.currentPeriodStart ? sub.currentPeriodStart.toISOString() : null,
-        currentPeriodEnd: sub.currentPeriodEnd ? sub.currentPeriodEnd.toISOString() : null,
-        createdAt: sub.createdAt.toISOString(),
-        updatedAt: sub.updatedAt.toISOString(),
-      }));
+      const paginated = allSubscriptions
+        .slice(skip, skip + limit)
+        .map((sub) => ({
+          ...sub,
+          currentPeriodStart: sub.currentPeriodStart
+            ? sub.currentPeriodStart.toISOString()
+            : null,
+          currentPeriodEnd: sub.currentPeriodEnd
+            ? sub.currentPeriodEnd.toISOString()
+            : null,
+          createdAt: sub.createdAt.toISOString(),
+          updatedAt: sub.updatedAt.toISOString(),
+        }));
 
       return c.json({
         subscriptions: paginated,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit), hasMore: skip + paginated.length < total },
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+          hasMore: skip + paginated.length < total,
+        },
       });
     } catch (error) {
       console.error("Failed to fetch subscriptions:", error);
       return c.json({ error: "Failed to fetch subscriptions" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/subscriptions/analytics ───────────────────────────────────
@@ -478,30 +594,37 @@ admin.get(
   async (c) => {
     try {
       const { adminDb } = await import("../services/firebase/admin");
-      const { getTierConfig } = await import("../constants/subscription.constants");
-      const { extractSubscriptionTier, convertFirestoreTimestamp } = await import(
-        "../services/firebase/subscription-helpers"
-      );
+      const { getTierConfig } =
+        await import("../constants/subscription.constants");
+      const { extractSubscriptionTier, convertFirestoreTimestamp } =
+        await import("../services/firebase/subscription-helpers");
 
       const customersSnapshot = await adminDb.collection("customers").get();
-      const allSubscriptions: Array<{ tier: string; status: string; canceledAt: Date | null }> = [];
+      const allSubscriptions: Array<{
+        tier: string;
+        status: string;
+        canceledAt: Date | null;
+      }> = [];
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       for (const customerDoc of customersSnapshot.docs) {
-        const subscriptionsSnapshot = await customerDoc.ref.collection("subscriptions").get();
+        const subscriptionsSnapshot = await customerDoc.ref
+          .collection("subscriptions")
+          .get();
         for (const subDoc of subscriptionsSnapshot.docs) {
           const subData = subDoc.data();
           const tier = extractSubscriptionTier(subData);
           const status = subData.status || "incomplete";
           const canceledAt = subData.canceled_at
-            ? new Date(subData.canceled_at * 1000) : null;
+            ? new Date(subData.canceled_at * 1000)
+            : null;
           allSubscriptions.push({ tier, status, canceledAt });
         }
       }
 
       const activeSubscriptions = allSubscriptions.filter((s) =>
-        ["active", "trialing"].includes(s.status)
+        ["active", "trialing"].includes(s.status),
       );
 
       const tierDistribution: Record<string, number> = {};
@@ -512,21 +635,28 @@ admin.get(
       let mrr = 0;
       for (const sub of activeSubscriptions) {
         try {
-          const config = getTierConfig(sub.tier as "basic" | "pro" | "enterprise");
+          const config = getTierConfig(
+            sub.tier as "basic" | "pro" | "enterprise",
+          );
           mrr += (config.prices?.monthly || 0) / 100;
-        } catch { /* skip unknown tiers */ }
+        } catch {
+          /* skip unknown tiers */
+        }
       }
 
       const canceledLast30Days = allSubscriptions.filter(
-        (s) => s.canceledAt && s.canceledAt >= thirtyDaysAgo
+        (s) => s.canceledAt && s.canceledAt >= thirtyDaysAgo,
       ).length;
 
-      const churnRate = activeSubscriptions.length > 0
-        ? (canceledLast30Days / activeSubscriptions.length) * 100 : 0;
+      const churnRate =
+        activeSubscriptions.length > 0
+          ? (canceledLast30Days / activeSubscriptions.length) * 100
+          : 0;
 
       return c.json({
         totalActive: activeSubscriptions.length,
-        totalTrialing: allSubscriptions.filter((s) => s.status === "trialing").length,
+        totalTrialing: allSubscriptions.filter((s) => s.status === "trialing")
+          .length,
         mrr,
         arr: mrr * 12,
         churnRate,
@@ -536,7 +666,7 @@ admin.get(
       console.error("Failed to fetch subscription analytics:", error);
       return c.json({ error: "Failed to fetch subscription analytics" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/subscriptions/:id ────────────────────────────────────────
@@ -552,7 +682,10 @@ admin.get(
       const customersSnapshot = await adminDb.collection("customers").get();
 
       for (const customerDoc of customersSnapshot.docs) {
-        const subDoc = await customerDoc.ref.collection("subscriptions").doc(id).get();
+        const subDoc = await customerDoc.ref
+          .collection("subscriptions")
+          .doc(id)
+          .get();
         if (subDoc.exists) {
           return c.json({ subscription: { id: subDoc.id, ...subDoc.data() } });
         }
@@ -563,7 +696,7 @@ admin.get(
       console.error("Failed to fetch subscription:", error);
       return c.json({ error: "Failed to fetch subscription" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/schema ────────────────────────────────────────────────────
@@ -598,7 +731,7 @@ admin.get(
       console.error("Failed to fetch schema:", error);
       return c.json({ error: "Failed to fetch schema" }, 500);
     }
-  }
+  },
 );
 
 // ─── POST /api/admin/sync-firebase ────────────────────────────────────────────
@@ -625,7 +758,7 @@ admin.post(
       console.error("Failed to sync Firebase:", error);
       return c.json({ error: "Failed to sync with Firebase" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/admin/database/health ──────────────────────────────────────────
@@ -641,9 +774,12 @@ admin.get(
       return c.json({ status: "healthy", database: "connected" });
     } catch (error) {
       console.error("Database health check failed:", error);
-      return c.json({ status: "unhealthy", database: "disconnected", error: String(error) }, 503);
+      return c.json(
+        { status: "unhealthy", database: "disconnected", error: String(error) },
+        503,
+      );
     }
-  }
+  },
 );
 
 export default admin;

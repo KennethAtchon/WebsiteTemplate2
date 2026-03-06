@@ -7,7 +7,9 @@ import type { MiddlewareHandler } from "hono";
  * Applies CSP, HSTS, X-Frame-Options, Permissions-Policy, etc.
  */
 export function secureHeaders(): MiddlewareHandler {
-  const IS_PRODUCTION = process.env.APP_ENV === "production" || process.env.NODE_ENV === "production";
+  const IS_PRODUCTION =
+    process.env.APP_ENV === "production" ||
+    process.env.NODE_ENV === "production";
 
   return async (c, next) => {
     await next();
@@ -28,7 +30,7 @@ export function secureHeaders(): MiddlewareHandler {
     if (IS_PRODUCTION) {
       c.res.headers.set(
         "Strict-Transport-Security",
-        "max-age=31536000; includeSubDomains; preload"
+        "max-age=31536000; includeSubDomains; preload",
       );
     }
 
@@ -77,7 +79,7 @@ export function secureHeaders(): MiddlewareHandler {
     if (c.req.path.startsWith("/api/")) {
       c.res.headers.set(
         "Cache-Control",
-        "no-store, no-cache, must-revalidate, proxy-revalidate"
+        "no-store, no-cache, must-revalidate, proxy-revalidate",
       );
       c.res.headers.set("Pragma", "no-cache");
       c.res.headers.set("Expires", "0");

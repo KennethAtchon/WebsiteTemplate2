@@ -12,7 +12,8 @@ health.get("/", rateLimiter("health"), async (c) => {
 
   try {
     const { prisma, getQueryStats } = await import("../../services/db/prisma");
-    const getRedisConnection = (await import("../../services/db/redis")).default;
+    const getRedisConnection = (await import("../../services/db/redis"))
+      .default;
 
     const healthChecks = await Promise.allSettled([
       checkDatabaseHealth(prisma),
@@ -33,13 +34,16 @@ health.get("/", rateLimiter("health"), async (c) => {
         database: extractResult(dbResult, "database"),
         redis: extractResult(redisResult, "redis"),
         service: extractResult(serviceResult, "service"),
-        database_performance: extractResult(dbPerfResult, "database_performance"),
+        database_performance: extractResult(
+          dbPerfResult,
+          "database_performance",
+        ),
       },
       response_time_ms: Date.now() - startTime,
     };
 
     const allHealthy = Object.values(report.checks).every(
-      (check) => check.status === "healthy"
+      (check) => check.status === "healthy",
     );
     report.status = allHealthy ? "healthy" : "unhealthy";
 
@@ -52,7 +56,7 @@ health.get("/", rateLimiter("health"), async (c) => {
         error: "Health check failed",
         response_time_ms: Date.now() - startTime,
       },
-      503
+      503,
     );
   }
 });
@@ -63,7 +67,8 @@ health.get("/", rateLimiter("health"), async (c) => {
  */
 health.get("/error-monitoring", rateLimiter("health"), async (c) => {
   try {
-    const { getErrorMetrics } = await import("../../services/observability/metrics");
+    const { getErrorMetrics } =
+      await import("../../services/observability/metrics");
     const metrics = getErrorMetrics();
     return c.json({ metrics });
   } catch {
@@ -90,7 +95,7 @@ async function checkDatabaseHealth(prisma: any): Promise<HealthCheckResult> {
         await prisma.$queryRaw`SELECT COUNT(*) as user_count FROM "User" LIMIT 1`;
       })(),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Database timeout")), 1000)
+        setTimeout(() => reject(new Error("Database timeout")), 1000),
       ),
     ]);
     return {
@@ -110,7 +115,7 @@ async function checkDatabaseHealth(prisma: any): Promise<HealthCheckResult> {
 }
 
 async function checkRedisHealth(
-  getRedis: () => any
+  getRedis: () => any,
 ): Promise<HealthCheckResult> {
   const start = Date.now();
   try {
@@ -133,7 +138,7 @@ async function checkRedisHealth(
         if (val !== "ok") throw new Error("Redis read/write failed");
       })(),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Redis timeout")), 500)
+        setTimeout(() => reject(new Error("Redis timeout")), 500),
       ),
     ]);
     return {
@@ -171,7 +176,7 @@ async function checkServiceHealth(): Promise<HealthCheckResult> {
 
 async function checkDatabasePerformance(
   prisma: any,
-  getQueryStats: (minutes: number) => any
+  getQueryStats: (minutes: number) => any,
 ): Promise<HealthCheckResult> {
   const start = Date.now();
   try {
@@ -201,7 +206,7 @@ async function checkDatabasePerformance(
 
 function extractResult(
   result: PromiseSettledResult<HealthCheckResult>,
-  name: string
+  name: string,
 ): HealthCheckResult {
   if (result.status === "fulfilled") return result.value;
   return {

@@ -101,7 +101,7 @@ export function getFeaturedProducts(): OrderProduct[] {
  * Get products by category
  */
 export function getProductsByCategory(
-  category: OrderProduct["category"]
+  category: OrderProduct["category"],
 ): OrderProduct[] {
   return ORDER_PRODUCTS.filter((product) => product.category === category);
 }

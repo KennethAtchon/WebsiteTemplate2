@@ -224,7 +224,7 @@ const timeServiceMocks = {
   getBrowserTimezone: mock(() => "America/New_York"),
   fromUTC: mock((utc: string) => utc),
   formatWithLabel: mock(
-    (_d: string, _tz: string, fmt: string) => `Formatted: ${fmt}`
+    (_d: string, _tz: string, fmt: string) => `Formatted: ${fmt}`,
   ),
 };
 
@@ -402,7 +402,10 @@ const rateLimiterMock = () => ({
     default: { window: 60, maxRequests: 30, keyPrefix: "default_rate_limit" },
   },
 });
-mock.module("@/services/rate-limit/comprehensive-rate-limiter", rateLimiterMock);
+mock.module(
+  "@/services/rate-limit/comprehensive-rate-limiter",
+  rateLimiterMock,
+);
 
 mock.module("@/services/timezone/TimeService", () => ({
   TimeService: {

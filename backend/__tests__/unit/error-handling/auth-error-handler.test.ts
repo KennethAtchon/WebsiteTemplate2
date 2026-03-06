@@ -22,90 +22,90 @@ describe("auth-error-handler", () => {
     it("returns translated message for auth/invalid-credential", () => {
       const err = new ErrorWithCode("Invalid", "auth/invalid-credential");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_incorrect_email_or_password"
+        "translated:auth_error_incorrect_email_or_password",
       );
     });
 
     it("returns translated message for auth/wrong-password", () => {
       const err = new ErrorWithCode("Wrong password", "auth/wrong-password");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_incorrect_email_or_password"
+        "translated:auth_error_incorrect_email_or_password",
       );
     });
 
     it("returns translated message for auth/user-not-found", () => {
       const err = new ErrorWithCode("Not found", "auth/user-not-found");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_incorrect_email_or_password"
+        "translated:auth_error_incorrect_email_or_password",
       );
     });
 
     it("returns translated message for auth/invalid-email", () => {
       const err = new ErrorWithCode("Bad email", "auth/invalid-email");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_invalid_email"
+        "translated:auth_error_invalid_email",
       );
     });
 
     it("returns translated message for auth/user-disabled", () => {
       const err = new ErrorWithCode("Disabled", "auth/user-disabled");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_account_disabled"
+        "translated:auth_error_account_disabled",
       );
     });
 
     it("returns translated message for auth/too-many-requests", () => {
       const err = new ErrorWithCode("Too many", "auth/too-many-requests");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_too_many_attempts"
+        "translated:auth_error_too_many_attempts",
       );
     });
 
     it("returns translated message for auth/email-already-in-use", () => {
       const err = new ErrorWithCode("Exists", "auth/email-already-in-use");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_email_already_in_use"
+        "translated:auth_error_email_already_in_use",
       );
     });
 
     it("returns translated message for auth/weak-password", () => {
       const err = new ErrorWithCode("Weak", "auth/weak-password");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_weak_password"
+        "translated:auth_error_weak_password",
       );
     });
 
     it("returns translated message for auth/invalid-password", () => {
       const err = new ErrorWithCode("Invalid", "auth/invalid-password");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_invalid_password"
+        "translated:auth_error_invalid_password",
       );
     });
 
     it("returns translated message for auth/network-request-failed", () => {
       const err = new ErrorWithCode("Network", "auth/network-request-failed");
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_network_failed"
+        "translated:auth_error_network_failed",
       );
     });
 
     it("returns translated message for auth/operation-not-allowed", () => {
       const err = new ErrorWithCode(
         "Not allowed",
-        "auth/operation-not-allowed"
+        "auth/operation-not-allowed",
       );
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_operation_not_allowed"
+        "translated:auth_error_operation_not_allowed",
       );
     });
 
     it("returns translated message for auth/requires-recent-login", () => {
       const err = new ErrorWithCode(
         "Recent login",
-        "auth/requires-recent-login"
+        "auth/requires-recent-login",
       );
       expect(getAuthErrorMessage(err, t)).toBe(
-        "translated:auth_error_requires_recent_login"
+        "translated:auth_error_requires_recent_login",
       );
     });
 

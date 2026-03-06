@@ -58,7 +58,7 @@ describe("rate-limit.config", () => {
       expect(Array.isArray(configs)).toBe(true);
       expect(configs.length).toBeGreaterThan(5);
       expect(
-        configs.every((c) => "type" in c && c.window && c.maxRequests)
+        configs.every((c) => "type" in c && c.window && c.maxRequests),
       ).toBe(true);
     });
   });

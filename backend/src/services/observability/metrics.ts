@@ -154,7 +154,7 @@ export function recordHttpRequest(
   method: string,
   route: string,
   status: number,
-  durationMs: number
+  durationMs: number,
 ): void {
   if (!serverOnly()) return;
   init();
@@ -188,7 +188,7 @@ export function recordDbQuery(
   model: string,
   operation: string,
   durationMs: number,
-  status: "ok" | "error"
+  status: "ok" | "error",
 ): void {
   if (!serverOnly()) return;
   init();
@@ -200,7 +200,7 @@ export function recordDbQuery(
 export function recordConnectionPool(
   active: number,
   idle: number,
-  max: number
+  max: number,
 ): void {
   if (!serverOnly()) return;
   init();

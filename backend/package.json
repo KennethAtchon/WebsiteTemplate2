@@ -11,6 +11,7 @@
     "dev": "bun run --hot src/index.ts",
     "start": "bun run src/index.ts",
     "build": "bun build src/index.ts --outdir ./dist --target bun",
+    "build:all": "bun run lint && bun run format && bunx tsc --noEmit && bun run build",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -47,10 +48,15 @@
     "@types/bcryptjs": "^3.0.0",
     "@types/formidable": "^3.4.6",
     "@types/node": "^25.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "bun-types": "^1.3.10",
+    "clsx": "^2.1.1",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.7.4",
     "supertest": "^7.1.4",
+    "tailwind-merge": "^3.5.0",
     "typescript": "^5.9.3"
   }
 }

@@ -119,7 +119,7 @@ export interface FirebaseLogMetadata {
 export async function writeFirebaseLog(
   level: FirebaseLogLevel,
   message: string,
-  metadata: FirebaseLogMetadata = {}
+  metadata: FirebaseLogMetadata = {},
 ): Promise<void> {
   // ============================================================================
   // FIREBASE IMPLEMENTATION (COMMENTED OUT)
@@ -191,7 +191,7 @@ export async function writeFirebaseLog(
       service: metadata.service || "observability",
       operation: metadata.operation || "writeFirebaseLog",
     },
-    metadata
+    metadata,
   );
 }
 
@@ -200,7 +200,7 @@ export async function writeFirebaseLog(
  */
 export async function logInfo(
   message: string,
-  metadata: FirebaseLogMetadata = {}
+  metadata: FirebaseLogMetadata = {},
 ): Promise<void> {
   return writeFirebaseLog("INFO", message, metadata);
 }
@@ -210,7 +210,7 @@ export async function logInfo(
  */
 export async function logWarning(
   message: string,
-  metadata: FirebaseLogMetadata = {}
+  metadata: FirebaseLogMetadata = {},
 ): Promise<void> {
   return writeFirebaseLog("WARNING", message, metadata);
 }
@@ -221,7 +221,7 @@ export async function logWarning(
 export async function logError(
   message: string,
   error?: Error | unknown,
-  metadata: FirebaseLogMetadata = {}
+  metadata: FirebaseLogMetadata = {},
 ): Promise<void> {
   const errorMetadata = {
     ...metadata,
@@ -241,7 +241,7 @@ export async function logError(
 export async function logCritical(
   message: string,
   error?: Error | unknown,
-  metadata: FirebaseLogMetadata = {}
+  metadata: FirebaseLogMetadata = {},
 ): Promise<void> {
   const errorMetadata = {
     ...metadata,
@@ -263,7 +263,7 @@ export async function logApiRequest(
   endpoint: string,
   statusCode: number,
   duration: number,
-  metadata: FirebaseLogMetadata = {}
+  metadata: FirebaseLogMetadata = {},
 ): Promise<void> {
   const level: FirebaseLogLevel =
     statusCode >= 500 ? "ERROR" : statusCode >= 400 ? "WARNING" : "INFO";
@@ -277,7 +277,7 @@ export async function logApiRequest(
       endpoint,
       statusCode,
       duration,
-    }
+    },
   );
 }
 
@@ -288,7 +288,7 @@ export async function logRateLimitViolation(
   rateLimitType: string,
   ip: string,
   endpoint: string,
-  metadata: FirebaseLogMetadata = {}
+  metadata: FirebaseLogMetadata = {},
 ): Promise<void> {
   return writeFirebaseLog(
     "WARNING",
@@ -299,7 +299,7 @@ export async function logRateLimitViolation(
       ip,
       endpoint,
       eventType: "rate_limit_violation",
-    }
+    },
   );
 }
 
@@ -309,7 +309,7 @@ export async function logRateLimitViolation(
 export async function logSecurityEvent(
   eventType: string,
   message: string,
-  metadata: FirebaseLogMetadata = {}
+  metadata: FirebaseLogMetadata = {},
 ): Promise<void> {
   return writeFirebaseLog("WARNING", `Security event: ${message}`, {
     ...metadata,

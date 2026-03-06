@@ -44,7 +44,7 @@ describe("csrf-protection", () => {
       const req = new Request("http://localhost/api", { method: "GET" }) as any;
       const result = await requireCSRFToken(req, TEST_UID);
       expect(result === true || result === false || result === undefined).toBe(
-        true
+        true,
       );
     });
   });

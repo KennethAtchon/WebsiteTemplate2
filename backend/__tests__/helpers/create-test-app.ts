@@ -20,7 +20,7 @@ export function createTestApp() {
         "X-Requested-With",
       ],
       credentials: true,
-    })
+    }),
   );
 
   return app;
@@ -56,7 +56,7 @@ export const mockAuthResult = {
 export async function req(
   app: Hono,
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<{ status: number; data: any; headers: Headers }> {
   const res = await app.request(path, options);
   let data: any;

@@ -91,7 +91,7 @@ const TIER_NAMES: Record<SubscriptionTier, string> = {
  */
 export function getTierConfig(
   tier: SubscriptionTier,
-  billingCycle: "monthly" | "annual" = "monthly"
+  billingCycle: "monthly" | "annual" = "monthly",
 ): SubscriptionTierConfig {
   return {
     name: TIER_NAMES[tier],
@@ -107,7 +107,7 @@ export function getTierConfig(
  */
 export function tierHasExportFormat(
   tier: SubscriptionTier,
-  format: string
+  format: string,
 ): boolean {
   const config = getTierConfig(tier);
   return config.features.exportFormats.includes(format);
@@ -118,7 +118,7 @@ export function tierHasExportFormat(
  */
 export function isUsageLimitReached(
   usageCount: number,
-  usageLimit: number | null
+  usageLimit: number | null,
 ): boolean {
   if (usageLimit === null || usageLimit === -1) {
     return false; // Unlimited

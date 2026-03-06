@@ -79,7 +79,7 @@ describe("calculator constants", () => {
       expect(configs).toHaveLength(4);
       for (let i = 1; i < configs.length; i++) {
         expect(configs[i].displayOrder).toBeGreaterThanOrEqual(
-          configs[i - 1].displayOrder
+          configs[i - 1].displayOrder,
         );
       }
     });

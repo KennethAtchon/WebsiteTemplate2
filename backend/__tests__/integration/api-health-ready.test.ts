@@ -44,7 +44,7 @@ app.get("/api/live", (c) =>
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     response_time_ms: 0,
-  })
+  }),
 );
 app.get("/api/ready", (c) =>
   c.json({
@@ -52,7 +52,7 @@ app.get("/api/ready", (c) =>
     timestamp: new Date().toISOString(),
     checks: { database: { ready: true }, redis: { ready: true } },
     response_time_ms: 0,
-  })
+  }),
 );
 
 describe("Health & Readiness Routes", () => {

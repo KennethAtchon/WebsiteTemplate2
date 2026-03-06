@@ -22,7 +22,7 @@ export type { FeatureType as CalculationType, FeatureType as CalculatorType };
 export const getRequiredTierForCalculator = getRequiredTierForFeature;
 export const hasCalculatorAccess = (
   userTier: Parameters<typeof hasFeatureAccess>[0],
-  calculatorType: FeatureType
+  calculatorType: FeatureType,
 ) => hasFeatureAccess(userTier, calculatorType);
 export { isFeatureFree, hasTierAccess };
 export const getAccessibleCalculators = getAccessibleFeatures;

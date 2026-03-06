@@ -27,7 +27,7 @@ export function getMonthBoundaries(): {
  */
 export function calculatePercentChange(
   lastMonth: number,
-  thisMonth: number
+  thisMonth: number,
 ): number {
   if (lastMonth > 0) {
     return ((thisMonth - lastMonth) / lastMonth) * 100;
@@ -51,7 +51,7 @@ export function safeFormatDateWithTimezone(
   dateValue: string | Date | null | undefined,
   timezone: string,
   formatString: string = DEFAULT_FORMAT,
-  fallback: string = DEFAULT_FALLBACK
+  fallback: string = DEFAULT_FALLBACK,
 ): string {
   if (!dateValue) {
     return fallback;
@@ -77,13 +77,13 @@ export function safeFormatDateWithTimezone(
     return TimeService.formatWithLabel(
       TimeService.fromUTC(utcString, timezone),
       timezone,
-      formatString
+      formatString,
     );
   } catch (error) {
     debugLog.warn(
       "Timezone-aware date formatting error",
       { utility: "date", timezone },
-      error
+      error,
     );
     return fallback;
   }
@@ -97,7 +97,7 @@ export function safeFormatDateWithTimezone(
  */
 export function formatDateWithTimezone(
   dateString: string | null | undefined,
-  formatString: string = DEFAULT_FORMAT
+  formatString: string = DEFAULT_FORMAT,
 ): string {
   const timezone = TimeService.getBrowserTimezone();
   return safeFormatDateWithTimezone(dateString, timezone, formatString);

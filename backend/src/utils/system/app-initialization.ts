@@ -66,7 +66,7 @@ export function initializeApp() {
   systemLogger.lifecycle(
     "info",
     "Initializing application with error handling and monitoring",
-    "init"
+    "init",
   );
 
   try {
@@ -84,14 +84,14 @@ export function initializeApp() {
     systemLogger.lifecycle(
       "info",
       "Application initialization completed successfully",
-      "init"
+      "init",
     );
   } catch (error) {
     systemLogger.lifecycle(
       "critical",
       "Failed to initialize application",
       "init",
-      error
+      error,
     );
 
     // If we can't set up error handling, this is critical
@@ -123,7 +123,7 @@ async function getRedisHealth() {
           line.startsWith("connected_clients:") ||
           line.startsWith("blocked_clients:") ||
           line.startsWith("keyspace_hits:") ||
-          line.startsWith("keyspace_misses:")
+          line.startsWith("keyspace_misses:"),
       );
 
     const metrics: any = {};
@@ -144,7 +144,7 @@ async function getRedisHealth() {
       "error",
       "Redis health check failed",
       "health-check",
-      error
+      error,
     );
 
     return {
@@ -201,7 +201,7 @@ function setupProcessMonitoring() {
           "warn",
           "Redis connection issues detected",
           "health-check",
-          redisHealth
+          redisHealth,
         );
         setLastRedisAlert(now);
       }
@@ -217,7 +217,7 @@ function setupProcessMonitoring() {
             pingTime: redisHealth.pingTime,
             status: redisHealth.status,
             alertCooldownMinutes: REDIS_ALERT_COOLDOWN / (60 * 1000),
-          }
+          },
         );
         setLastRedisAlert(now);
       }
@@ -226,7 +226,7 @@ function setupProcessMonitoring() {
     // Redis memory alerts - with global rate limiting
     if (redisHealth.metrics && redisHealth.metrics.used_memory) {
       const redisMemoryMB = Math.round(
-        redisHealth.metrics.used_memory / 1024 / 1024
+        redisHealth.metrics.used_memory / 1024 / 1024,
       );
       if (redisMemoryMB > 512) {
         // Alert if Redis using more than 512MB
@@ -243,7 +243,7 @@ function setupProcessMonitoring() {
               keyspaceHits: redisHealth.metrics.keyspace_hits,
               keyspaceMisses: redisHealth.metrics.keyspace_misses,
               alertCooldownMinutes: REDIS_ALERT_COOLDOWN / (60 * 1000),
-            }
+            },
           );
           setLastRedisAlert(now);
         }
@@ -262,7 +262,7 @@ function setupProcessMonitoring() {
           service: "app-monitoring",
           operation: "error-metrics",
         },
-        errorMetrics
+        errorMetrics,
       );
     }
   }, 60000); // Check every minute
@@ -273,7 +273,7 @@ function setupProcessMonitoring() {
   systemLogger.lifecycle(
     "info",
     "Process and Redis monitoring enabled",
-    "setup"
+    "setup",
   );
 }
 
@@ -285,7 +285,7 @@ function setupGracefulShutdown() {
     systemLogger.lifecycle(
       "info",
       `${signal} received, initiating graceful shutdown`,
-      "graceful-shutdown"
+      "graceful-shutdown",
     );
 
     // Clear monitoring intervals
@@ -302,7 +302,7 @@ function setupGracefulShutdown() {
       systemLogger.lifecycle(
         "info",
         "Graceful shutdown completed",
-        "graceful-shutdown"
+        "graceful-shutdown",
       );
       process.exit(0);
     }, 3000);
@@ -317,7 +317,7 @@ function setupGracefulShutdown() {
     systemLogger.lifecycle(
       "info",
       "SIGUSR2 received (nodemon restart)",
-      "nodemon-restart"
+      "nodemon-restart",
     );
     process.kill(process.pid, "SIGUSR2");
   });

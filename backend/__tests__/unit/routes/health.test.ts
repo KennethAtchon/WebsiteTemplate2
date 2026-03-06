@@ -7,7 +7,13 @@ import { describe, it, expect, mock } from "bun:test";
 // Mock rate-limit-redis to always allow (dynamic import in rateLimiter middleware)
 mock.module("@/services/rate-limit/rate-limit-redis", () => ({
   checkRateLimit: mock(() =>
-    Promise.resolve({ allowed: true, limit: 60, remaining: 59, resetAt: 0, retryAfter: 0 })
+    Promise.resolve({
+      allowed: true,
+      limit: 60,
+      remaining: 59,
+      resetAt: 0,
+      retryAfter: 0,
+    }),
   ),
 }));
 

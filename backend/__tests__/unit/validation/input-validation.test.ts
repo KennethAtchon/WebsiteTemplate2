@@ -66,7 +66,7 @@ describe("Input Validation Tests - Production Readiness", () => {
           expect(result.success).toBe(false);
           if (!result.success) {
             expect(
-              result.error.issues.some((issue) => issue.path.includes("email"))
+              result.error.issues.some((issue) => issue.path.includes("email")),
             ).toBe(true);
           }
         });
@@ -100,7 +100,7 @@ describe("Input Validation Tests - Production Readiness", () => {
         expect(result.success).toBe(false);
         if (!result.success) {
           const messageError = result.error.issues.find((issue) =>
-            issue.path.includes("message")
+            issue.path.includes("message"),
           );
           expect(messageError).toBeDefined();
         }
@@ -488,8 +488,8 @@ describe("Input Validation Tests - Production Readiness", () => {
       expect(result.isValid).toBe(false);
       expect(
         result.errors.some((e) =>
-          e.includes("does not match declared MIME type")
-        )
+          e.includes("does not match declared MIME type"),
+        ),
       ).toBe(true);
     });
 
@@ -597,7 +597,7 @@ describe("Input Validation Tests - Production Readiness", () => {
 
       // Invalid name
       const invalidName = validateContactField.name(
-        "<script>alert('xss')</script>"
+        "<script>alert('xss')</script>",
       );
       expect(invalidName.isValid).toBe(false);
       expect(invalidName.error).toBeDefined();
@@ -704,7 +704,7 @@ describe("Input Validation Tests - Production Readiness", () => {
           name: "Test User",
           email: "test@example.com",
         },
-        "test-context"
+        "test-context",
       );
 
       expect(result.success).toBe(true);
@@ -726,7 +726,7 @@ describe("Input Validation Tests - Production Readiness", () => {
           name: "",
           email: "not-an-email",
         },
-        "test-context"
+        "test-context",
       );
 
       expect(result.success).toBe(false);

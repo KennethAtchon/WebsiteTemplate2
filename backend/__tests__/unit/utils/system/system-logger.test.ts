@@ -26,7 +26,7 @@ describe("system-logger", () => {
       systemLogger.info("test info", { service: "test", operation: "op" });
       expect(systemLogger.info).toHaveBeenCalledWith(
         "test info",
-        expect.objectContaining({ service: "test", operation: "op" })
+        expect.objectContaining({ service: "test", operation: "op" }),
       );
     });
 
@@ -58,7 +58,7 @@ describe("system-logger", () => {
         "info",
         "redis ok",
         "connect",
-        {}
+        {},
       );
     });
 
@@ -112,7 +112,7 @@ describe("system-logger", () => {
         "info",
         "ok",
         "connect",
-        undefined
+        undefined,
       );
     });
 
@@ -122,7 +122,7 @@ describe("system-logger", () => {
         "warn",
         "event",
         "op",
-        undefined
+        undefined,
       );
     });
 
@@ -132,7 +132,7 @@ describe("system-logger", () => {
         "info",
         "login",
         "signin",
-        undefined
+        undefined,
       );
     });
 

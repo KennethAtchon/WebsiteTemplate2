@@ -47,7 +47,7 @@ app.use(
     ],
     credentials: true,
     maxAge: 86400,
-  })
+  }),
 );
 
 // Security headers for all responses

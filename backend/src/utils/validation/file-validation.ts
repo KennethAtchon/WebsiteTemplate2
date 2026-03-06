@@ -47,12 +47,12 @@ function checkFileSignature(buffer: ArrayBuffer, mimeType: string): boolean {
       // For WebP, check RIFF at start and WEBP at offset 8
       if (bufferLength < 12) return false;
       const riffMatch = signature.every(
-        (byte, index) => fileBytes[index] === byte
+        (byte, index) => fileBytes[index] === byte,
       );
       if (!riffMatch) return false;
       const webpSignature = new Uint8Array([0x57, 0x45, 0x42, 0x50]); // WEBP
       const webpMatch = webpSignature.every(
-        (byte, index) => fileBytes[8 + index] === byte
+        (byte, index) => fileBytes[8 + index] === byte,
       );
       return webpMatch;
     }
@@ -95,7 +95,7 @@ function sanitizeFilename(filename: string): string {
 
 export async function validateFile(
   file: File,
-  config: Partial<FileValidationConfig> = {}
+  config: Partial<FileValidationConfig> = {},
 ): Promise<FileValidationResult> {
   const finalConfig = { ...DEFAULT_CONFIG, ...config };
   const errors: string[] = [];
@@ -109,7 +109,7 @@ export async function validateFile(
   // Validate MIME type
   if (!finalConfig.allowedMimeTypes.includes(file.type)) {
     errors.push(
-      `File type ${file.type} is not allowed. Allowed types: ${finalConfig.allowedMimeTypes.join(", ")}`
+      `File type ${file.type} is not allowed. Allowed types: ${finalConfig.allowedMimeTypes.join(", ")}`,
     );
   }
 
@@ -117,7 +117,7 @@ export async function validateFile(
   const fileExt = path.extname(file.name).toLowerCase();
   if (!finalConfig.allowedTypes.includes(fileExt)) {
     errors.push(
-      `File extension ${fileExt} is not allowed. Allowed extensions: ${finalConfig.allowedTypes.join(", ")}`
+      `File extension ${fileExt} is not allowed. Allowed extensions: ${finalConfig.allowedTypes.join(", ")}`,
     );
   }
 
@@ -148,7 +148,7 @@ export async function validateFile(
 
       if (!checkFileSignature(buffer, file.type)) {
         errors.push(
-          "File content does not match declared MIME type (potential file spoofing)"
+          "File content does not match declared MIME type (potential file spoofing)",
         );
       }
     } catch {
@@ -172,7 +172,7 @@ export async function validateFile(
 
 export function generateSecureFilename(
   originalName: string,
-  prefix: string = ""
+  prefix: string = "",
 ): string {
   // Extract extension from original name before sanitization
   let ext = path.extname(originalName).toLowerCase();

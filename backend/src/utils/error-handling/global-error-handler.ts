@@ -13,8 +13,7 @@ import { APP_ENV } from "@/utils/config/envUtil";
 // Dynamic imports are tree-shaken from the browser bundle by Next.js/Turbopack.
 async function recordErrorMetric(category: string, severity: string) {
   if (typeof window !== "undefined") return;
-  const { recordError } =
-    await import("@/services/observability/metrics");
+  const { recordError } = await import("@/services/observability/metrics");
   recordError(category, severity);
 }
 async function recordUnhandledRejectionMetric() {
@@ -146,7 +145,7 @@ function categorizeError(error: Error): ErrorCategory {
  */
 function determineErrorSeverity(
   error: Error,
-  category: ErrorCategory
+  category: ErrorCategory,
 ): ErrorSeverity {
   const message = (error.message || "").toLowerCase();
 
@@ -226,7 +225,7 @@ function generateErrorId(): string {
 function structureError(
   error: Error,
   context: Partial<ErrorContext> = {},
-  _source: "unhandledRejection" | "uncaughtException" | "manual" = "manual"
+  _source: "unhandledRejection" | "uncaughtException" | "manual" = "manual",
 ): StructuredError {
   const category = categorizeError(error);
   const severity = determineErrorSeverity(error, category);
@@ -255,11 +254,11 @@ function structureError(
   errorMetrics.lastErrorTime = new Date();
   errorMetrics.errorsByCategory.set(
     category,
-    (errorMetrics.errorsByCategory.get(category) || 0) + 1
+    (errorMetrics.errorsByCategory.get(category) || 0) + 1,
   );
   errorMetrics.errorsBySeverity.set(
     severity,
-    (errorMetrics.errorsBySeverity.get(severity) || 0) + 1
+    (errorMetrics.errorsBySeverity.get(severity) || 0) + 1,
   );
 
   recordErrorMetric(category, severity);
@@ -292,7 +291,7 @@ function logStructuredError(structuredError: StructuredError, source: string) {
       severity: structuredError.severity,
       recoverable: structuredError.isRecoverable,
       context: structuredError.context,
-    }
+    },
   );
 }
 
@@ -323,7 +322,7 @@ function handleUnhandledRejection(reason: any, promise: Promise<any>) {
         service: "global-error-handler",
         operation: "critical-error-shutdown",
       },
-      { errorId: structuredError.id }
+      { errorId: structuredError.id },
     );
 
     // Give some time for logging before shutdown
@@ -350,7 +349,7 @@ function handleUncaughtException(error: Error) {
       service: "global-error-handler",
       operation: "uncaught-exception-shutdown",
     },
-    { errorId: structuredError.id }
+    { errorId: structuredError.id },
   );
 
   // Give some time for cleanup and logging
@@ -373,7 +372,7 @@ function handleProcessWarning(warning: any) {
       name: warning.name,
       message: warning.message,
       stack: warning.stack,
-    }
+    },
   );
 }
 
@@ -461,7 +460,7 @@ export function resetErrorMetrics() {
  */
 export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
   fn: T,
-  context: Partial<ErrorContext> = {}
+  context: Partial<ErrorContext> = {},
 ): T {
   return (async (...args: Parameters<T>) => {
     try {
@@ -481,7 +480,7 @@ export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
 export function withTimeout<T>(
   promise: Promise<T>,
   timeoutMs: number,
-  errorMessage: string = "Operation timed out"
+  errorMessage: string = "Operation timed out",
 ): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     let isResolved = false;

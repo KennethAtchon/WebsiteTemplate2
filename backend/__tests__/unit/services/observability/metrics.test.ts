@@ -26,7 +26,7 @@ describe("observability metrics", () => {
       expect(normalizeRouteLabel("/api/v1/users")).toBe("/api/v1/users");
       // 4 segments; numeric 123 becomes :id
       expect(normalizeRouteLabel("/api/v1/users/123/posts")).toBe(
-        "/api/v1/users/:id"
+        "/api/v1/users/:id",
       );
     });
 

@@ -37,7 +37,7 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
  */
 export async function safeFetch(
   url: string,
-  safeFetchOptions: SafeFetchOptions = {}
+  safeFetchOptions: SafeFetchOptions = {},
 ): Promise<Response> {
   const {
     timeout = DEFAULT_TIMEOUT,
@@ -68,7 +68,7 @@ export async function safeFetch(
         method: requestInit.method || "GET",
         timeout,
         retryAttempts,
-      }
+      },
     );
   }
 
@@ -112,7 +112,7 @@ export async function safeFetch(
         // Validate response
         if (!validateResponse(response)) {
           throw new Error(
-            `Invalid response: ${response.status} ${response.statusText}`
+            `Invalid response: ${response.status} ${response.statusText}`,
           );
         }
 
@@ -132,7 +132,7 @@ export async function safeFetch(
               statusCode: response.status,
               duration,
               attempt: attempt + 1,
-            }
+            },
           );
         }
 
@@ -167,7 +167,7 @@ export async function safeFetch(
             error: err.message,
             isTimeout,
             willRetry: shouldRetry,
-          }
+          },
         );
       }
 
@@ -178,7 +178,7 @@ export async function safeFetch(
       // Wait before retry with exponential backoff
       const delay = Math.min(
         retryDelay * Math.pow(2, attempt - 1),
-        DEFAULT_RETRY_CONFIG.maxDelay
+        DEFAULT_RETRY_CONFIG.maxDelay,
       );
       await sleep(delay);
     }
@@ -212,7 +212,7 @@ export async function safeFetch(
       duration,
       errorId: structuredError.id,
       error: finalError.message,
-    }
+    },
   );
 
   throw finalError;
@@ -373,7 +373,7 @@ export const externalServiceFetch = {
  */
 export async function publicFetch(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<Response> {
   return safeFetch(url, {
     ...options,
@@ -392,7 +392,7 @@ export async function publicFetch(
  */
 export async function publicFetchJson<T = unknown>(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const response = await publicFetch(url, options);
 

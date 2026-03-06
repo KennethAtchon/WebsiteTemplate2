@@ -10,7 +10,7 @@ describe("addTimezoneHeader", () => {
     expect(result.headers).toBeDefined();
     expect(result.headers).toHaveProperty("x-timezone");
     expect(
-      typeof (result.headers as Record<string, string>)["x-timezone"]
+      typeof (result.headers as Record<string, string>)["x-timezone"],
     ).toBe("string");
   });
 
@@ -20,7 +20,7 @@ describe("addTimezoneHeader", () => {
     });
     expect(result.headers).toHaveProperty("x-timezone");
     expect((result.headers as Record<string, string>)["Content-Type"]).toBe(
-      "application/json"
+      "application/json",
     );
   });
 

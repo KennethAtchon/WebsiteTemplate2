@@ -1,6 +1,14 @@
 import { Hono } from "hono";
-import { authMiddleware, csrfMiddleware, rateLimiter } from "../middleware/protection";
-import { FIREBASE_PROJECT_ID_SERVER, FIREBASE_PROJECT_ID, BASE_URL } from "../utils/config/envUtil";
+import {
+  authMiddleware,
+  csrfMiddleware,
+  rateLimiter,
+} from "../../middleware/protection";
+import {
+  FIREBASE_PROJECT_ID_SERVER,
+  FIREBASE_PROJECT_ID,
+  BASE_URL,
+} from "../../utils/config/envUtil";
 
 const subscriptions = new Hono();
 
@@ -60,7 +68,9 @@ subscriptions.get(
         billingCycle = interval === "month" ? "monthly" : "annual";
       } else if (subData.items?.data?.[0]?.price?.id) {
         const priceId = subData.items.data[0].price.id;
-        for (const [, tierConfig] of Object.entries(STRIPE_MAP.tiers) as any[]) {
+        for (const [, tierConfig] of Object.entries(
+          STRIPE_MAP.tiers,
+        ) as any[]) {
           if (tierConfig.prices?.monthly?.priceId === priceId) {
             billingCycle = "monthly";
             break;
@@ -99,7 +109,7 @@ subscriptions.get(
       console.error("Error fetching current subscription:", error);
       return c.json({ error: "Failed to fetch subscription" }, 500);
     }
-  }
+  },
 );
 
 // ─── GET /api/subscriptions/trial-eligibility ────────────────────────────────
@@ -144,7 +154,7 @@ subscriptions.get(
       console.error("Error checking trial eligibility:", error);
       return c.json({ error: "Failed to check trial eligibility" }, 500);
     }
-  }
+  },
 );
 
 // ─── POST /api/subscriptions/portal-link ─────────────────────────────────────
@@ -191,14 +201,22 @@ subscriptions.post(
       });
 
       if (!response.ok) {
-        const errorData: any = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error?.message || errorData.error || `HTTP ${response.status}`);
+        const errorData: any = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        throw new Error(
+          errorData.error?.message ||
+            errorData.error ||
+            `HTTP ${response.status}`,
+        );
       }
 
       const result: any = await response.json();
 
       if (result.error) {
-        throw new Error(result.error.message || result.error || "Firebase Extension error");
+        throw new Error(
+          result.error.message || result.error || "Firebase Extension error",
+        );
       }
 
       const portalUrl =
@@ -216,7 +234,7 @@ subscriptions.post(
       console.error("Error creating portal link:", error);
       return c.json({ error: "Failed to create portal link" }, 500);
     }
-  }
+  },
 );
 
 // ─── POST /api/subscriptions/checkout ────────────────────────────────────────
@@ -235,10 +253,13 @@ subscriptions.post(
       if (!priceId) return c.json({ error: "priceId is required" }, 400);
 
       const { STRIPE_SECRET_KEY } = await import("../utils/config/envUtil");
-      if (!STRIPE_SECRET_KEY) return c.json({ error: "Stripe not configured" }, 500);
+      if (!STRIPE_SECRET_KEY)
+        return c.json({ error: "Stripe not configured" }, 500);
 
       const Stripe = (await import("stripe")).default;
-      const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-12-18.acacia" });
+      const stripe = new Stripe(STRIPE_SECRET_KEY, {
+        apiVersion: "2024-12-18.acacia",
+      });
 
       const origin = c.req.header("origin") || "http://localhost:5173";
       const baseUrl = BASE_URL !== "[BASE_URL]" ? BASE_URL : origin;
@@ -302,7 +323,7 @@ subscriptions.post(
       console.error("Error creating checkout session:", error);
       return c.json({ error: "Failed to create checkout session" }, 500);
     }
-  }
+  },
 );
 
 export default subscriptions;
