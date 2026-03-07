@@ -27,9 +27,15 @@ customer.get(
 
       const [user] = await db
         .select({
-          id: users.id, name: users.name, email: users.email,
-          phone: users.phone, address: users.address, role: users.role,
-          timezone: users.timezone, createdAt: users.createdAt, updatedAt: users.updatedAt,
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          phone: users.phone,
+          address: users.address,
+          role: users.role,
+          timezone: users.timezone,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
         })
         .from(users)
         .where(and(eq(users.id, auth.user.id), eq(users.isDeleted, false)));
@@ -120,9 +126,14 @@ customer.put(
         .set(updateData)
         .where(eq(users.id, auth.user.id))
         .returning({
-          id: users.id, name: users.name, email: users.email,
-          phone: users.phone, address: users.address,
-          timezone: users.timezone, createdAt: users.createdAt, updatedAt: users.updatedAt,
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          phone: users.phone,
+          address: users.address,
+          timezone: users.timezone,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
         });
 
       return c.json({
@@ -160,8 +171,17 @@ customer.get(
       const skip = (page - 1) * limit;
 
       const [orderRows, [{ count: total }]] = await Promise.all([
-        db.select().from(orders).where(eq(orders.userId, auth.user.id)).orderBy(desc(orders.createdAt)).offset(skip).limit(limit),
-        db.select({ count: sql<number>`count(*)::int` }).from(orders).where(eq(orders.userId, auth.user.id)),
+        db
+          .select()
+          .from(orders)
+          .where(eq(orders.userId, auth.user.id))
+          .orderBy(desc(orders.createdAt))
+          .offset(skip)
+          .limit(limit),
+        db
+          .select({ count: sql<number>`count(*)::int` })
+          .from(orders)
+          .where(eq(orders.userId, auth.user.id)),
       ]);
 
       return c.json({
@@ -220,8 +240,14 @@ customer.get(
       if (!sessionId) return c.json({ error: "sessionId is required" }, 400);
 
       const [order] = await db
-        .select().from(orders)
-        .where(and(eq(orders.stripeSessionId, sessionId), eq(orders.userId, auth.user.id)))
+        .select()
+        .from(orders)
+        .where(
+          and(
+            eq(orders.stripeSessionId, sessionId),
+            eq(orders.userId, auth.user.id),
+          ),
+        )
         .limit(1);
 
       if (!order) return c.json({ error: "Order not found" }, 404);
@@ -247,7 +273,9 @@ customer.get(
       const [result] = await db
         .select({ total: sql<string>`sum(total_amount)` })
         .from(orders)
-        .where(and(eq(orders.userId, auth.user.id), eq(orders.status, "completed")));
+        .where(
+          and(eq(orders.userId, auth.user.id), eq(orders.status, "completed")),
+        );
 
       return c.json({ totalRevenue: result?.total || 0 });
     } catch (error) {
@@ -270,7 +298,8 @@ customer.get(
       const orderId = c.req.param("orderId");
 
       const [order] = await db
-        .select().from(orders)
+        .select()
+        .from(orders)
         .where(and(eq(orders.id, orderId), eq(orders.userId, auth.user.id)))
         .limit(1);
 

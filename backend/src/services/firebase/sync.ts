@@ -191,7 +191,10 @@ export class FirebaseUserSync {
    */
   static async syncAllUsers(): Promise<SyncResult[]> {
     try {
-      const dbUsers = await db.select().from(users).where(isNotNull(users.firebaseUid));
+      const dbUsers = await db
+        .select()
+        .from(users)
+        .where(isNotNull(users.firebaseUid));
 
       const results: SyncResult[] = [];
 

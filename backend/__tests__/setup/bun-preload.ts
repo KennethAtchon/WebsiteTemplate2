@@ -167,9 +167,22 @@ const adminAuthMocks = {
 function makeChainableMock(resolveValue: any = []) {
   const chain: any = {};
   const chainMethods = [
-    "select", "from", "where", "insert", "values", "update", "set",
-    "delete", "innerJoin", "leftJoin", "orderBy", "limit", "offset",
-    "returning", "onConflictDoUpdate", "execute",
+    "select",
+    "from",
+    "where",
+    "insert",
+    "values",
+    "update",
+    "set",
+    "delete",
+    "innerJoin",
+    "leftJoin",
+    "orderBy",
+    "limit",
+    "offset",
+    "returning",
+    "onConflictDoUpdate",
+    "execute",
   ];
   chainMethods.forEach((m) => {
     chain[m] = mock(() => chain);

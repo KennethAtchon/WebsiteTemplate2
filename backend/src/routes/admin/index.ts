@@ -9,7 +9,12 @@ import { ADMIN_SPECIAL_CODE_HASH } from "../../utils/config/envUtil";
 import { createHash } from "crypto";
 import { adminAuth, adminDb } from "../../services/firebase/admin";
 import { db } from "../../services/db/db";
-import { users, orders, featureUsages } from "../../infrastructure/database/drizzle/schema";
+import {
+  users,
+  orders,
+  contactMessages,
+  featureUsages,
+} from "../../infrastructure/database/drizzle/schema";
 import { eq, and, or, ilike, desc, gte, lte, sql } from "drizzle-orm";
 import {
   getMonthBoundaries,
@@ -76,8 +81,17 @@ admin.post(
 
       await db
         .insert(users)
-        .values({ firebaseUid: uid, email: auth.firebaseUser.email || "", name: (auth.firebaseUser.name as string) || "Admin User", role: "admin", isActive: true })
-        .onConflictDoUpdate({ target: users.firebaseUid, set: { role: "admin", lastLogin: new Date() } });
+        .values({
+          firebaseUid: uid,
+          email: auth.firebaseUser.email || "",
+          name: (auth.firebaseUser.name as string) || "Admin User",
+          role: "admin",
+          isActive: true,
+        })
+        .onConflictDoUpdate({
+          target: users.firebaseUid,
+          set: { role: "admin", lastLogin: new Date() },
+        });
 
       await adminAuth.setCustomUserClaims(uid, { role: "admin" });
 
@@ -118,12 +132,82 @@ admin.get(
         [{ thisMonthCustomers }],
         [{ thisMonthCustomersWithPaidOrders }],
       ] = await Promise.all([
-        db.select({ totalCustomers: sql<number>`count(*)::int` }).from(users).where(eq(users.role, "user")),
-        db.select({ customersWithPaidOrders: sql<number>`count(distinct ${users.id})::int` }).from(users).innerJoin(orders, and(eq(orders.userId, users.id), eq(orders.status, "paid"))).where(eq(users.role, "user")),
-        db.select({ lastMonthCustomers: sql<number>`count(*)::int` }).from(users).where(and(eq(users.role, "user"), gte(users.createdAt, startOfLastMonth), lte(users.createdAt, endOfLastMonth))),
-        db.select({ lastMonthCustomersWithPaidOrders: sql<number>`count(distinct ${users.id})::int` }).from(users).innerJoin(orders, and(eq(orders.userId, users.id), eq(orders.status, "paid"), gte(orders.createdAt, startOfLastMonth), lte(orders.createdAt, endOfLastMonth))).where(and(eq(users.role, "user"), gte(users.createdAt, startOfLastMonth), lte(users.createdAt, endOfLastMonth))),
-        db.select({ thisMonthCustomers: sql<number>`count(*)::int` }).from(users).where(and(eq(users.role, "user"), gte(users.createdAt, startOfThisMonth), lte(users.createdAt, now))),
-        db.select({ thisMonthCustomersWithPaidOrders: sql<number>`count(distinct ${users.id})::int` }).from(users).innerJoin(orders, and(eq(orders.userId, users.id), eq(orders.status, "paid"), gte(orders.createdAt, startOfThisMonth), lte(orders.createdAt, now))).where(and(eq(users.role, "user"), gte(users.createdAt, startOfThisMonth), lte(users.createdAt, now))),
+        db
+          .select({ totalCustomers: sql<number>`count(*)::int` })
+          .from(users)
+          .where(eq(users.role, "user")),
+        db
+          .select({
+            customersWithPaidOrders: sql<number>`count(distinct ${users.id})::int`,
+          })
+          .from(users)
+          .innerJoin(
+            orders,
+            and(eq(orders.userId, users.id), eq(orders.status, "paid")),
+          )
+          .where(eq(users.role, "user")),
+        db
+          .select({ lastMonthCustomers: sql<number>`count(*)::int` })
+          .from(users)
+          .where(
+            and(
+              eq(users.role, "user"),
+              gte(users.createdAt, startOfLastMonth),
+              lte(users.createdAt, endOfLastMonth),
+            ),
+          ),
+        db
+          .select({
+            lastMonthCustomersWithPaidOrders: sql<number>`count(distinct ${users.id})::int`,
+          })
+          .from(users)
+          .innerJoin(
+            orders,
+            and(
+              eq(orders.userId, users.id),
+              eq(orders.status, "paid"),
+              gte(orders.createdAt, startOfLastMonth),
+              lte(orders.createdAt, endOfLastMonth),
+            ),
+          )
+          .where(
+            and(
+              eq(users.role, "user"),
+              gte(users.createdAt, startOfLastMonth),
+              lte(users.createdAt, endOfLastMonth),
+            ),
+          ),
+        db
+          .select({ thisMonthCustomers: sql<number>`count(*)::int` })
+          .from(users)
+          .where(
+            and(
+              eq(users.role, "user"),
+              gte(users.createdAt, startOfThisMonth),
+              lte(users.createdAt, now),
+            ),
+          ),
+        db
+          .select({
+            thisMonthCustomersWithPaidOrders: sql<number>`count(distinct ${users.id})::int`,
+          })
+          .from(users)
+          .innerJoin(
+            orders,
+            and(
+              eq(orders.userId, users.id),
+              eq(orders.status, "paid"),
+              gte(orders.createdAt, startOfThisMonth),
+              lte(orders.createdAt, now),
+            ),
+          )
+          .where(
+            and(
+              eq(users.role, "user"),
+              gte(users.createdAt, startOfThisMonth),
+              lte(users.createdAt, now),
+            ),
+          ),
       ]);
 
       const conversionRate =
@@ -175,9 +259,26 @@ admin.get(
       );
 
       const [customers, [{ total }]] = await Promise.all([
-        db.select({ id: users.id, name: users.name, email: users.email, phone: users.phone, address: users.address, createdAt: users.createdAt, updatedAt: users.updatedAt, isActive: users.isActive })
-          .from(users).where(customerWhere).orderBy(desc(users.createdAt)).limit(limit).offset(skip),
-        db.select({ total: sql<number>`count(*)::int` }).from(users).where(customerWhere),
+        db
+          .select({
+            id: users.id,
+            name: users.name,
+            email: users.email,
+            phone: users.phone,
+            address: users.address,
+            createdAt: users.createdAt,
+            updatedAt: users.updatedAt,
+            isActive: users.isActive,
+          })
+          .from(users)
+          .where(customerWhere)
+          .orderBy(desc(users.createdAt))
+          .limit(limit)
+          .offset(skip),
+        db
+          .select({ total: sql<number>`count(*)::int` })
+          .from(users)
+          .where(customerWhere),
       ]);
 
       const totalPages = Math.ceil(total / limit);
@@ -233,12 +334,27 @@ admin.get(
       );
 
       const [orderRows, [{ total }]] = await Promise.all([
-        db.select({ order: orders, user: { id: users.id, name: users.name, email: users.email } })
-          .from(orders).innerJoin(users, eq(orders.userId, users.id))
-          .where(orderWhere).orderBy(desc(orders.createdAt)).limit(limit).offset(skip),
-        db.select({ total: sql<number>`count(*)::int` }).from(orders).leftJoin(users, eq(orders.userId, users.id)).where(orderWhere),
+        db
+          .select({
+            order: orders,
+            user: { id: users.id, name: users.name, email: users.email },
+          })
+          .from(orders)
+          .innerJoin(users, eq(orders.userId, users.id))
+          .where(orderWhere)
+          .orderBy(desc(orders.createdAt))
+          .limit(limit)
+          .offset(skip),
+        db
+          .select({ total: sql<number>`count(*)::int` })
+          .from(orders)
+          .leftJoin(users, eq(orders.userId, users.id))
+          .where(orderWhere),
       ]);
-      const ordersWithUser = orderRows.map(({ order, user }) => ({ ...order, user }));
+      const ordersWithUser = orderRows.map(({ order, user }) => ({
+        ...order,
+        user,
+      }));
 
       const totalPages = Math.ceil(total / limit);
       return c.json({
@@ -278,8 +394,19 @@ admin.post(
         return c.json({ error: "userId and totalAmount are required" }, 400);
       }
 
-      const [newOrder] = await db.insert(orders).values({ userId, totalAmount: String(totalAmount), status: status || "pending" }).returning();
-      const [orderUser] = await db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(eq(users.id, userId)).limit(1);
+      const [newOrder] = await db
+        .insert(orders)
+        .values({
+          userId,
+          totalAmount: String(totalAmount),
+          status: status || "pending",
+        })
+        .returning();
+      const [orderUser] = await db
+        .select({ id: users.id, name: users.name, email: users.email })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
       const order = { ...newOrder, user: orderUser };
 
       return c.json({ order: formatOrderResponse(order) }, 201);
@@ -306,11 +433,20 @@ admin.put(
 
       const updateData: Record<string, unknown> = {};
       if (userId) updateData.userId = userId;
-      if (totalAmount !== undefined) updateData.totalAmount = String(totalAmount);
+      if (totalAmount !== undefined)
+        updateData.totalAmount = String(totalAmount);
       if (status !== undefined) updateData.status = status;
 
-      const [updatedOrder] = await db.update(orders).set(updateData).where(eq(orders.id, id)).returning();
-      const [orderUser] = await db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(eq(users.id, updatedOrder.userId)).limit(1);
+      const [updatedOrder] = await db
+        .update(orders)
+        .set(updateData)
+        .where(eq(orders.id, id))
+        .returning();
+      const [orderUser] = await db
+        .select({ id: users.id, name: users.name, email: users.email })
+        .from(users)
+        .where(eq(users.id, updatedOrder.userId))
+        .limit(1);
       const order = { ...updatedOrder, user: orderUser };
 
       return c.json({ order: formatOrderResponse(order) });
@@ -335,11 +471,27 @@ admin.delete(
 
       if (!id) return c.json({ error: "id is required" }, 400);
 
-      const [existing] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+      const [existing] = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.id, id))
+        .limit(1);
       if (!existing) return c.json({ error: "Order not found" }, 404);
 
-      const [deletedOrder] = await db.update(orders).set({ isDeleted: true, deletedAt: new Date(), deletedBy: deletedBy || "admin" }).where(eq(orders.id, id)).returning();
-      const [orderUser] = await db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(eq(users.id, deletedOrder.userId)).limit(1);
+      const [deletedOrder] = await db
+        .update(orders)
+        .set({
+          isDeleted: true,
+          deletedAt: new Date(),
+          deletedBy: deletedBy || "admin",
+        })
+        .where(eq(orders.id, id))
+        .returning();
+      const [orderUser] = await db
+        .select({ id: users.id, name: users.name, email: users.email })
+        .from(users)
+        .where(eq(users.id, deletedOrder.userId))
+        .limit(1);
       const order = { ...deletedOrder, user: orderUser };
 
       return c.json({ order: formatOrderResponse(order), deleted: true });
@@ -360,8 +512,15 @@ admin.get(
     try {
       const id = c.req.param("id");
 
-      const [orderRow] = await db.select({ order: orders, user: { id: users.id, name: users.name, email: users.email } })
-        .from(orders).innerJoin(users, eq(orders.userId, users.id)).where(eq(orders.id, id)).limit(1);
+      const [orderRow] = await db
+        .select({
+          order: orders,
+          user: { id: users.id, name: users.name, email: users.email },
+        })
+        .from(orders)
+        .innerJoin(users, eq(orders.userId, users.id))
+        .where(eq(orders.id, id))
+        .limit(1);
       if (!orderRow) return c.json({ error: "Order not found" }, 404);
       const order = { ...orderRow.order, user: orderRow.user };
 
@@ -400,7 +559,9 @@ admin.get(
 
           const [dbUser] = await db
             .select({ id: users.id, name: users.name, email: users.email })
-            .from(users).where(eq(users.firebaseUid, customerDoc.id)).limit(1);
+            .from(users)
+            .where(eq(users.firebaseUid, customerDoc.id))
+            .limit(1);
 
           const tierFromMetadata = extractSubscriptionTier(subData);
 
@@ -648,7 +809,12 @@ admin.get(
       const skip = (page - 1) * limit;
 
       const [usages, [{ total }]] = await Promise.all([
-        db.select().from(featureUsages).orderBy(desc(featureUsages.createdAt)).limit(limit).offset(skip),
+        db
+          .select()
+          .from(featureUsages)
+          .orderBy(desc(featureUsages.createdAt))
+          .limit(limit)
+          .offset(skip),
         db.select({ total: sql<number>`count(*)::int` }).from(featureUsages),
       ]);
 
@@ -713,6 +879,81 @@ admin.get(
         { status: "unhealthy", database: "disconnected", error: String(error) },
         503,
       );
+    }
+  },
+);
+
+// ─── GET /api/admin/schema ─────────────────────────────────────────────────────
+
+admin.get(
+  "/schema",
+  rateLimiter("admin"),
+  authMiddleware("admin"),
+  async (c) => {
+    try {
+      // Return actual Drizzle schema structure
+      const getTableName = (table: any) => {
+        const firstColumn = Object.values(table)[0] as any;
+        return firstColumn?.tableName || 'unknown';
+      };
+
+      const schema = {
+        tables: [
+          {
+            name: "User",
+            tableName: getTableName(users),
+            columns: Object.entries(users).map(([key, column]) => ({
+              name: key,
+              dataType: (column as any).dataType,
+              nullable: (column as any).nullable,
+              hasDefault: !!(column as any).hasDefault,
+              primaryKey: key === "id",
+              unique: (column as any).unique || false,
+            })),
+          },
+          {
+            name: "Order",
+            tableName: getTableName(orders),
+            columns: Object.entries(orders).map(([key, column]) => ({
+              name: key,
+              dataType: (column as any).dataType,
+              nullable: (column as any).nullable,
+              hasDefault: !!(column as any).hasDefault,
+              primaryKey: key === "id",
+              unique: (column as any).unique || false,
+            })),
+          },
+          {
+            name: "ContactMessage",
+            tableName: getTableName(contactMessages),
+            columns: Object.entries(contactMessages).map(([key, column]) => ({
+              name: key,
+              dataType: (column as any).dataType,
+              nullable: (column as any).nullable,
+              hasDefault: !!(column as any).hasDefault,
+              primaryKey: key === "id",
+              unique: (column as any).unique || false,
+            })),
+          },
+          {
+            name: "FeatureUsage",
+            tableName: getTableName(featureUsages),
+            columns: Object.entries(featureUsages).map(([key, column]) => ({
+              name: key,
+              dataType: (column as any).dataType,
+              nullable: (column as any).nullable,
+              hasDefault: !!(column as any).hasDefault,
+              primaryKey: key === "id",
+              unique: (column as any).unique || false,
+            })),
+          },
+        ],
+      };
+
+      return c.json(schema);
+    } catch (error) {
+      console.error("Failed to fetch schema:", error);
+      return c.json({ error: "Failed to fetch schema" }, 500);
     }
   },
 );

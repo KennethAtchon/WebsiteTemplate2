@@ -233,7 +233,7 @@ export function getAllowedCorsOrigins(): string[] {
       "http://frontend:3001",
       "http://backend:3001",
       // Allow empty origin for same-origin requests and certain browser behaviors
-      "", 
+      "",
       // HTTPS variants
       "https://localhost:3000",
       "https://127.0.0.1:3000",

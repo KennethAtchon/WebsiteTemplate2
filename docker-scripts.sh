@@ -68,7 +68,7 @@ case "${1:-help}" in
         log_info "Starting Docker services..."
         check_docker
         if check_env; then
-            docker-compose up -d
+            docker compose up -d --build
             log_info "Services started. Frontend: http://localhost:3000, Backend: http://localhost:3001"
         else
             log_error "Please configure .env file first, then run: ./docker-scripts.sh start"
@@ -99,7 +99,7 @@ case "${1:-help}" in
         ;;
     
     "studio")
-        log_info "Opening Prisma Studio..."
+        log_info "Opening Drizzle Studio..."
         docker compose exec backend bun run db:studio
         ;;
     

@@ -178,10 +178,7 @@ export function withApiErrorHandling(
 function classifyAndRespond(error: Error): Response {
   const message = error.message.toLowerCase();
 
-  if (
-    message.includes("database") ||
-    message.includes("connection pool")
-  ) {
+  if (message.includes("database") || message.includes("connection pool")) {
     return createErrorResponse(
       ERROR_MESSAGES.DATABASE_ERROR,
       503,

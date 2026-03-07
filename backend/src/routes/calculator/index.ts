@@ -161,8 +161,17 @@ calculator.get(
       );
 
       const [history, [{ total }]] = await Promise.all([
-        db.select().from(featureUsages).where(historyWhere).orderBy(desc(featureUsages.createdAt)).offset(skip).limit(limit),
-        db.select({ total: sql<number>`count(*)::int` }).from(featureUsages).where(historyWhere),
+        db
+          .select()
+          .from(featureUsages)
+          .where(historyWhere)
+          .orderBy(desc(featureUsages.createdAt))
+          .offset(skip)
+          .limit(limit),
+        db
+          .select({ total: sql<number>`count(*)::int` })
+          .from(featureUsages)
+          .where(historyWhere),
       ]);
 
       return c.json({
@@ -247,7 +256,11 @@ calculator.get(
       const auth = c.get("auth");
       const format = c.req.query("format") || "json";
 
-      const history = await db.select().from(featureUsages).where(eq(featureUsages.userId, auth.user.id)).orderBy(desc(featureUsages.createdAt));
+      const history = await db
+        .select()
+        .from(featureUsages)
+        .where(eq(featureUsages.userId, auth.user.id))
+        .orderBy(desc(featureUsages.createdAt));
 
       if (format === "csv") {
         const csvRows = [

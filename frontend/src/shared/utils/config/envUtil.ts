@@ -66,8 +66,8 @@ export const STRIPE_PUBLISHABLE_KEY = getEnvVarRequired(
 // ============================================================================
 // API
 // ============================================================================
-/** Backend API base URL, e.g. http://localhost:3001 or https://api.yourdomain.com */
-export const API_URL = getEnvVar("VITE_API_URL", "http://localhost:3001");
+/** Backend API base URL, e.g. http://localhost:3002 or https://api.yourdomain.com */
+export const API_URL = getEnvVar("VITE_API_URL", "http://localhost:3002");
 
 // ============================================================================
 // SEO & Metadata

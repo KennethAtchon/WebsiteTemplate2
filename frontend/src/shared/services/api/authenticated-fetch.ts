@@ -2,7 +2,7 @@ import { auth } from "@/shared/services/firebase/config";
 import { safeFetch, SafeFetchOptions } from "./safe-fetch";
 import { debugLog } from "@/shared/utils/debug";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
 
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # db-reset-and-migrate.sh
 #
-# Drops all tables, re-runs all Prisma migrations from scratch, and optionally
+# Drops all tables, re-runs all Drizzle migrations from scratch, and optionally
 # seeds the database. Intended for local development and CI only — never run
 # this against a production database.
 #
@@ -48,15 +48,11 @@ fi
 
 # ─── Reset ─────────────────────────────────────────────────────────────────────
 echo "Resetting database …"
-bun prisma migrate reset --force --skip-seed
+bun run db:push --force
 
 # ─── Migrate ───────────────────────────────────────────────────────────────────
 echo "Running migrations …"
-bun prisma migrate deploy
-
-# ─── Generate client ───────────────────────────────────────────────────────────
-echo "Generating Prisma client …"
-bun run db:generate
+bun run db:migrate
 
 # ─── Optional seed ─────────────────────────────────────────────────────────────
 if [[ "${1:-}" == "--seed" ]]; then

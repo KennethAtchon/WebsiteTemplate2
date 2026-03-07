@@ -1,7 +1,10 @@
 /**
  * Mock data and helper functions
  */
-import type { Order as DrizzleOrder, User as DrizzleUser } from "@/infrastructure/database/drizzle/schema";
+import type {
+  Order as DrizzleOrder,
+  User as DrizzleUser,
+} from "@/infrastructure/database/drizzle/schema";
 
 // Extended types for UI components with computed fields
 export interface OrderWithDetails extends Omit<DrizzleOrder, "userId"> {

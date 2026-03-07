@@ -47,9 +47,16 @@ subscriptions.get(
       // Mark hasUsedFreeTrial when user has any active subscription
       if (subData.status === "trialing" || subData.status === "active") {
         try {
-          const [dbUser] = await db.select({ hasUsedFreeTrial: users.hasUsedFreeTrial }).from(users).where(eq(users.id, auth.user.id)).limit(1);
+          const [dbUser] = await db
+            .select({ hasUsedFreeTrial: users.hasUsedFreeTrial })
+            .from(users)
+            .where(eq(users.id, auth.user.id))
+            .limit(1);
           if (dbUser && !dbUser.hasUsedFreeTrial) {
-            await db.update(users).set({ hasUsedFreeTrial: true }).where(eq(users.id, auth.user.id));
+            await db
+              .update(users)
+              .set({ hasUsedFreeTrial: true })
+              .where(eq(users.id, auth.user.id));
           }
         } catch {
           // Don't fail the request if marking fails
@@ -120,7 +127,11 @@ subscriptions.get(
     try {
       const auth = c.get("auth");
 
-      const [dbUser] = await db.select({ hasUsedFreeTrial: users.hasUsedFreeTrial }).from(users).where(eq(users.id, auth.user.id)).limit(1);
+      const [dbUser] = await db
+        .select({ hasUsedFreeTrial: users.hasUsedFreeTrial })
+        .from(users)
+        .where(eq(users.id, auth.user.id))
+        .limit(1);
 
       if (!dbUser) return c.json({ error: "User not found" }, 404);
 
@@ -259,7 +270,11 @@ subscriptions.post(
       // Check trial eligibility
       let allowTrial = false;
       if (trialEnabled) {
-        const [dbUser] = await db.select({ hasUsedFreeTrial: users.hasUsedFreeTrial }).from(users).where(eq(users.id, auth.user.id)).limit(1);
+        const [dbUser] = await db
+          .select({ hasUsedFreeTrial: users.hasUsedFreeTrial })
+          .from(users)
+          .where(eq(users.id, auth.user.id))
+          .limit(1);
         const trialingSnapshot = await adminDb
           .collection("customers")
           .doc(uid)

@@ -23,7 +23,11 @@
  */
 
 import { db, gracefulShutdown } from "../src/services/db/db";
-import { users, orders, featureUsages } from "../src/infrastructure/database/drizzle/schema";
+import {
+  users,
+  orders,
+  featureUsages,
+} from "../src/infrastructure/database/drizzle/schema";
 import { and, eq, lte, isNotNull, ne, sql } from "drizzle-orm";
 import { adminAuth, adminDb } from "../src/services/firebase/admin";
 
@@ -80,7 +84,13 @@ async function main() {
   console.log("─────────────────────────────────────────\n");
 
   const userRows = await db
-    .select({ id: users.id, firebaseUid: users.firebaseUid, name: users.name, email: users.email, deletedAt: users.deletedAt })
+    .select({
+      id: users.id,
+      firebaseUid: users.firebaseUid,
+      name: users.name,
+      email: users.email,
+      deletedAt: users.deletedAt,
+    })
     .from(users)
     .where(
       and(
@@ -119,10 +129,23 @@ async function main() {
       await db.delete(featureUsages).where(eq(featureUsages.userId, user.id));
 
       // 2. Soft-delete remaining orders
-      await db.update(orders).set({ isDeleted: true, deletedAt: new Date(), deletedBy: "gdpr" }).where(and(eq(orders.userId, user.id), eq(orders.isDeleted, false)));
+      await db
+        .update(orders)
+        .set({ isDeleted: true, deletedAt: new Date(), deletedBy: "gdpr" })
+        .where(and(eq(orders.userId, user.id), eq(orders.isDeleted, false)));
 
       // 3. Anonymise Postgres PII
-      await db.update(users).set({ name: "GDPR_PURGED", email: anonymisedEmail(user.id), phone: null, address: null, notes: null, firebaseUid: null }).where(eq(users.id, user.id));
+      await db
+        .update(users)
+        .set({
+          name: "GDPR_PURGED",
+          email: anonymisedEmail(user.id),
+          phone: null,
+          address: null,
+          notes: null,
+          firebaseUid: null,
+        })
+        .where(eq(users.id, user.id));
 
       // 4. Purge Firestore
       if (user.firebaseUid) {

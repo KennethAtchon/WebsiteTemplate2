@@ -11,7 +11,11 @@ import { db } from "./db";
 import { sql } from "drizzle-orm";
 
 class DatabasePerformanceMonitor {
-  private connectionMetrics: { active: number; idle: number; timestamp: Date }[] = [];
+  private connectionMetrics: {
+    active: number;
+    idle: number;
+    timestamp: Date;
+  }[] = [];
 
   constructor() {
     this.startConnectionPoolMonitoring();
@@ -24,7 +28,10 @@ class DatabasePerformanceMonitor {
       } catch (err) {
         debugLog.error(
           "Connection pool monitoring error",
-          { service: "db-performance-monitor", operation: "connection-pool-check" },
+          {
+            service: "db-performance-monitor",
+            operation: "connection-pool-check",
+          },
           err,
         );
       }
@@ -52,9 +59,23 @@ class DatabasePerformanceMonitor {
         if (this.connectionMetrics.length > 100) this.connectionMetrics.shift();
 
         if (util > 95) {
-          debugLog.error("CRITICAL: Database connection pool near limit", { service: "db-performance-monitor", operation: "connection-pool-alert" }, { util: `${util.toFixed(1)}%`, active, max });
+          debugLog.error(
+            "CRITICAL: Database connection pool near limit",
+            {
+              service: "db-performance-monitor",
+              operation: "connection-pool-alert",
+            },
+            { util: `${util.toFixed(1)}%`, active, max },
+          );
         } else if (util > 80) {
-          debugLog.warn("Database connection pool usage high", { service: "db-performance-monitor", operation: "connection-pool-alert" }, { util: `${util.toFixed(1)}%`, active, max });
+          debugLog.warn(
+            "Database connection pool usage high",
+            {
+              service: "db-performance-monitor",
+              operation: "connection-pool-alert",
+            },
+            { util: `${util.toFixed(1)}%`, active, max },
+          );
         }
       }
     } catch {
@@ -68,7 +89,8 @@ class DatabasePerformanceMonitor {
 
   public getConnectionStats() {
     const latest = this.connectionMetrics[this.connectionMetrics.length - 1];
-    if (!latest) return { status: "NO_DATA", message: "No connection metrics available" };
+    if (!latest)
+      return { status: "NO_DATA", message: "No connection metrics available" };
     return {
       status: "OK",
       activeConnections: latest.active,
@@ -80,8 +102,16 @@ class DatabasePerformanceMonitor {
   public getHealthCheck() {
     const queryStats = this.getQueryStats(5);
     const connectionStats = this.getConnectionStats();
-    const isHealthy = queryStats.slowQueries === 0 && queryStats.errorQueries === 0 && connectionStats.status === "OK";
-    return { healthy: isHealthy, timestamp: new Date().toISOString(), queries: queryStats, connections: connectionStats };
+    const isHealthy =
+      queryStats.slowQueries === 0 &&
+      queryStats.errorQueries === 0 &&
+      connectionStats.status === "OK";
+    return {
+      healthy: isHealthy,
+      timestamp: new Date().toISOString(),
+      queries: queryStats,
+      connections: connectionStats,
+    };
   }
 }
 

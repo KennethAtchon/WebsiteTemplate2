@@ -79,22 +79,27 @@ export function authMiddleware(
 
       const email = decodedToken.email;
       if (!email) {
-        return c.json({ error: "Firebase token missing email", code: "INVALID_TOKEN" }, 401);
+        return c.json(
+          { error: "Firebase token missing email", code: "INVALID_TOKEN" },
+          401,
+        );
       }
+
+      const name = decodedToken.name || email.split("@")[0] || "User";
 
       const [user] = await db
         .insert(users)
         .values({
           firebaseUid: decodedToken.uid,
           email,
-          name: decodedToken.name || email.split("@")[0] || "User",
+          name,
           role: "user",
           isActive: true,
           timezone: "UTC",
         })
         .onConflictDoUpdate({
           target: users.firebaseUid,
-          set: { lastLogin: new Date() },
+          set: { email, name, lastLogin: new Date() },
         })
         .returning({ id: users.id, email: users.email, role: users.role });
 
@@ -270,7 +275,7 @@ export function validateBody(
           {
             error: "Validation failed",
             code: "VALIDATION_ERROR",
-            details: result.error.flatten(),
+            details: z.flattenError(result.error),
           },
           422,
         );
@@ -304,7 +309,7 @@ export function validateQuery(
         {
           error: "Invalid query parameters",
           code: "VALIDATION_ERROR",
-          details: result.error.flatten(),
+          details: z.flattenError(result.error),
         },
         422,
       );

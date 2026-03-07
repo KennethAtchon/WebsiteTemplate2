@@ -34,12 +34,24 @@ authRoutes.post("/register", rateLimiter("auth"), async (c) => {
 
     const [user] = await db
       .insert(users)
-      .values({ firebaseUid: decoded.uid, email, name, role: "user", isActive: true, timezone: "UTC" })
+      .values({
+        firebaseUid: decoded.uid,
+        email,
+        name,
+        role: "user",
+        isActive: true,
+        timezone: "UTC",
+      })
       .onConflictDoUpdate({
         target: users.firebaseUid,
-        set: { lastLogin: new Date() },
+        set: { email, name, lastLogin: new Date() },
       })
-      .returning({ id: users.id, email: users.email, role: users.role, name: users.name });
+      .returning({
+        id: users.id,
+        email: users.email,
+        role: users.role,
+        name: users.name,
+      });
 
     return c.json({ user }, 200);
   } catch (error) {

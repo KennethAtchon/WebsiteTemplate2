@@ -26,6 +26,8 @@ import {
 } from "firebase/auth";
 import { auth } from "@/shared/services/firebase/config";
 import { authenticatedFetchJson as baseAuthenticatedFetchJson } from "@/shared/services/api/authenticated-fetch";
+import { safeFetch } from "@/shared/services/api/safe-fetch";
+import { API_URL } from "@/shared/utils/config/envUtil";
 import { addTimezoneHeader } from "@/shared/utils/api/add-timezone-header";
 import { debugLog } from "@/shared/utils/debug";
 import {
@@ -201,12 +203,16 @@ export function AppProvider({ children }: AppProviderProps) {
       setUser(firebaseUser);
       setAuthLoading(false);
 
-      // Ensure user exists in DB before the profile query can fire
+      // Ensure user exists in DB before the profile query can fire.
+      // Uses safeFetch directly — /api/auth/register does not validate CSRF.
       try {
         const token = await firebaseUser.getIdToken();
-        await baseAuthenticatedFetchJson("/api/auth/register", {
+        await safeFetch(`${API_URL}/api/auth/register`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         });
       } catch (error) {
         debugLog.error(

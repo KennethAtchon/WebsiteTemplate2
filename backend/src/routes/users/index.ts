@@ -6,7 +6,10 @@ import {
 } from "../../middleware/protection";
 import type { HonoEnv } from "../../middleware/protection";
 import { db } from "../../services/db/db";
-import { users as usersTable, orders as ordersTable } from "../../infrastructure/database/drizzle/schema";
+import {
+  users as usersTable,
+  orders as ordersTable,
+} from "../../infrastructure/database/drizzle/schema";
 import { eq, and, or, ilike, desc, gte, lte, sql } from "drizzle-orm";
 import { adminAuth } from "../../services/firebase/admin";
 import { FirebaseUserSync } from "../../services/firebase/sync";
@@ -26,14 +29,29 @@ users.get("/", rateLimiter("admin"), authMiddleware("admin"), async (c) => {
     const conditions = [
       ...(includeDeleted ? [] : [eq(usersTable.isDeleted, false)]),
       ...(search
-        ? [or(ilike(usersTable.name, `%${search}%`), ilike(usersTable.email, `%${search}%`))]
+        ? [
+            or(
+              ilike(usersTable.name, `%${search}%`),
+              ilike(usersTable.email, `%${search}%`),
+            ),
+          ]
         : []),
     ];
-    const whereClause = conditions.length > 0 ? and(...(conditions as any)) : undefined;
+    const whereClause =
+      conditions.length > 0 ? and(...(conditions as any)) : undefined;
 
     const [allUsers, [{ total }]] = await Promise.all([
-      db.select().from(usersTable).where(whereClause).orderBy(desc(usersTable.isActive), desc(usersTable.createdAt)).limit(limit).offset(skip),
-      db.select({ total: sql<number>`count(*)::int` }).from(usersTable).where(whereClause),
+      db
+        .select()
+        .from(usersTable)
+        .where(whereClause)
+        .orderBy(desc(usersTable.isActive), desc(usersTable.createdAt))
+        .limit(limit)
+        .offset(skip),
+      db
+        .select({ total: sql<number>`count(*)::int` })
+        .from(usersTable)
+        .where(whereClause),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -86,7 +104,14 @@ users.post(
 
       const [newUser] = await db
         .insert(usersTable)
-        .values({ name, email, firebaseUid, role: "user", isActive: true, timezone: timezone || "UTC" })
+        .values({
+          name,
+          email,
+          firebaseUid,
+          role: "user",
+          isActive: true,
+          timezone: timezone || "UTC",
+        })
         .returning();
 
       return c.json(newUser, 201);
@@ -120,7 +145,11 @@ users.patch(
 
       if (!id) return c.json({ error: "User id is required" }, 400);
 
-      const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+      const [existingUser] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.id, id))
+        .limit(1);
       if (!existingUser) return c.json({ error: "User not found" }, 404);
 
       const updateData: Record<string, unknown> = {};
@@ -176,13 +205,20 @@ users.delete(
 
       if (!id) return c.json({ error: "User id is required" }, 400);
 
-      const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+      const [existingUser] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.id, id))
+        .limit(1);
       if (!existingUser) return c.json({ error: "User not found" }, 404);
 
       if (hardDelete) {
         await db.delete(usersTable).where(eq(usersTable.id, id));
       } else {
-        await db.update(usersTable).set({ isActive: false }).where(eq(usersTable.id, id));
+        await db
+          .update(usersTable)
+          .set({ isActive: false })
+          .where(eq(usersTable.id, id));
       }
 
       if (existingUser.firebaseUid) {
@@ -222,13 +258,41 @@ users.get(
       );
       const endOfLastMonth = new Date(startOfThisMonth.getTime() - 1);
 
-      const baseWhere = and(eq(usersTable.role, "user"), eq(usersTable.isActive, true), eq(usersTable.isDeleted, false));
-      const [[{ totalCustomers }], [{ thisMonthCustomers }], [{ lastMonthCustomers }]] =
-        await Promise.all([
-          db.select({ totalCustomers: sql<number>`count(*)::int` }).from(usersTable).where(baseWhere),
-          db.select({ thisMonthCustomers: sql<number>`count(*)::int` }).from(usersTable).where(and(baseWhere, gte(usersTable.createdAt, startOfThisMonth), lte(usersTable.createdAt, now))),
-          db.select({ lastMonthCustomers: sql<number>`count(*)::int` }).from(usersTable).where(and(baseWhere, gte(usersTable.createdAt, startOfLastMonth), lte(usersTable.createdAt, endOfLastMonth))),
-        ]);
+      const baseWhere = and(
+        eq(usersTable.role, "user"),
+        eq(usersTable.isActive, true),
+        eq(usersTable.isDeleted, false),
+      );
+      const [
+        [{ totalCustomers }],
+        [{ thisMonthCustomers }],
+        [{ lastMonthCustomers }],
+      ] = await Promise.all([
+        db
+          .select({ totalCustomers: sql<number>`count(*)::int` })
+          .from(usersTable)
+          .where(baseWhere),
+        db
+          .select({ thisMonthCustomers: sql<number>`count(*)::int` })
+          .from(usersTable)
+          .where(
+            and(
+              baseWhere,
+              gte(usersTable.createdAt, startOfThisMonth),
+              lte(usersTable.createdAt, now),
+            ),
+          ),
+        db
+          .select({ lastMonthCustomers: sql<number>`count(*)::int` })
+          .from(usersTable)
+          .where(
+            and(
+              baseWhere,
+              gte(usersTable.createdAt, startOfLastMonth),
+              lte(usersTable.createdAt, endOfLastMonth),
+            ),
+          ),
+      ]);
 
       let percentChange = 0;
       if (lastMonthCustomers > 0) {
@@ -264,22 +328,31 @@ users.delete(
       const auth = c.get("auth");
 
       const [user] = await db
-        .select().from(usersTable)
-        .where(and(eq(usersTable.firebaseUid, auth.firebaseUser.uid), eq(usersTable.isDeleted, false)))
+        .select()
+        .from(usersTable)
+        .where(
+          and(
+            eq(usersTable.firebaseUid, auth.firebaseUser.uid),
+            eq(usersTable.isDeleted, false),
+          ),
+        )
         .limit(1);
 
       if (!user) return c.json({ error: "User not found" }, 404);
 
-      await db.update(usersTable).set({
-        isDeleted: true,
-        deletedAt: new Date(),
-        name: "Deleted User",
-        email: `deleted-${user.id}@example.com`,
-        phone: null,
-        address: null,
-        firebaseUid: null,
-        isActive: false,
-      }).where(eq(usersTable.id, user.id));
+      await db
+        .update(usersTable)
+        .set({
+          isDeleted: true,
+          deletedAt: new Date(),
+          name: "Deleted User",
+          email: `deleted-${user.id}@example.com`,
+          phone: null,
+          address: null,
+          firebaseUid: null,
+          isActive: false,
+        })
+        .where(eq(usersTable.id, user.id));
 
       try {
         await adminAuth.deleteUser(auth.firebaseUser.uid);
@@ -306,13 +379,26 @@ users.get(
       const auth = c.get("auth");
 
       const [user] = await db
-        .select({ id: usersTable.id, name: usersTable.name, email: usersTable.email, phone: usersTable.phone, address: usersTable.address, timezone: usersTable.timezone, createdAt: usersTable.createdAt })
+        .select({
+          id: usersTable.id,
+          name: usersTable.name,
+          email: usersTable.email,
+          phone: usersTable.phone,
+          address: usersTable.address,
+          timezone: usersTable.timezone,
+          createdAt: usersTable.createdAt,
+        })
         .from(usersTable)
         .where(eq(usersTable.id, auth.user.id))
         .limit(1);
 
       const userOrders = await db
-        .select({ id: ordersTable.id, status: ordersTable.status, totalAmount: ordersTable.totalAmount, createdAt: ordersTable.createdAt })
+        .select({
+          id: ordersTable.id,
+          status: ordersTable.status,
+          totalAmount: ordersTable.totalAmount,
+          createdAt: ordersTable.createdAt,
+        })
         .from(ordersTable)
         .where(eq(ordersTable.userId, auth.user.id));
 
@@ -344,7 +430,11 @@ users.post(
 
       if (!userId) return c.json({ error: "userId is required" }, 400);
 
-      const [user] = await db.update(usersTable).set({ isActive: false }).where(eq(usersTable.id, userId)).returning();
+      const [user] = await db
+        .update(usersTable)
+        .set({ isActive: false })
+        .where(eq(usersTable.id, userId))
+        .returning();
 
       return c.json({ success: true, user });
     } catch (error) {

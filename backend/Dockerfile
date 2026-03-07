@@ -38,9 +38,6 @@ ENV FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID
 ENV FIREBASE_CLIENT_EMAIL=$FIREBASE_CLIENT_EMAIL
 ENV FIREBASE_PRIVATE_KEY=$FIREBASE_PRIVATE_KEY
 
-# Generate Prisma Client
-RUN bun run db:generate
-
 # Build the application
 RUN bun run build
 
@@ -62,8 +59,8 @@ RUN bun install --production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src ./src
 
-# Copy Prisma files
-COPY --from=builder /app/src/infrastructure/database/prisma ./src/infrastructure/database/prisma
+# Copy Drizzle migrations
+COPY --from=builder /app/src/infrastructure/database/drizzle/migrations ./src/infrastructure/database/drizzle/migrations
 
 # Expose port
 EXPOSE 3001

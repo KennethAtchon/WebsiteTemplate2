@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { rateLimiter } from "../../middleware/protection";
 import type { HonoEnv } from "../../middleware/protection";
-import { db, getQueryStats, ensureConnectionHealth } from "../../services/db/db";
+import {
+  db,
+  getQueryStats,
+  ensureConnectionHealth,
+} from "../../services/db/db";
 import { users } from "../../infrastructure/database/drizzle/schema";
 import { sql, count } from "drizzle-orm";
 import getRedisConnection from "../../services/db/redis";
@@ -86,7 +90,9 @@ interface HealthCheckResult {
   error?: string;
 }
 
-async function checkDatabaseHealth(dbInstance: any): Promise<HealthCheckResult> {
+async function checkDatabaseHealth(
+  dbInstance: any,
+): Promise<HealthCheckResult> {
   const start = Date.now();
   try {
     await Promise.race([

@@ -38,22 +38,43 @@ publicRoutes.get(
               ilike(contactMessages.subject, `%${search}%`),
             )
           : undefined,
-        dateFrom ? gte(contactMessages.createdAt, new Date(dateFrom)) : undefined,
+        dateFrom
+          ? gte(contactMessages.createdAt, new Date(dateFrom))
+          : undefined,
         dateTo ? lte(contactMessages.createdAt, new Date(dateTo)) : undefined,
       );
 
       const [rawMessages, [{ total }]] = await Promise.all([
-        db.select().from(contactMessages).where(msgWhere).orderBy(desc(contactMessages.createdAt)).limit(limit).offset(skip),
-        db.select({ total: sql<number>`count(*)::int` }).from(contactMessages).where(msgWhere),
+        db
+          .select()
+          .from(contactMessages)
+          .where(msgWhere)
+          .orderBy(desc(contactMessages.createdAt))
+          .limit(limit)
+          .offset(skip),
+        db
+          .select({ total: sql<number>`count(*)::int` })
+          .from(contactMessages)
+          .where(msgWhere),
       ]);
 
       // Decrypt PII fields
-      const ENCRYPTED_FIELDS = ["name", "email", "phone", "subject", "message"] as const;
+      const ENCRYPTED_FIELDS = [
+        "name",
+        "email",
+        "phone",
+        "subject",
+        "message",
+      ] as const;
       const messages = rawMessages.map((msg) => {
         const decrypted = { ...msg };
         for (const field of ENCRYPTED_FIELDS) {
           if (decrypted[field]) {
-            try { (decrypted as any)[field] = decrypt(decrypted[field] as string); } catch { /* leave as-is */ }
+            try {
+              (decrypted as any)[field] = decrypt(decrypted[field] as string);
+            } catch {
+              /* leave as-is */
+            }
           }
         }
         return decrypted;
@@ -121,7 +142,13 @@ publicRoutes.post("/contact-messages", rateLimiter("public"), async (c) => {
         subject: encrypt(subject),
         message: encrypt(message),
       })
-      .returning({ id: contactMessages.id, name: contactMessages.name, email: contactMessages.email, subject: contactMessages.subject, createdAt: contactMessages.createdAt });
+      .returning({
+        id: contactMessages.id,
+        name: contactMessages.name,
+        email: contactMessages.email,
+        subject: contactMessages.subject,
+        createdAt: contactMessages.createdAt,
+      });
 
     return c.json(
       {
