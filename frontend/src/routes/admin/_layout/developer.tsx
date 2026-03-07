@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 
-export const Route = createFileRoute("/admin/developer")({
+export const Route = createFileRoute("/admin/_layout/developer")({
   component: DeveloperPage,
 });
 
@@ -99,7 +99,8 @@ function DeveloperPage() {
         selectedTable.apiEndpoint.includes("/api/users") ||
         selectedTable.apiEndpoint.includes("/api/admin/") ||
         selectedTable.apiEndpoint.includes("/api/customer/") ||
-        selectedTable.apiEndpoint.includes("/api/public/")
+        selectedTable.apiEndpoint.includes("/api/public/") ||
+        selectedTable.apiEndpoint.includes("/api/shared/")
       ) {
         const separator = selectedTable.apiEndpoint.includes("?") ? "&" : "?";
         fetchUrl = `${selectedTable.apiEndpoint}${separator}page=${page}&limit=${pageSize}`;
@@ -118,9 +119,9 @@ function DeveloperPage() {
         const data = await res.json();
 
         if (data.pagination) {
-          setCurrentPage(data.pagination.currentPage);
+          setCurrentPage(data.pagination.page);
           setTotalPages(data.pagination.totalPages);
-          setTotalCount(data.pagination.totalCount);
+          setTotalCount(data.pagination.total);
           const arr = Object.values(data).find((val) => Array.isArray(val));
           setTableData(Array.isArray(arr) ? arr : []);
         } else {
@@ -435,18 +436,38 @@ function DeveloperPage() {
                 </Alert>
               ) : tableData && tableData.length > 0 ? (
                 <div className="space-y-4">
+                  {/* Debug info */}
+                  <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
+                    <div>Table: {selectedTable.name}</div>
+                    <div>KeyFields: {JSON.stringify(selectedTable.keyFields)}</div>
+                    <div>Data count: {tableData.length}</div>
+                    <div>Sample data: {JSON.stringify(tableData[0], null, 2)}</div>
+                  </div>
+                  
                   <div className="overflow-x-auto border rounded-lg">
                     <table className="w-full text-sm">
                       <thead className="bg-muted">
                         <tr>
-                          {selectedTable.keyFields.map((field) => (
-                            <th
-                              key={field}
-                              className="px-3 py-2 text-left font-semibold text-xs"
-                            >
-                              {field}
-                            </th>
-                          ))}
+                          {selectedTable.keyFields.length > 0 ? (
+                            selectedTable.keyFields.map((field) => (
+                              <th
+                                key={field}
+                                className="px-3 py-2 text-left font-semibold text-xs"
+                              >
+                                {field}
+                              </th>
+                            ))
+                          ) : (
+                            // Fallback: use all keys from first row
+                            tableData[0] && Object.keys(tableData[0]).map((field) => (
+                              <th
+                                key={field}
+                                className="px-3 py-2 text-left font-semibold text-xs"
+                              >
+                                {field}
+                              </th>
+                            ))
+                          )}
                         </tr>
                       </thead>
                       <tbody>
@@ -460,7 +481,7 @@ function DeveloperPage() {
                             }
                             className="border-t hover:bg-muted/50"
                           >
-                            {selectedTable.keyFields.map((field) => (
+                            {(selectedTable.keyFields.length > 0 ? selectedTable.keyFields : Object.keys(row)).map((field) => (
                               <td key={field} className="px-3 py-2 text-xs">
                                 {typeof row[field] === "object" &&
                                 row[field] !== null

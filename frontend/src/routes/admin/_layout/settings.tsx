@@ -16,7 +16,7 @@ import { debugLog } from "@/shared/utils/debug";
 import { User, Lock, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 
-export const Route = createFileRoute("/admin/settings")({
+export const Route = createFileRoute("/admin/_layout/settings")({
   component: SettingsPage,
 });
 

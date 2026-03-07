@@ -39,9 +39,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryFetcher } from "@/shared/hooks/use-query-fetcher";
 import { queryKeys } from "@/shared/lib/query-keys";
 import { useApp } from "@/shared/contexts/app-context";
-import { PageLayout } from "@/shared/components/layout/page-layout";
 
-export const Route = createFileRoute("/admin/contactmessages")({
+export const Route = createFileRoute("/admin/_layout/contactmessages")({
   component: ContactMessagesPage,
 });
 
@@ -135,8 +134,7 @@ function ContactMessagesPage() {
   );
 
   return (
-    <PageLayout variant="admin">
-      <div className="p-6">
+    <div className="p-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold">
             {t("admin_contact_messages_all_messages")}
@@ -306,8 +304,7 @@ function ContactMessagesPage() {
             </CardContent>
           </Card>
         )}
-      </div>
-    </PageLayout>
+    </div>
   );
 }
 

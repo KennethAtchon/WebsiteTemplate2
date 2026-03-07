@@ -79,9 +79,9 @@ export function SubscriptionAnalytics() {
   }
 
   const tierDistributionData = [
-    { name: "Basic", value: analytics.tierDistribution.basic },
-    { name: "Pro", value: analytics.tierDistribution.pro },
-    { name: "Enterprise", value: analytics.tierDistribution.enterprise },
+    { name: "Basic", value: analytics.tierDistribution.basic ?? 0 },
+    { name: "Pro", value: analytics.tierDistribution.pro ?? 0 },
+    { name: "Enterprise", value: analytics.tierDistribution.enterprise ?? 0 },
   ];
 
   return (

@@ -223,31 +223,6 @@ customer.post(
 );
 
 /**
- * GET /api/customer/orders/:orderId
- */
-customer.get(
-  "/orders/:orderId",
-  rateLimiter("customer"),
-  authMiddleware("user"),
-  async (c) => {
-    try {
-      const auth = c.get("auth");
-      const orderId = c.req.param("orderId");
-
-      const order = await prisma.order.findFirst({
-        where: { id: orderId, userId: auth.user.id },
-      });
-
-      if (!order) return c.json({ error: "Order not found" }, 404);
-      return c.json(order);
-    } catch (error) {
-      console.error("Failed to fetch order:", error);
-      return c.json({ error: "Failed to fetch order" }, 500);
-    }
-  },
-);
-
-/**
  * GET /api/customer/orders/by-session
  */
 customer.get(
@@ -293,6 +268,31 @@ customer.get(
     } catch (error) {
       console.error("Failed to fetch total revenue:", error);
       return c.json({ error: "Failed to fetch total revenue" }, 500);
+    }
+  },
+);
+
+/**
+ * GET /api/customer/orders/:orderId
+ */
+customer.get(
+  "/orders/:orderId",
+  rateLimiter("customer"),
+  authMiddleware("user"),
+  async (c) => {
+    try {
+      const auth = c.get("auth");
+      const orderId = c.req.param("orderId");
+
+      const order = await prisma.order.findFirst({
+        where: { id: orderId, userId: auth.user.id },
+      });
+
+      if (!order) return c.json({ error: "Order not found" }, 404);
+      return c.json(order);
+    } catch (error) {
+      console.error("Failed to fetch order:", error);
+      return c.json({ error: "Failed to fetch order" }, 500);
     }
   },
 );

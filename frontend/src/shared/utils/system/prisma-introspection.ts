@@ -126,6 +126,7 @@ export async function getTableConfigs(): Promise<TableConfig[]> {
     { name: "User", apiEndpoint: "/api/users" },
     { name: "Order", apiEndpoint: "/api/admin/orders" },
     { name: "ContactMessage", apiEndpoint: "/api/shared/contact-messages" },
+    { name: "FeatureUsage", apiEndpoint: "/api/admin/feature-usages" },
   ];
 
   const configs = await Promise.all(

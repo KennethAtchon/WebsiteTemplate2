@@ -7,6 +7,8 @@ import {
 import type { HonoEnv } from "../../middleware/protection";
 import { ADMIN_SPECIAL_CODE_HASH } from "../../utils/config/envUtil";
 import { createHash } from "crypto";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 import { adminAuth, adminDb } from "../../services/firebase/admin";
 import { prisma } from "../../services/db/prisma";
 import {
@@ -21,7 +23,6 @@ import {
 import { getTierConfig } from "../../constants/subscription.constants";
 import { getMonthlyUsageCount } from "../../features/calculator/services/usage-service";
 import { FirebaseUserSync } from "../../services/firebase/sync";
-import { Prisma } from "@prisma/client";
 
 const admin = new Hono<HonoEnv>();
 
@@ -630,14 +631,35 @@ admin.get(
           ? (canceledLast30Days / activeSubscriptions.length) * 100
           : 0;
 
+      const activeCount = activeSubscriptions.length;
+      const arpu = activeCount > 0 ? mrr / activeCount : 0;
+
+      const revenueByTier = Object.entries(tierDistribution).map(
+        ([tier, count]) => {
+          let price = 0;
+          try {
+            const config = getTierConfig(
+              tier as "basic" | "pro" | "enterprise",
+            );
+            price = (config.price / 100) * count;
+          } catch {
+            /* skip unknown tiers */
+          }
+          return { tier, revenue: price };
+        },
+      );
+
       return c.json({
-        totalActive: activeSubscriptions.length,
+        activeSubscriptions: activeCount,
         totalTrialing: allSubscriptions.filter((s) => s.status === "trialing")
           .length,
         mrr,
         arr: mrr * 12,
         churnRate,
+        arpu,
         tierDistribution,
+        revenueByTier,
+        growthRate: 0,
       });
     } catch (error) {
       console.error("Failed to fetch subscription analytics:", error);
@@ -675,7 +697,81 @@ admin.get(
   },
 );
 
+// ─── GET /api/admin/feature-usages ───────────────────────────────────────────
+
+admin.get(
+  "/feature-usages",
+  rateLimiter("admin"),
+  authMiddleware("admin"),
+  async (c) => {
+    try {
+      const page = parseInt(c.req.query("page") || "1", 10);
+      const limit = Math.min(parseInt(c.req.query("limit") || "50", 10), 100);
+      const skip = (page - 1) * limit;
+
+      const [usages, total] = await Promise.all([
+        prisma.featureUsage.findMany({
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip,
+        }),
+        prisma.featureUsage.count(),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+      return c.json({
+        featureUsages: usages,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasMore: page < totalPages,
+          hasPrevious: page > 1,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to fetch feature usages:", error);
+      return c.json({ error: "Failed to fetch feature usages" }, 500);
+    }
+  },
+);
+
 // ─── GET /api/admin/schema ────────────────────────────────────────────────────
+
+const SCALAR_TYPES = new Set([
+  "String", "Int", "Float", "Boolean", "DateTime",
+  "Json", "Bytes", "Decimal", "BigInt",
+]);
+
+function parsePrismaSchema(content: string) {
+  const models: Array<{ name: string; fields: any[] }> = [];
+  const modelRegex = /^model\s+(\w+)\s*\{([\s\S]*?)\n\}/gm;
+  let modelMatch;
+  while ((modelMatch = modelRegex.exec(content)) !== null) {
+    const name = modelMatch[1];
+    const body = modelMatch[2];
+    const fields: any[] = [];
+    for (const line of body.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith("@@")) continue;
+      const fieldMatch = trimmed.match(/^(\w+)\s+(\w+)(\?|\[\])?\s*(.*)?$/);
+      if (!fieldMatch) continue;
+      const [, fieldName, fieldType, modifier = "", rest = ""] = fieldMatch;
+      if (!SCALAR_TYPES.has(fieldType)) continue; // skip relations
+      fields.push({
+        name: fieldName,
+        type: fieldType,
+        isRequired: modifier !== "?",
+        isId: rest.includes("@id"),
+        hasDefaultValue: rest.includes("@default"),
+        isList: modifier === "[]",
+      });
+    }
+    models.push({ name, fields });
+  }
+  return { models };
+}
 
 admin.get(
   "/schema",
@@ -683,25 +779,13 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      const dmmf = (Prisma as any).dmmf;
-
-      if (!dmmf?.datamodel) {
-        return c.json({ error: "DMMF not available" }, 500);
-      }
-
-      const models = dmmf.datamodel.models.map((model: any) => ({
-        name: model.name,
-        fields: model.fields.map((field: any) => ({
-          name: field.name,
-          type: field.type,
-          isRequired: field.isRequired,
-          isId: field.isId,
-          hasDefaultValue: field.hasDefaultValue,
-          isList: field.isList,
-        })),
-      }));
-
-      return c.json({ models });
+      const schemaPath = resolve(
+        import.meta.dir,
+        "../../infrastructure/database/prisma/schema.prisma",
+      );
+      const content = readFileSync(schemaPath, "utf-8");
+      const schema = parsePrismaSchema(content);
+      return c.json(schema);
     } catch (error) {
       console.error("Failed to fetch schema:", error);
       return c.json({ error: "Failed to fetch schema" }, 500);

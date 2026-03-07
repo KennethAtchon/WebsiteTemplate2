@@ -318,39 +318,11 @@ function MobileSidebar({ isOpen, onClose, pathname }: MobileSidebarProps) {
   );
 }
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-interface LayoutState {
-  helpOpen: boolean;
-  mobileNavOpen: boolean;
-}
-
-const INITIAL_LAYOUT_STATE: LayoutState = {
-  helpOpen: false,
-  mobileNavOpen: false,
-};
-
-const t = (key: string) => {
-  const translations: Record<string, string> = {
-    admin_layout_navigation_dashboard: "Dashboard",
-    admin_layout_navigation_customers: "Customers",
-    admin_layout_navigation_orders: "Orders",
-    admin_layout_navigation_subscriptions: "Subscriptions",
-    admin_layout_navigation_contact_messages: "Contact Messages",
-    admin_layout_navigation_developer: "Developer",
-    admin_layout_navigation_settings: "Settings",
-  };
-  return translations[key] || key;
-};
-
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { t } = useTranslation();
   const location = useLocation();
   const pathname = location.pathname;
 
-  // Layout state for mobile navigation and help modal
   const [layoutState, setLayoutState] = useState({
     mobileNavOpen: false,
     helpOpen: false,
