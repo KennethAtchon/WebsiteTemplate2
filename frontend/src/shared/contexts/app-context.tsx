@@ -172,6 +172,7 @@ export function AppProvider({ children }: AppProviderProps) {
   // Firebase auth state
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [backendReady, setBackendReady] = useState(false);
   const queryClient = useQueryClient();
 
   // User profile state - now using React Query
@@ -182,20 +183,39 @@ export function AppProvider({ children }: AppProviderProps) {
 
   // Initialize Firebase auth state listener
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       debugLog.info(
         "Authentication state changed",
         { service: "app-context", operation: "onAuthStateChanged" },
-        { userId: user?.uid || "anonymous", isAuthenticated: !!user }
+        { userId: firebaseUser?.uid || "anonymous", isAuthenticated: !!firebaseUser }
       );
 
-      // Clear all user-specific query caches when user logs out
-      if (!user) {
+      if (!firebaseUser) {
         clearApiQueryCache(queryClient);
+        setUser(null);
+        setBackendReady(false);
+        setAuthLoading(false);
+        return;
       }
 
-      setUser(user);
+      setUser(firebaseUser);
       setAuthLoading(false);
+
+      // Ensure user exists in DB before the profile query can fire
+      try {
+        const token = await firebaseUser.getIdToken();
+        await baseAuthenticatedFetchJson("/api/auth/register", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch (error) {
+        debugLog.error(
+          "Failed to sync user with backend",
+          { service: "app-context", operation: "onAuthStateChanged" },
+          error
+        );
+      }
+      setBackendReady(true);
     });
     return unsubscribe;
   }, [queryClient]);
@@ -312,7 +332,7 @@ export function AppProvider({ children }: AppProviderProps) {
   } = useQuery({
     queryKey: queryKeys.api.profile(),
     queryFn: () => fetcher("/api/customer/profile"),
-    enabled: !!user && !authLoading,
+    enabled: !!user && !authLoading && backendReady,
     staleTime: QUERY_STALE.long,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

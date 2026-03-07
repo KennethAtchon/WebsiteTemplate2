@@ -176,7 +176,7 @@ export const LOG_LEVEL = getEnvVar("LOG_LEVEL", false, "debug") as
 // ============================================================================
 // SEO & Metadata
 // ============================================================================
-export const BASE_URL = getEnvVar("BASE_URL", false, "http://localhost:3001");
+export const BASE_URL = getEnvVar("BASE_URL", false, "http://localhost:3000");
 
 // ============================================================================
 // Package Info

@@ -77,45 +77,45 @@ case "${1:-help}" in
     
     "stop")
         log_info "Stopping Docker services..."
-        docker-compose down
+        docker compose down
         log_info "Services stopped."
         ;;
     
     "restart")
         log_info "Restarting Docker services..."
-        docker-compose restart
+        docker compose restart
         log_info "Services restarted."
         ;;
     
     "logs")
         log_info "Showing logs (Ctrl+C to exit)..."
-        docker-compose logs -f
+        docker compose logs -f
         ;;
     
     "migrate")
         log_info "Running database migrations..."
-        docker-compose exec backend bun run db:migrate
+        docker compose exec backend bun run db:migrate
         log_info "Migrations completed."
         ;;
     
     "studio")
         log_info "Opening Prisma Studio..."
-        docker-compose exec backend bun run db:studio
+        docker compose exec backend bun run db:studio
         ;;
     
     "shell-backend")
         log_info "Opening backend shell..."
-        docker-compose exec backend sh
+        docker compose exec backend sh
         ;;
     
     "shell-frontend")
         log_info "Opening frontend shell..."
-        docker-compose exec frontend sh
+        docker compose exec frontend sh
         ;;
     
     "build")
         log_info "Building Docker images..."
-        docker-compose build
+        docker compose build
         log_info "Build completed."
         ;;
     
@@ -124,7 +124,7 @@ case "${1:-help}" in
         read -r response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
             log_info "Cleaning up Docker resources..."
-            docker-compose down -v --remove-orphans
+            docker compose down -v --remove-orphans
             docker system prune -f
             log_info "Cleanup completed."
         else
@@ -136,7 +136,7 @@ case "${1:-help}" in
         log_info "Starting production services with nginx..."
         check_docker
         if check_env; then
-            NODE_ENV=production docker-compose --profile production up -d
+            NODE_ENV=production docker compose --profile production up -d
             log_info "Production services started. Access via http://localhost"
         else
             log_error "Please configure .env file first."
@@ -145,7 +145,7 @@ case "${1:-help}" in
     
     "status")
         log_info "Service status:"
-        docker-compose ps
+        docker compose ps
         ;;
     
     "help"|*)

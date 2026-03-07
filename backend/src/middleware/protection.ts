@@ -76,14 +76,24 @@ export function authMiddleware(
       const token = authHeader.substring(7);
       const decodedToken = await adminAuth.verifyIdToken(token, true);
 
-      const user = await prisma.user.findUnique({
+      const email = decodedToken.email;
+      if (!email) {
+        return c.json({ error: "Firebase token missing email", code: "INVALID_TOKEN" }, 401);
+      }
+
+      const user = await prisma.user.upsert({
         where: { firebaseUid: decodedToken.uid },
+        update: { lastLogin: new Date() },
+        create: {
+          firebaseUid: decodedToken.uid,
+          email,
+          name: decodedToken.name || decodedToken.email?.split("@")[0] || "User",
+          role: "user",
+          isActive: true,
+          timezone: "UTC",
+        },
         select: { id: true, email: true, role: true },
       });
-
-      if (!user) {
-        return c.json({ error: "User not found", code: "USER_NOT_FOUND" }, 404);
-      }
 
       if (level === "admin" && user.role !== "admin") {
         return c.json(
