@@ -79,8 +79,8 @@ async function getDrizzleFieldInfo(
       return { fields: [], fieldsInfo: {} };
     }
 
-    const table = schema.tables.find((t: any) => 
-      t.name === tableName || t.tableName === tableName
+    const table = schema.tables.find(
+      (t: any) => t.name === tableName || t.tableName === tableName
     );
 
     if (!table) {
@@ -130,8 +130,16 @@ export async function getTableConfigs(): Promise<TableConfig[]> {
   const modelConfigs = [
     { name: "User", tableName: "user", apiEndpoint: "/api/users" },
     { name: "Order", tableName: "order", apiEndpoint: "/api/admin/orders" },
-    { name: "ContactMessage", tableName: "contact_message", apiEndpoint: "/api/shared/contact-messages" },
-    { name: "FeatureUsage", tableName: "feature_usage", apiEndpoint: "/api/admin/feature-usages" },
+    {
+      name: "ContactMessage",
+      tableName: "contact_message",
+      apiEndpoint: "/api/shared/contact-messages",
+    },
+    {
+      name: "FeatureUsage",
+      tableName: "feature_usage",
+      apiEndpoint: "/api/admin/feature-usages",
+    },
   ];
 
   const configs = await Promise.all(
@@ -195,7 +203,8 @@ export async function generateExpectedParams(
         }
     }
 
-    const required = !info.nullable && !info.hasDefaultValue ? "required" : "optional";
+    const required =
+      !info.nullable && !info.hasDefaultValue ? "required" : "optional";
     params[fieldName] = `${typeStr} (${required})`;
   });
 

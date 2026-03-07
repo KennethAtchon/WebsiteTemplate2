@@ -189,7 +189,10 @@ export function AppProvider({ children }: AppProviderProps) {
       debugLog.info(
         "Authentication state changed",
         { service: "app-context", operation: "onAuthStateChanged" },
-        { userId: firebaseUser?.uid || "anonymous", isAuthenticated: !!firebaseUser }
+        {
+          userId: firebaseUser?.uid || "anonymous",
+          isAuthenticated: !!firebaseUser,
+        }
       );
 
       if (!firebaseUser) {

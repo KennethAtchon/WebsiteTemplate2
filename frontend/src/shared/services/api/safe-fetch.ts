@@ -124,7 +124,7 @@ export async function safeFetch(
               method: requestInit.method || "GET",
               status: response.status,
               statusText: response.statusText,
-              headers: Object.fromEntries(response.headers.entries())
+              headers: Object.fromEntries(response.headers.entries()),
             }
           );
           throw new Error(errorDetails);

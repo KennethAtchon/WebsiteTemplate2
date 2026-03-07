@@ -38,7 +38,7 @@ export async function getMonthlyUsageCount(userId: string): Promise<number> {
       console.warn("Failed to fetch usage data, returning 0");
       return 0;
     }
-    
+
     const data = await response.json();
     return data.usageCount || 0;
   } catch (error) {

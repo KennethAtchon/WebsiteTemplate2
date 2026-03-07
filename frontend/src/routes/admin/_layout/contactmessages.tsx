@@ -135,175 +135,173 @@ function ContactMessagesPage() {
 
   return (
     <div className="p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">
-            {t("admin_contact_messages_all_messages")}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {t("admin_contact_messages_count", {
-              count: pagination.total,
-              message:
-                pagination.total === 1
-                  ? t("admin_contact_messages_message_singular")
-                  : t("admin_contact_messages_message_plural"),
-            })}
-          </p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">
+          {t("admin_contact_messages_all_messages")}
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          {t("admin_contact_messages_count", {
+            count: pagination.total,
+            message:
+              pagination.total === 1
+                ? t("admin_contact_messages_message_singular")
+                : t("admin_contact_messages_message_plural"),
+          })}
+        </p>
+      </div>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-              <p className="text-muted-foreground">
-                {t("common_loading_contact_messages")}
-              </p>
-            </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">
+              {t("common_loading_contact_messages")}
+            </p>
           </div>
-        ) : error ? (
-          <Card className="border-destructive">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-2 text-destructive">
-                <AlertCircle className="h-5 w-5" />
-                <span className="font-medium">
-                  {error instanceof Error
-                    ? error.message
-                    : t("admin_failed_to_fetch_contact_messages")}
-                </span>
+        </div>
+      ) : error ? (
+        <Card className="border-destructive">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              <span className="font-medium">
+                {error instanceof Error
+                  ? error.message
+                  : t("admin_failed_to_fetch_contact_messages")}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-2">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl">
+                  {t("admin_contact_messages_all_messages")}
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  {t("admin_contact_messages_count", {
+                    count: pagination.total,
+                    message:
+                      pagination.total === 1
+                        ? t("admin_contact_messages_message_singular")
+                        : t("admin_contact_messages_message_plural"),
+                  })}
+                </CardDescription>
               </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="border-2">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl">
-                    {t("admin_contact_messages_all_messages")}
-                  </CardTitle>
-                  <CardDescription className="mt-1">
-                    {t("admin_contact_messages_count", {
-                      count: pagination.total,
-                      message:
-                        pagination.total === 1
-                          ? t("admin_contact_messages_message_singular")
-                          : t("admin_contact_messages_message_plural"),
-                    })}
-                  </CardDescription>
-                </div>
-                <Badge variant="secondary" className="text-sm">
-                  <Mail className="h-3 w-3 mr-1" />
-                  {pagination.total} {t("admin_contact_messages_total")}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/50">
-                      <TableHead className="font-semibold">
-                        {t("admin_contact_messages_name")}
-                      </TableHead>
-                      <TableHead className="font-semibold">
-                        {t("admin_settings_placeholder_email")}
-                      </TableHead>
-                      <TableHead className="font-semibold">
-                        {t("admin_contact_messages_phone")}
-                      </TableHead>
-                      <TableHead className="font-semibold">
-                        {t("admin_contact_messages_subject")}
-                      </TableHead>
-                      <TableHead className="font-semibold">
-                        {t("admin_contact_messages_message")}
-                      </TableHead>
-                      <TableHead className="font-semibold">
-                        {t("admin_contact_messages_received_at")}
-                      </TableHead>
-                      <TableHead className="w-[50px]"></TableHead>
+              <Badge variant="secondary" className="text-sm">
+                <Mail className="h-3 w-3 mr-1" />
+                {pagination.total} {t("admin_contact_messages_total")}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="font-semibold">
+                      {t("admin_contact_messages_name")}
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      {t("admin_settings_placeholder_email")}
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      {t("admin_contact_messages_phone")}
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      {t("admin_contact_messages_subject")}
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      {t("admin_contact_messages_message")}
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      {t("admin_contact_messages_received_at")}
+                    </TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {formattedMessages.length > 0 ? (
+                    formattedMessages.map((msg) => (
+                      <ContactMessageRow key={msg.id} message={msg} />
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className="h-24 text-center">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <MessageSquare className="h-8 w-8 text-muted-foreground" />
+                          <p className="text-muted-foreground">
+                            {t("admin_contact_messages_no_messages")}
+                          </p>
+                        </div>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {formattedMessages.length > 0 ? (
-                      formattedMessages.map((msg) => (
-                        <ContactMessageRow key={msg.id} message={msg} />
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7} className="h-24 text-center">
-                          <div className="flex flex-col items-center justify-center gap-2">
-                            <MessageSquare className="h-8 w-8 text-muted-foreground" />
-                            <p className="text-muted-foreground">
-                              {t("admin_contact_messages_no_messages")}
-                            </p>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-              {pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t">
-                  <div className="text-sm text-muted-foreground">
-                    {t("common_pagination_showing", {
-                      page: pagination.page,
-                      totalPages: pagination.totalPages,
-                      total: pagination.total,
-                      item: t("common_pagination_messages"),
-                    })}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage((p) => p - 1)}
-                      disabled={pagination.page <= 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      {t("common_pagination_previous")}
-                    </Button>
-                    <div className="flex items-center space-x-1">
-                      {Array.from(
-                        { length: Math.min(5, pagination.totalPages) },
-                        (_, i) => {
-                          const startPage = Math.max(1, pagination.page - 2);
-                          const page = startPage + i;
-                          if (page <= pagination.totalPages) {
-                            return (
-                              <Button
-                                key={page}
-                                variant={
-                                  pagination.page === page
-                                    ? "default"
-                                    : "outline"
-                                }
-                                size="sm"
-                                onClick={() => setCurrentPage(page)}
-                                className="w-8 h-8 p-0"
-                              >
-                                {page}
-                              </Button>
-                            );
-                          }
-                          return null;
-                        }
-                      )}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage((p) => p + 1)}
-                      disabled={!pagination.hasMore}
-                    >
-                      {t("common_pagination_next")}
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t">
+                <div className="text-sm text-muted-foreground">
+                  {t("common_pagination_showing", {
+                    page: pagination.page,
+                    totalPages: pagination.totalPages,
+                    total: pagination.total,
+                    item: t("common_pagination_messages"),
+                  })}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                    disabled={pagination.page <= 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    {t("common_pagination_previous")}
+                  </Button>
+                  <div className="flex items-center space-x-1">
+                    {Array.from(
+                      { length: Math.min(5, pagination.totalPages) },
+                      (_, i) => {
+                        const startPage = Math.max(1, pagination.page - 2);
+                        const page = startPage + i;
+                        if (page <= pagination.totalPages) {
+                          return (
+                            <Button
+                              key={page}
+                              variant={
+                                pagination.page === page ? "default" : "outline"
+                              }
+                              size="sm"
+                              onClick={() => setCurrentPage(page)}
+                              className="w-8 h-8 p-0"
+                            >
+                              {page}
+                            </Button>
+                          );
+                        }
+                        return null;
+                      }
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    disabled={!pagination.hasMore}
+                  >
+                    {t("common_pagination_next")}
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

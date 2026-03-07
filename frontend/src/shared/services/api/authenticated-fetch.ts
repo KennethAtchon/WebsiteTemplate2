@@ -42,7 +42,9 @@ async function getCSRFToken(): Promise<string> {
       tokenLength: token?.length,
       cachedToken: !!csrfTokenCache,
       cacheExpires: csrfTokenCache?.expires,
-      isCacheValid: csrfTokenCache?.expires ? csrfTokenCache.expires > new Date() : false
+      isCacheValid: csrfTokenCache?.expires
+        ? csrfTokenCache.expires > new Date()
+        : false,
     }
   );
 
@@ -62,7 +64,7 @@ async function getCSRFToken(): Promise<string> {
       status: response.status,
       statusText: response.statusText,
       ok: response.ok,
-      headers: Object.fromEntries(response.headers.entries())
+      headers: Object.fromEntries(response.headers.entries()),
     }
   );
 
@@ -79,7 +81,7 @@ async function getCSRFToken(): Promise<string> {
           status: response.status,
           statusText: response.statusText,
           errorBody: errorText,
-          url: `${API_BASE_URL}/api/csrf`
+          url: `${API_BASE_URL}/api/csrf`,
         }
       );
     } catch (parseError) {
@@ -89,17 +91,22 @@ async function getCSRFToken(): Promise<string> {
         {
           status: response.status,
           statusText: response.statusText,
-          parseError: parseError instanceof Error ? parseError.message : String(parseError),
-          url: `${API_BASE_URL}/api/csrf`
+          parseError:
+            parseError instanceof Error
+              ? parseError.message
+              : String(parseError),
+          url: `${API_BASE_URL}/api/csrf`,
         }
       );
     }
-    
-    throw new Error(`CSRF token request failed: ${response.status} ${response.statusText}${errorDetails ? ` - ${errorDetails}` : ""}`);
+
+    throw new Error(
+      `CSRF token request failed: ${response.status} ${response.statusText}${errorDetails ? ` - ${errorDetails}` : ""}`
+    );
   }
 
   const data = await response.json();
-  
+
   debugLog.info(
     "CSRF token parsed successfully",
     { service: "authenticated-fetch" },
@@ -107,10 +114,10 @@ async function getCSRFToken(): Promise<string> {
       hasToken: !!data.csrfToken,
       tokenLength: data.csrfToken?.length,
       expires: data.expires,
-      cacheExpires: csrfTokenCache?.expires
+      cacheExpires: csrfTokenCache?.expires,
     }
   );
-  
+
   csrfTokenCache = {
     token: data.csrfToken,
     expires: new Date(data.expires),
@@ -143,10 +150,10 @@ export async function authenticatedFetch(
   requestInit: RequestInit = {}
 ): Promise<Response> {
   // Construct full URL if relative path provided
-  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
-  
+  const fullUrl = url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
+
   const user = auth.currentUser;
-  
+
   debugLog.info(
     "Authenticated fetch called",
     { service: "authenticated-fetch" },
@@ -156,10 +163,10 @@ export async function authenticatedFetch(
       method: requestInit.method || "GET",
       hasUser: !!user,
       uid: user?.uid,
-      isEmailVerified: user?.emailVerified
+      isEmailVerified: user?.emailVerified,
     }
   );
-  
+
   if (!user) {
     debugLog.error(
       "User not authenticated for authenticated fetch",
@@ -199,10 +206,12 @@ export async function authenticatedFetch(
           method: requestInit.method || "GET",
           hasUser: !!auth.currentUser,
           uid: auth.currentUser?.uid,
-          requestInit: requestInit
+          requestInit: requestInit,
         }
       );
-      throw new Error(`Failed to get CSRF token: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to get CSRF token: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 

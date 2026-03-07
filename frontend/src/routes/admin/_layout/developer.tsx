@@ -439,35 +439,38 @@ function DeveloperPage() {
                   {/* Debug info */}
                   <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
                     <div>Table: {selectedTable.name}</div>
-                    <div>KeyFields: {JSON.stringify(selectedTable.keyFields)}</div>
+                    <div>
+                      KeyFields: {JSON.stringify(selectedTable.keyFields)}
+                    </div>
                     <div>Data count: {tableData.length}</div>
-                    <div>Sample data: {JSON.stringify(tableData[0], null, 2)}</div>
+                    <div>
+                      Sample data: {JSON.stringify(tableData[0], null, 2)}
+                    </div>
                   </div>
-                  
+
                   <div className="overflow-x-auto border rounded-lg">
                     <table className="w-full text-sm">
                       <thead className="bg-muted">
                         <tr>
-                          {selectedTable.keyFields.length > 0 ? (
-                            selectedTable.keyFields.map((field) => (
-                              <th
-                                key={field}
-                                className="px-3 py-2 text-left font-semibold text-xs"
-                              >
-                                {field}
-                              </th>
-                            ))
-                          ) : (
-                            // Fallback: use all keys from first row
-                            tableData[0] && Object.keys(tableData[0]).map((field) => (
-                              <th
-                                key={field}
-                                className="px-3 py-2 text-left font-semibold text-xs"
-                              >
-                                {field}
-                              </th>
-                            ))
-                          )}
+                          {selectedTable.keyFields.length > 0
+                            ? selectedTable.keyFields.map((field) => (
+                                <th
+                                  key={field}
+                                  className="px-3 py-2 text-left font-semibold text-xs"
+                                >
+                                  {field}
+                                </th>
+                              ))
+                            : // Fallback: use all keys from first row
+                              tableData[0] &&
+                              Object.keys(tableData[0]).map((field) => (
+                                <th
+                                  key={field}
+                                  className="px-3 py-2 text-left font-semibold text-xs"
+                                >
+                                  {field}
+                                </th>
+                              ))}
                         </tr>
                       </thead>
                       <tbody>
@@ -481,7 +484,10 @@ function DeveloperPage() {
                             }
                             className="border-t hover:bg-muted/50"
                           >
-                            {(selectedTable.keyFields.length > 0 ? selectedTable.keyFields : Object.keys(row)).map((field) => (
+                            {(selectedTable.keyFields.length > 0
+                              ? selectedTable.keyFields
+                              : Object.keys(row)
+                            ).map((field) => (
                               <td key={field} className="px-3 py-2 text-xs">
                                 {typeof row[field] === "object" &&
                                 row[field] !== null
