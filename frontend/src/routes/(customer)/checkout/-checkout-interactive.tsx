@@ -14,12 +14,17 @@ import { Badge } from "@/shared/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryFetcher } from "@/shared/hooks/use-query-fetcher";
 import { queryKeys } from "@/shared/lib/query-keys";
+import { debugLog } from "@/shared/utils/debug";
 import {
   getProductById,
   DEFAULT_PRODUCT,
 } from "@/shared/constants/order.constants";
 import { SubscriptionCheckout } from "@/features/payments/components/checkout/subscription-checkout";
 import { OrderCheckout } from "@/features/payments/components/checkout/order-checkout";
+import {
+  useSmartRedirect,
+  REDIRECT_PATHS,
+} from "@/shared/utils/redirect/redirect-util";
 
 interface OrderItem {
   name: string;
@@ -37,9 +42,21 @@ export function CheckoutInteractive() {
   >;
   const navigate = useNavigate();
   const { user } = useApp();
+  const { redirectToAuth } = useSmartRedirect();
   const subscriptionFetcher = useQueryFetcher<{
+    subscription: {
+      id: string;
+      tier: string;
+      billingCycle: "monthly" | "annual" | null;
+      status: string;
+      currentPeriodStart: string | null;
+      currentPeriodEnd: string | null;
+      isInTrial: boolean;
+      trialEnd: string | null;
+    } | null;
     tier: string | null;
     billingCycle: "monthly" | "annual" | null;
+    isInTrial: boolean;
   }>();
   const trialFetcher = useQueryFetcher<{
     isEligible: boolean;
@@ -81,18 +98,24 @@ export function CheckoutInteractive() {
   ]);
 
   useEffect(() => {
+    debugLog.info("Checkout useEffect triggered", {
+      service: "checkout",
+      operation: "useEffect",
+      isAuthenticated: !!user,
+      searchParams: search,
+    });
+
     if (!user) {
+      debugLog.info("No user found, redirecting to auth", {
+        service: "checkout",
+        operation: "redirectToAuth",
+      });
+      // Always redirect to sign-up for checkout access with consistent flow
       const currentUrl = window.location.pathname + window.location.search;
-      const redirectUrl = encodeURIComponent(currentUrl);
-
-      const tierParam = search.tier;
-      const billingParam = search.billing;
-
-      if (tierParam || billingParam) {
-        navigate({ to: "/sign-up", search: { redirect_url: redirectUrl } });
-      } else {
-        navigate({ to: "/sign-in", search: { redirect_url: redirectUrl } });
-      }
+      redirectToAuth({
+        isSignUp: true,
+        returnUrl: currentUrl,
+      });
       return;
     }
 
@@ -102,11 +125,25 @@ export function CheckoutInteractive() {
     const priceParam = search.price;
     const quantityParam = search.quantity;
 
+    debugLog.info("Processing checkout request", {
+      service: "checkout",
+      operation: "processRequest",
+      currentSubscription,
+    });
+
     if (
       productIdParam ||
       orderTypeParam === "order" ||
       (itemParam && priceParam)
     ) {
+      debugLog.info("Processing order checkout", {
+        service: "checkout",
+        operation: "orderCheckout",
+        productIdParam,
+        orderTypeParam,
+        itemParam,
+        priceParam,
+      });
       let computedOrderItems: OrderItem[] = [
         {
           name: DEFAULT_PRODUCT.name,
@@ -163,15 +200,78 @@ export function CheckoutInteractive() {
         setOrderItems(computedOrderItems);
       });
     } else {
+      debugLog.info("Processing subscription checkout", {
+        service: "checkout",
+        operation: "subscriptionCheckout",
+      });
       const tierParam = search.tier as SubscriptionTier | undefined;
       const billingParam = search.billing as "monthly" | "annual" | undefined;
 
-      if (currentSubscription?.tier) {
-        navigate({ to: "/account", search: { message: "use-portal" } });
-        return;
+      // Check if user has an active subscription that should redirect to portal
+      const hasActiveSubscription =
+        currentSubscription?.subscription &&
+        (currentSubscription.subscription.status === "active" ||
+          currentSubscription.subscription.status === "trialing");
+
+      debugLog.info("Checking subscription status", {
+        service: "checkout",
+        operation: "checkSubscription",
+        hasActiveSubscription,
+        subscriptionStatus: currentSubscription?.subscription?.status,
+        subscriptionTier: currentSubscription?.tier,
+        tierParam,
+        billingParam,
+      });
+
+      // Only redirect to portal if user has an active subscription AND is trying to purchase the same or lower tier
+      if (hasActiveSubscription) {
+        const currentTier = currentSubscription.tier;
+        const tierHierarchy: Record<string, number> = {
+          basic: 1,
+          pro: 2,
+          enterprise: 3,
+        };
+        const currentLevel = tierHierarchy[currentTier || "basic"] || 0;
+        const requestedLevel = tierHierarchy[tierParam || "basic"] || 0;
+
+        debugLog.info("Comparing subscription tiers", {
+          service: "checkout",
+          operation: "tierComparison",
+          currentTier,
+          currentLevel,
+          requestedTier: tierParam,
+          requestedLevel,
+          isUpgrade: requestedLevel > currentLevel,
+        });
+
+        if (requestedLevel <= currentLevel) {
+          debugLog.info(
+            "User purchasing same/lower tier, redirecting to portal",
+            {
+              service: "checkout",
+              operation: "redirectToPortal",
+            }
+          );
+          navigate({
+            to: REDIRECT_PATHS.ACCOUNT,
+            search: { message: "use-portal" },
+          });
+          return;
+        } else {
+          debugLog.info("User upgrading subscription, allowing checkout", {
+            service: "checkout",
+            operation: "allowUpgrade",
+          });
+        }
       }
 
       if (tierParam && Object.values(SUBSCRIPTION_TIERS).includes(tierParam)) {
+        debugLog.info("Valid tier provided, setting up subscription checkout", {
+          service: "checkout",
+          operation: "setupSubscription",
+          tier: tierParam,
+          billing: billingParam,
+        });
         startTransition(() => {
           setCheckoutType("subscription");
           setTier(tierParam);
@@ -180,10 +280,15 @@ export function CheckoutInteractive() {
           }
         });
       } else {
+        debugLog.info("No valid tier, redirecting to pricing", {
+          service: "checkout",
+          operation: "redirectToPricing",
+          tierParam,
+        });
         startTransition(() => {
           setCheckoutType("subscription");
         });
-        navigate({ to: "/pricing" });
+        navigate({ to: REDIRECT_PATHS.PRICING });
       }
     }
   }, [search, user, navigate, t, currentSubscription]);
@@ -200,7 +305,13 @@ export function CheckoutInteractive() {
     <>
       <div className="mb-8">
         <Button variant="ghost" asChild className="mb-6">
-          <Link to={checkoutType === "subscription" ? "/pricing" : "/"}>
+          <Link
+            to={
+              checkoutType === "subscription"
+                ? REDIRECT_PATHS.PRICING
+                : REDIRECT_PATHS.HOME
+            }
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             {checkoutType === "subscription"
               ? t("payment_cancel_back_to_pricing")

@@ -23,8 +23,11 @@ import { Eye, EyeOff, ArrowLeft, LogIn, Sparkles, Loader2 } from "lucide-react";
 import { debugLog } from "@/shared/utils/debug";
 import { useTranslation } from "react-i18next";
 import { getAuthErrorMessage } from "@/shared/utils/error-handling/auth-error-handler";
+import {
+  useSmartRedirect,
+  REDIRECT_PATHS,
+} from "@/shared/utils/redirect/redirect-util";
 
-const REDIRECT_PATH = "/";
 const SIGN_UP_PATH = "/sign-up";
 
 function SignInPage() {
@@ -39,17 +42,22 @@ function SignInPage() {
 
   const { signIn, signInWithGoogle, user, authLoading } = useApp();
   const navigate = useNavigate();
+  const { smartRedirect } = useSmartRedirect();
 
   // Redirect authenticated users away from sign-in page
   useEffect(() => {
     if (!authLoading && user) {
-      // User is already authenticated, redirect them
+      // User is already authenticated, use smart redirect
       const destination = redirectUrl
         ? decodeURIComponent(redirectUrl)
-        : REDIRECT_PATH;
-      navigate({ to: destination });
+        : undefined;
+
+      smartRedirect({
+        intendedDestination: destination,
+        isNewUser: false, // This is a returning user
+      });
     }
-  }, [user, authLoading, redirectUrl, navigate]);
+  }, [user, authLoading, redirectUrl, navigate, smartRedirect]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,7 +66,15 @@ function SignInPage() {
 
     try {
       await signIn(email, password);
-      navigate({ to: redirectUrl || REDIRECT_PATH });
+      // Use smart redirect after successful sign-in
+      const destination = redirectUrl
+        ? decodeURIComponent(redirectUrl)
+        : undefined;
+
+      smartRedirect({
+        intendedDestination: destination,
+        isNewUser: false,
+      });
     } catch (error: unknown) {
       const errorMessage = getAuthErrorMessage(error, t);
       debugLog.error(
@@ -81,7 +97,15 @@ function SignInPage() {
 
     try {
       await signInWithGoogle();
-      navigate({ to: redirectUrl || REDIRECT_PATH });
+      // Use smart redirect after successful Google sign-in
+      const destination = redirectUrl
+        ? decodeURIComponent(redirectUrl)
+        : undefined;
+
+      smartRedirect({
+        intendedDestination: destination,
+        isNewUser: false,
+      });
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error

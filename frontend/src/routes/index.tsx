@@ -14,11 +14,27 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-const REDIRECT_PATH = "/pricing";
+import {
+  useSmartRedirect,
+  REDIRECT_PATHS,
+} from "@/shared/utils/redirect/redirect-util";
 
 function HomePage() {
   const { t } = useTranslation();
+  const { smartRedirect, redirectToAuth, userContext } = useSmartRedirect();
+
+  const handleGetStarted = () => {
+    // For new users or unauthenticated users, redirect to sign-up with pricing as intended destination
+    if (userContext === "new_user" || userContext === "authenticated_user") {
+      redirectToAuth({
+        isSignUp: true,
+        returnUrl: window.location.origin + REDIRECT_PATHS.PRICING,
+      });
+    } else {
+      // For authenticated users, redirect to pricing
+      smartRedirect({ intendedDestination: REDIRECT_PATHS.PRICING });
+    }
+  };
 
   return (
     <PageLayout variant="public">
@@ -43,14 +59,12 @@ function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button
-                asChild
                 size="lg"
                 className="text-lg px-8 h-12 shadow-lg hover:shadow-xl transition-all saas-button"
+                onClick={handleGetStarted}
               >
-                <Link to="/sign-up" search={{ redirect_url: REDIRECT_PATH }}>
-                  {t("home_hero_cta_start_trial")}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+                {t("home_hero_cta_start_trial")}
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 asChild
@@ -58,7 +72,9 @@ function HomePage() {
                 size="lg"
                 className="text-lg px-8 h-12 border-2 saas-button"
               >
-                <Link to="/pricing">{t("home_hero_cta_view_pricing")}</Link>
+                <Link to={REDIRECT_PATHS.PRICING}>
+                  {t("home_hero_cta_view_pricing")}
+                </Link>
               </Button>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
@@ -214,7 +230,7 @@ function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="text-lg px-8 h-12 shadow-lg">
-                <Link to="/pricing">
+                <Link to={REDIRECT_PATHS.PRICING}>
                   {t("common_view_pricing_plans")}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>

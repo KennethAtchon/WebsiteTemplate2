@@ -19,15 +19,16 @@ import {
 import { Link, useNavigate } from "@tanstack/react-router";
 import { User, LogOut } from "lucide-react";
 import { debugLog } from "@/shared/utils/debug";
+import { REDIRECT_PATHS } from "@/shared/utils/redirect/redirect-util";
 
 // Constants
 const AVATAR_SIZE = 8;
 const DROPDOWN_WIDTH = 56;
 const DEFAULT_USER_FALLBACK = "U";
-const HOME_ROUTE = "/";
-const SIGN_IN_ROUTE = "/sign-in";
-const SIGN_UP_ROUTE = "/sign-up";
-const ACCOUNT_ROUTE = "/account";
+const HOME_ROUTE = REDIRECT_PATHS.HOME;
+const SIGN_IN_ROUTE = REDIRECT_PATHS.SIGN_IN;
+const SIGN_UP_ROUTE = REDIRECT_PATHS.SIGN_UP;
+const ACCOUNT_ROUTE = REDIRECT_PATHS.ACCOUNT;
 
 /**
  * User button component with authentication state display and dropdown menu.

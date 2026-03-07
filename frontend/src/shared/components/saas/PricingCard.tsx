@@ -22,6 +22,7 @@ import {
   SUBSCRIPTION_TRIAL_DAYS,
 } from "@/shared/constants/subscription.constants";
 import { cn } from "@/shared/utils/helpers/utils";
+import { debugLog } from "@/shared/utils/debug";
 import { useSubscription } from "@/features/subscriptions/hooks/use-subscription";
 import { usePortalLink } from "@/shared/hooks/use-portal-link";
 import { useApp } from "@/shared/contexts/app-context";
@@ -29,6 +30,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryFetcher } from "@/shared/hooks/use-query-fetcher";
 import { queryKeys } from "@/shared/lib/query-keys";
 import { useTranslation } from "react-i18next";
+import { useSmartRedirect } from "@/shared/utils/redirect/redirect-util";
 
 interface PricingCardProps {
   tier: SubscriptionTierConfig;
@@ -45,40 +47,153 @@ export function PricingCard({
   const { role } = useSubscription();
   const { portalUrl, isLoading: portalLoading } = usePortalLink();
   const { user } = useApp();
-  const hasSubscription = !!role;
-  const fetcher = useQueryFetcher<{
+  const { redirectToCheckout, redirectToAuth } = useSmartRedirect();
+  const subscriptionFetcher = useQueryFetcher<{
+    subscription: {
+      id: string;
+      tier: string;
+      billingCycle: "monthly" | "annual" | null;
+      status: string;
+      currentPeriodStart: string | null;
+      currentPeriodEnd: string | null;
+      isInTrial: boolean;
+      trialEnd: string | null;
+    } | null;
+    tier: string | null;
+    billingCycle: "monthly" | "annual" | null;
+    isInTrial: boolean;
+  }>();
+  const trialFetcher = useQueryFetcher<{
     isEligible: boolean;
     hasUsedFreeTrial: boolean;
     isInTrial: boolean;
   }>();
 
+  // Get accurate subscription data from API
+  const { data: currentSubscription } = useQuery({
+    queryKey: queryKeys.api.currentSubscription(),
+    queryFn: () => subscriptionFetcher("/api/subscriptions/current"),
+    enabled: !!user,
+  });
+
+  // Use API data to determine if user has active subscription
+  const hasActiveSubscription =
+    currentSubscription?.subscription &&
+    (currentSubscription.subscription.status === "active" ||
+      currentSubscription.subscription.status === "trialing");
+
   const { data: trialEligibilityData } = useQuery({
     queryKey: queryKeys.api.trialEligibility(),
-    queryFn: () => fetcher("/api/subscriptions/trial-eligibility"),
-    enabled: !!user && !hasSubscription,
+    queryFn: () => trialFetcher("/api/subscriptions/trial-eligibility"),
+    enabled: !!user && !hasActiveSubscription,
   });
 
   const trialEligible = trialEligibilityData?.isEligible ?? false;
 
   const handleButtonClick = () => {
-    if (hasSubscription && portalUrl) {
-      // User has subscription - redirect to portal
-      window.location.href = portalUrl;
-    } else if (!hasSubscription) {
-      // User doesn't have subscription - go to checkout for new subscription
-      window.location.href = `/checkout?tier=${tierKey}&billing=${tier.billingCycle}`;
+    debugLog.info("Pricing card button clicked", {
+      service: "pricing-card",
+      operation: "handleButtonClick",
+      hasActiveSubscription,
+      isAuthenticated: !!user,
+      portalUrlAvailable: !!portalUrl,
+      currentTier: currentSubscription?.tier,
+      requestedTier: tierKey,
+      billingCycle: tier.billingCycle,
+    });
+
+    if (hasActiveSubscription && portalUrl) {
+      // Check if this is an upgrade
+      const currentTier = currentSubscription?.tier;
+      const tierHierarchy: Record<string, number> = {
+        basic: 1,
+        pro: 2,
+        enterprise: 3,
+      };
+      const currentLevel = tierHierarchy[currentTier || "basic"] || 0;
+      const requestedLevel = tierHierarchy[tierKey || "basic"] || 0;
+
+      debugLog.info("Checking if upgrade or same/lower tier", {
+        service: "pricing-card",
+        operation: "tierComparison",
+        currentLevel,
+        requestedLevel,
+        isUpgrade: requestedLevel > currentLevel,
+      });
+
+      if (requestedLevel <= currentLevel) {
+        debugLog.info(
+          "User purchasing same/lower tier, redirecting to portal",
+          {
+            service: "pricing-card",
+            operation: "redirectToPortal",
+          }
+        );
+        // User has subscription and wants same/lower tier - redirect to portal
+        window.location.href = portalUrl;
+      } else {
+        debugLog.info("User upgrading subscription, redirecting to checkout", {
+          service: "pricing-card",
+          operation: "redirectToCheckout",
+        });
+        // User has subscription but wants to upgrade - go to checkout
+        if (user) {
+          redirectToCheckout({
+            tier: tierKey,
+            billingCycle: tier.billingCycle,
+          });
+        } else {
+          const checkoutUrl = `${window.location.origin}/checkout?tier=${tierKey}&billing=${tier.billingCycle}`;
+          redirectToAuth({
+            isSignUp: true,
+            returnUrl: checkoutUrl,
+          });
+        }
+      }
+    } else if (!hasActiveSubscription) {
+      debugLog.info("User without subscription, proceeding to checkout", {
+        service: "pricing-card",
+        operation: "newUserCheckout",
+        isAuthenticated: !!user,
+      });
+      // User doesn't have subscription - check if authenticated
+      if (user) {
+        // Authenticated user - go to checkout
+        redirectToCheckout({
+          tier: tierKey,
+          billingCycle: tier.billingCycle,
+        });
+      } else {
+        // Unauthenticated user - go to sign-up first
+        const checkoutUrl = `${window.location.origin}/checkout?tier=${tierKey}&billing=${tier.billingCycle}`;
+        redirectToAuth({
+          isSignUp: true,
+          returnUrl: checkoutUrl,
+        });
+      }
+    } else {
+      debugLog.warn("Unexpected state - has subscription but no portal URL", {
+        service: "pricing-card",
+        operation: "unexpectedState",
+        hasActiveSubscription,
+        portalUrlAvailable: !!portalUrl,
+      });
     }
   };
 
   const showTrial =
-    trialEligible === true && SUBSCRIPTION_TRIAL_DAYS > 0 && !hasSubscription;
+    trialEligible === true &&
+    SUBSCRIPTION_TRIAL_DAYS > 0 &&
+    !hasActiveSubscription;
 
-  const buttonText = hasSubscription
+  const buttonText = hasActiveSubscription
     ? t("account_subscription_manage_subscription")
     : showTrial
       ? t("home_hero_cta_start_trial")
       : t("common_get_started");
-  const isButtonDisabled = hasSubscription && (!portalUrl || portalLoading);
+  const isButtonDisabled = Boolean(
+    hasActiveSubscription && (!portalUrl || portalLoading)
+  );
 
   return (
     <Card
@@ -129,7 +244,7 @@ export function PricingCard({
                 {t("common_no_credit_card_required")}
               </p>
             </div>
-          ) : !hasSubscription ? (
+          ) : !hasActiveSubscription ? (
             <p className="text-sm text-muted-foreground pt-1">
               {t("common_no_credit_card_required")}
             </p>
@@ -221,7 +336,7 @@ export function PricingCard({
           className={cn(
             "w-full h-12 text-base font-semibold transition-all hover:scale-105",
             isPopular &&
-              !hasSubscription &&
+              !hasActiveSubscription &&
               "bg-gradient-to-r from-primary to-purple-600 hover:shadow-lg"
           )}
           variant="default"
@@ -229,7 +344,7 @@ export function PricingCard({
           disabled={isButtonDisabled}
         >
           <span className="flex items-center justify-center gap-2">
-            {portalLoading && hasSubscription
+            {portalLoading && hasActiveSubscription
               ? t("common_loading_subscriptions")
               : buttonText}
             {!portalLoading && <ArrowRight className="h-4 w-4" />}

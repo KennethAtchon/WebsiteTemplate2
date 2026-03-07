@@ -21,6 +21,7 @@ import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { SUBSCRIPTION_TIERS } from "@/shared/constants/subscription.constants";
 import { useTranslation } from "react-i18next";
+import { REDIRECT_PATHS } from "@/shared/utils/redirect/redirect-util";
 
 function PricingPage() {
   const { t } = useTranslation();
@@ -124,7 +125,7 @@ function PricingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="text-lg px-8 h-12 shadow-lg">
                 <Link
-                  to="/checkout"
+                  to={REDIRECT_PATHS.CHECKOUT}
                   search={{ tier: SUBSCRIPTION_TIERS.PRO, billing: "monthly" }}
                 >
                   {t("home_hero_cta_start_trial")}

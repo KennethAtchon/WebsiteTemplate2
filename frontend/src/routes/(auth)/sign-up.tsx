@@ -24,8 +24,11 @@ import {
 import { debugLog } from "@/shared/utils/debug";
 import { useTranslation } from "react-i18next";
 import { getAuthErrorMessage } from "@/shared/utils/error-handling/auth-error-handler";
+import {
+  useSmartRedirect,
+  REDIRECT_PATHS,
+} from "@/shared/utils/redirect/redirect-util";
 
-const REDIRECT_PATH = "/";
 const SIGN_IN_PATH = "/sign-in";
 const MIN_PASSWORD_LENGTH = 6;
 
@@ -43,6 +46,7 @@ function SignUpPage() {
 
   const { signUp, signInWithGoogle, user, authLoading } = useApp();
   const navigate = useNavigate();
+  const { smartRedirect } = useSmartRedirect();
   const search = useSearch({ from: "/(auth)/sign-up" });
   const redirectUrl = (search as Record<string, string | undefined>)
     .redirect_url;
@@ -64,12 +68,17 @@ function SignUpPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
+      // Use smart redirect to determine the best destination for new users
       const destination = redirectUrl
         ? decodeURIComponent(redirectUrl)
-        : REDIRECT_PATH;
-      navigate({ to: destination });
+        : undefined;
+
+      smartRedirect({
+        intendedDestination: destination,
+        isNewUser: true, // This is a new user who just signed up
+      });
     }
-  }, [user, authLoading, redirectUrl, navigate]);
+  }, [user, authLoading, redirectUrl, navigate, smartRedirect]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -85,7 +94,15 @@ function SignUpPage() {
 
     try {
       await signUp(email, password, name);
-      navigate({ to: redirectUrl || REDIRECT_PATH });
+      // Use smart redirect after successful sign-up
+      const destination = redirectUrl
+        ? decodeURIComponent(redirectUrl)
+        : undefined;
+
+      smartRedirect({
+        intendedDestination: destination,
+        isNewUser: true,
+      });
     } catch (submitError: unknown) {
       const errorMessage = getAuthErrorMessage(submitError, t);
       debugLog.error(
@@ -108,7 +125,15 @@ function SignUpPage() {
 
     try {
       await signInWithGoogle();
-      navigate({ to: redirectUrl || REDIRECT_PATH });
+      // Use smart redirect after successful Google sign-up
+      const destination = redirectUrl
+        ? decodeURIComponent(redirectUrl)
+        : undefined;
+
+      smartRedirect({
+        intendedDestination: destination,
+        isNewUser: true,
+      });
     } catch (submitError: unknown) {
       const errorMessage =
         submitError instanceof Error

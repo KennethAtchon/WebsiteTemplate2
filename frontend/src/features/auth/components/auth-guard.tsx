@@ -7,6 +7,10 @@ import { useApp } from "@/shared/contexts/app-context";
 import { useAuthenticatedFetch } from "@/features/auth/hooks/use-authenticated-fetch";
 import { debugLog } from "@/shared/utils/debug";
 import { Loader2 } from "lucide-react";
+import {
+  isAuthRoute,
+  getUnauthenticatedRedirect,
+} from "@/shared/utils/redirect/redirect-util";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -29,14 +33,6 @@ const INITIAL_VERIFICATION_STATE: VerificationState = {
 };
 
 const SIGN_IN_ROUTE = "/sign-in";
-
-/**
- * Determines if the current route is an auth page (sign-in, sign-up)
- * These routes should not be protected
- */
-function isAuthRoute(pathname: string): boolean {
-  return pathname.includes("/sign-in") || pathname.includes("/sign-up");
-}
 
 /**
  * Determines if the current route is a public route
@@ -99,8 +95,13 @@ export function AuthGuard({
             service: "auth-guard",
             pathname,
           });
-          const returnUrl = encodeURIComponent(window.location.href);
-          navigate({ to: `${SIGN_IN_ROUTE}?redirect_url=${returnUrl}` });
+
+          // Use the improved redirect utility with loop prevention
+          const redirectConfig = getUnauthenticatedRedirect(pathname, false);
+          navigate({
+            to: redirectConfig.path,
+            search: redirectConfig.search,
+          });
           return;
         }
 
@@ -123,7 +124,13 @@ export function AuthGuard({
               pathname,
             }
           );
-          navigate({ to: SIGN_IN_ROUTE });
+
+          // Use the improved redirect utility with loop prevention
+          const redirectConfig = getUnauthenticatedRedirect(pathname, false);
+          navigate({
+            to: redirectConfig.path,
+            search: redirectConfig.search,
+          });
           return;
         }
 

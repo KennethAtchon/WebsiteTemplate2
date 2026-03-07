@@ -36,15 +36,27 @@ export function useSubscription(): SubscriptionAccess {
   useEffect(() => {
     const checkSubscription = async () => {
       try {
+        debugLog.info("Checking subscription status", {
+          service: "subscription-hook",
+          operation: "checkSubscription",
+        });
         const auth = getAuth();
         const user = auth.currentUser;
 
         if (!user) {
+          debugLog.info("No user found, setting role to null", {
+            service: "subscription-hook",
+            operation: "noUser",
+          });
           setRole(null);
           setIsLoading(false);
           return;
         }
 
+        debugLog.info("User found, checking custom claims", {
+          service: "subscription-hook",
+          operation: "userFound",
+        });
         // Force refresh to get latest custom claims
         await user.getIdToken(true);
 
@@ -52,11 +64,25 @@ export function useSubscription(): SubscriptionAccess {
         const stripeRole = tokenResult.claims.stripeRole as string | undefined;
         const newRole = (stripeRole as SubscriptionRole) || null;
 
+        debugLog.info("Subscription role determined", {
+          service: "subscription-hook",
+          operation: "roleDetermined",
+          stripeRole,
+          newRole,
+          previousRole: previousRoleRef.current,
+        });
+
         // If role changed, invalidate subscription-related caches
         if (
           previousRoleRef.current !== newRole &&
           previousRoleRef.current !== null
         ) {
+          debugLog.info("Role changed, invalidating caches", {
+            service: "subscription-hook",
+            operation: "invalidateCaches",
+            oldRole: previousRoleRef.current,
+            newRole,
+          });
           queryClient.invalidateQueries({
             predicate: (query) => {
               const key = query.queryKey;
@@ -74,6 +100,11 @@ export function useSubscription(): SubscriptionAccess {
         previousRoleRef.current = newRole;
         setRole(newRole);
         setIsLoading(false);
+        debugLog.info("Final role set", {
+          service: "subscription-hook",
+          operation: "roleSet",
+          finalRole: newRole,
+        });
       } catch (err) {
         debugLog.error(
           "Error checking subscription",
@@ -94,6 +125,10 @@ export function useSubscription(): SubscriptionAccess {
     // Listen for auth state changes
     const auth = getAuth();
     const unsubscribe = auth.onAuthStateChanged(() => {
+      debugLog.info("Auth state changed, rechecking subscription", {
+        service: "subscription-hook",
+        operation: "authStateChanged",
+      });
       checkSubscription();
     });
 
