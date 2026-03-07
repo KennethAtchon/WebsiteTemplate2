@@ -37,3 +37,8 @@ bun.lockb
 
 # TanStack Router
 src/routeTree.gen.ts
+
+# Prisma generated files
+src/infrastructure/database/lib/generated/prisma/
+prisma/migrations/
+

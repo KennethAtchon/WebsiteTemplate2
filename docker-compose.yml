@@ -62,7 +62,7 @@ services:
     networks:
       - website-template-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/live"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -89,10 +89,42 @@ services:
     networks:
       - website-template-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+  # E2E Testing Service
+  e2e-tests:
+    build:
+      context: ./e2e
+      dockerfile: Dockerfile.e2e
+      target: e2e
+    container_name: website-template-e2e
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/website_template
+      - VITE_API_URL=http://backend:3001
+      - VITE_APP_URL=http://frontend:3000
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./frontend/test-results:/app/test-results
+      - ./frontend/playwright-report:/app/playwright-report
+      - ./backend:/app/backend:ro
+    networks:
+      - website-template-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    profiles:
+      - e2e
 
   # Nginx Reverse Proxy (Production)
   nginx:

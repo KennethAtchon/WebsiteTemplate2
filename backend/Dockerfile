@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Copy package files
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Development stage
 FROM base AS development
@@ -56,7 +56,7 @@ COPY --from=deps /app/package.json ./package.json
 COPY --from=deps /app/bun.lock ./bun.lock
 
 # Install production dependencies
-RUN bun install --frozen-lockfile --production
+RUN bun install --production
 
 # Copy built application
 COPY --from=builder /app/dist ./dist
