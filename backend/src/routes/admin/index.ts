@@ -894,7 +894,7 @@ admin.get(
       // Return actual Drizzle schema structure
       const getTableName = (table: any) => {
         const firstColumn = Object.values(table)[0] as any;
-        return firstColumn?.tableName || 'unknown';
+        return firstColumn?.tableName || "unknown";
       };
 
       const schema = {
