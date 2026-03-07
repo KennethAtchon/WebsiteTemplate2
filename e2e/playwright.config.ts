@@ -100,15 +100,6 @@ export default defineConfig({
       : []),
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: "bun dev",
-    url: E2E_BASE_URL,
-    // Always reuse an already-running server (Docker or local dev).
-    // In CI without a running server, this falls back to starting bun dev.
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
 
   /* Global setup and teardown */
   globalSetup: "./__tests__/helpers/global-setup.ts",

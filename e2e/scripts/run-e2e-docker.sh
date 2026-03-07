@@ -42,9 +42,10 @@ fi
 print_status "Building and starting required services..."
 $DOCKER_CMD up -d --wait postgres redis backend frontend
 
-# Build the e2e image separately so frontend/backend containers aren't recreated
+# Build the e2e image separately so frontend/backend containers aren't recreated.
+# --no-cache ensures all changed test files and config are picked up.
 print_status "Building E2E test image..."
-$DOCKER_CMD --profile e2e build e2e-tests
+$DOCKER_CMD --profile e2e build --no-cache e2e-tests
 
 # Run the E2E tests
 print_status "Running E2E tests..."

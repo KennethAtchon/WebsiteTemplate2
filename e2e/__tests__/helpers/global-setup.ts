@@ -10,13 +10,16 @@ async function globalSetup(config: FullConfig) {
   const context = await browser.newContext();
   const page = await context.newPage();
   
+  const frontendUrl = process.env.E2E_BASE_URL || "http://localhost:3000";
+  const backendUrl = process.env.VITE_API_URL || "http://localhost:3001";
+
   try {
     // Verify frontend is accessible
-    await page.goto(config.webServer?.url || "http://localhost:3000");
+    await page.goto(frontendUrl);
     console.log("✅ Frontend is accessible");
-    
+
     // Verify backend is accessible
-    const backendResponse = await page.request.get(`${process.env.VITE_API_URL || "http://localhost:3001"}/api/live`);
+    const backendResponse = await page.request.get(`${backendUrl}/api/live`);
     if (backendResponse.ok()) {
       console.log("✅ Backend is accessible");
     } else {

@@ -39,21 +39,26 @@ This is the master reference for understanding where everything lives in the tem
 
 ```bash
 git clone <this-repo> your-project
-cd your-project/project
-cp .env.example .env        # fill in your values (see Step 3 below)
-bun install
-bun run db:generate
-bun run db:migrate
-bun run dev
+cd your-project
+
+# Frontend
+cd frontend && cp .env.example .env && bun install && cd ..
+
+# Backend
+cd backend && cp .env.example .env && bun db:generate && bun db:migrate && cd ..
+
+# Start both servers
+cd frontend && bun dev   # http://localhost:3000
+cd backend && bun dev    # http://localhost:3001
 ```
 
 Then open three files:
 
 | File | What to do |
 |------|-----------|
-| `project/shared/constants/app.constants.ts` | Set `APP_NAME`, `APP_TAGLINE`, `SUPPORT_EMAIL`, `SUPPORT_PHONE`, and optionally `CORE_FEATURE_SLUG` |
-| `project/translations/en.json` | Replace "YourApp", "CalcPro", "calcpro.com" with your product name and copy |
-| `project/features/calculator/` | Keep, edit, or replace with your core feature |
+| `frontend/src/shared/constants/app.constants.ts` | Set `APP_NAME`, `APP_TAGLINE`, `SUPPORT_EMAIL`, `SUPPORT_PHONE`, and optionally `CORE_FEATURE_SLUG` |
+| `frontend/src/translations/en.json` | Replace "YourApp", "CalcPro", "calcpro.com" with your product name and copy |
+| `frontend/src/features/calculator/` | Keep, edit, or replace with your core feature |
 
 That's it for a working branded product. Everything else — auth, subscriptions, payments, admin, public pages — is already wired up.
 
@@ -85,89 +90,64 @@ Configure these via environment variables and Stripe/Firebase setup. You don't n
 ## 3. Project layout
 
 ```
-WebsiteTemplate/                     ← repo root
+WebsiteTemplate2/                    ← repo root
 ├── README.md                        ← getting started (clone → env → run)
-├── CONTRIBUTING.md                  ← developer setup, code standards, PR process
 ├── CLAUDE.md                        ← AI coding rules (patterns to follow)
-├── CHANGELOG.md                     ← version history
+├── docker-compose.yml
 │
 ├── docs/                            ← all documentation
+│   ├── README.md                    ← documentation hub (start here)
 │   ├── TEMPLATE_GUIDE.md            ← THIS FILE — master reference
-│   ├── where-to-start-coding.md     ← detailed guide: identity, core feature, adding types
+│   ├── where-to-start-coding.md     ← points to exact files to edit
 │   ├── template-roadmap.md          ← plan for making the template topic-agnostic
-│   │
-│   ├── AI_Orchestrator/             ← architecture docs hub (start here for deep dives)
-│   │   ├── index.md                 ← documentation hub (links to everything)
+│   ├── architecture/                ← system design docs
 │   │   ├── overview.md              ← full tech stack + system overview
-│   │   ├── architecture-guide.md    ← how docs are organized
-│   │   ├── STRUCTURE.md             ← folder hierarchy explanation
-│   │   ├── roles/                   ← AI role definitions (code org, security, UI, swap expert)
-│   │   ├── consider/                ← architecture proposals and migration guides
-│   │   ├── architecture/
-│   │   │   ├── core/                ← reusable patterns (auth, API, DB, security, etc.)
-│   │   │   └── domain/              ← default implementation docs (calculator, subscriptions, etc.)
-│   │   ├── issues/index.md          ← known issues
-│   │   ├── plantofix/index.md       ← fix backlog
-│   │   └── troubleshooting/         ← step-by-step fixes for common problems
-│   │
+│   │   ├── core/                    ← reusable patterns (auth, API, DB, security, etc.)
+│   │   └── domain/                  ← default implementation docs (calculator, subscriptions, etc.)
 │   ├── adr/                         ← Architecture Decision Records
 │   ├── runbooks/                    ← operational runbooks (deploy, rollback, incidents, DB, security)
 │   ├── checklists/                  ← pre-launch checklists (security, perf, compliance, testing)
-│   └── scripts/                     ← Docker helper scripts
+│   ├── troubleshooting/             ← step-by-step fixes for common problems
+│   └── guides/                      ← AI role definitions and architecture proposals
 │
-└── project/                         ← Next.js application source
-    ├── app/                         ← Next.js App Router (pages + API routes)
-    │   ├── (public)/                ← public marketing pages
-    │   ├── (customer)/              ← authenticated user pages
-    │   │   ├── (auth)/              ← sign-in, sign-up
-    │   │   └── (main)/              ← calculator, account, checkout, payment
-    │   ├── admin/                   ← admin pages (protected by admin role)
-    │   ├── api/                     ← all API route handlers
-    │   ├── layout.tsx               ← root layout
-    │   ├── page.tsx                 ← redirects to landing
-    │   ├── sitemap.ts / robots.ts / manifest.ts / apple-icon.tsx
-    │   └── not-found.tsx
-    │
-    ├── features/                    ← feature modules (domain-driven)
-    │   ├── account/                 ← usage dashboard, subscription management, profile editor
-    │   ├── admin/                   ← admin dashboard, customer/order/subscription views
-    │   ├── auth/                    ← auth guard, user button, authenticated-fetch hook, session
-    │   ├── calculator/              ← DEFAULT core feature (swap this for your product)
-    │   ├── contact/                 ← contact form and page
-    │   ├── customers/               ← customer types
-    │   ├── faq/                     ← FAQ accordion, categories, search
-    │   ├── orders/                  ← order types
-    │   ├── payments/                ← checkout, success page, Stripe helpers
-    │   └── subscriptions/           ← feature gating, upgrade prompts, tier management
-    │
-    ├── shared/                      ← cross-cutting concerns (reuse everywhere)
-    │   ├── components/              ← shared UI: layout, marketing, SaaS, UI primitives
-    │   ├── constants/               ← app.constants.ts (identity), subscription.constants.ts
-    │   ├── contexts/                ← React context providers
-    │   ├── hooks/                   ← shared React hooks
-    │   ├── lib/                     ← React Query client and query keys
-    │   ├── middleware/              ← API route protection helpers
-    │   ├── providers/               ← React providers wrapper
-    │   ├── services/                ← external integrations (API, CSRF, DB, email, Firebase, rate limit, SEO, session, storage, timezone)
-    │   ├── types/                   ← shared TypeScript types
-    │   └── utils/                   ← api, config (envUtil), error handling, permissions, security, validation
-    │
-    ├── infrastructure/
-    │   └── database/prisma/         ← Prisma schema and migrations
-    │
-    ├── translations/
-    │   └── en.json                  ← ALL user-facing strings (next-intl)
-    │
-    ├── __tests__/                   ← unit, integration, and e2e tests
-    ├── scripts/                     ← load testing, GDPR purge
-    ├── public/                      ← static assets and email templates
-    │
-    ├── middleware.ts                ← Next.js middleware (auth, CORS, CSRF)
-    ├── next.config.ts
-    ├── tailwind.config.ts
-    ├── tsconfig.json
-    ├── docker-compose.yml / Dockerfile / railway.toml
-    └── .env.example / example.env  ← environment variable template
+├── frontend/                        ← React SPA (Vite + TanStack Router)
+│   └── src/
+│       ├── routes/                  ← file-based pages
+│       │   ├── (public)/            ← public marketing pages
+│       │   ├── (auth)/              ← sign-in, sign-up
+│       │   ├── (customer)/          ← authenticated user pages
+│       │   └── admin/               ← admin dashboard
+│       ├── features/                ← feature modules (domain-driven)
+│       │   ├── account/
+│       │   ├── admin/
+│       │   ├── auth/
+│       │   ├── calculator/          ← DEFAULT core feature (swap this for your product)
+│       │   ├── contact/
+│       │   ├── faq/
+│       │   ├── payments/
+│       │   └── subscriptions/
+│       └── shared/                  ← cross-cutting concerns
+│           ├── components/          ← layout, marketing, saas, UI primitives
+│           ├── constants/           ← app.constants.ts (identity), subscription.constants.ts
+│           ├── contexts/            ← React context providers
+│           ├── hooks/               ← shared React hooks
+│           ├── lib/                 ← TanStack Query client and query keys
+│           ├── services/            ← API, Firebase, SEO, storage, etc.
+│           ├── translations/
+│           │   └── en.json          ← ALL user-facing strings (react-i18next)
+│           └── utils/               ← envUtil, error handling, permissions, validation
+│
+├── backend/                         ← Hono API server (Bun runtime)
+│   └── src/
+│       ├── index.ts                 ← entry point, mounts all routes
+│       ├── routes/                  ← API handlers (mounted at /api/<resource>)
+│       ├── middleware/              ← requireAuth, requireAdmin
+│       ├── services/                ← business logic
+│       └── infrastructure/
+│           └── database/
+│               └── prisma/          ← schema and migrations
+│
+└── e2e/                             ← Playwright E2E tests
 ```
 
 ---
@@ -176,7 +156,7 @@ WebsiteTemplate/                     ← repo root
 
 ### Step 1 — Identity (one file)
 
-**File:** `project/shared/constants/app.constants.ts`
+**File:** `frontend/src/shared/constants/app.constants.ts`
 
 This is the single source of truth for your product identity. Change it first.
 
@@ -197,7 +177,7 @@ export const CORE_FEATURE_SLUG = "calculator";   // URL slug: /calculator and /a
 
 ### Step 2 — Copy and marketing text
 
-**File:** `project/translations/en.json`
+**File:** `frontend/src/translations/en.json`
 
 All user-facing strings live here. Search for:
 - `"CalcPro"` / `"YourApp"` / `"calcpro.com"` — replace with your product name and domain
@@ -207,7 +187,7 @@ All user-facing strings live here. Search for:
 - FAQ questions and answers
 - Footer links and social URLs
 
-The template uses `next-intl`. Client components use `useTranslations()`; server components use `getTranslations()`. Never hardcode user-facing strings — always add a key here.
+The template uses `react-i18next`. Use `useTranslation()` in all components. Never hardcode user-facing strings — always add a key here.
 
 ---
 
@@ -236,7 +216,7 @@ The template uses `next-intl`. Client components use `useTranslations()`; server
 
 ### Step 4 — Subscription tiers and limits
 
-**File:** `project/shared/constants/subscription.constants.ts`
+**File:** `frontend/src/shared/constants/subscription.constants.ts`
 
 Defines your three tiers (Basic, Pro, Enterprise): names, prices, feature flags, and usage limits. Update:
 - Tier names and descriptions
@@ -250,7 +230,7 @@ Stripe product and price IDs must match what you create in the Stripe Dashboard.
 
 ### Step 5 — Your core feature
 
-The default core feature is a **financial calculator** (`project/features/calculator/`). You have three options:
+The default core feature is a **financial calculator** (`frontend/src/features/calculator/`). You have three options:
 
 #### Option A — Keep calculators, add/edit types
 
@@ -504,23 +484,19 @@ Query cache keys go in `shared/lib/query-keys.ts`. Always add a new key there ra
 | Document | What it covers |
 |----------|---------------|
 | [README.md](../README.md) | Clone → env → run → build. Entry point for new users. |
+| [docs/README.md](README.md) | Documentation hub — links to everything |
 | [docs/TEMPLATE_GUIDE.md](TEMPLATE_GUIDE.md) | **This file.** Full map + make-it-yours steps. |
 | [docs/where-to-start-coding.md](where-to-start-coding.md) | Detailed guide: identity, core feature structure, adding/replacing types |
 | [docs/template-roadmap.md](template-roadmap.md) | Plan and checklist for making the repo fully topic-agnostic |
-| [docs/AI_Orchestrator/index.md](AI_Orchestrator/index.md) | Documentation hub — links to all architecture docs |
-| [docs/AI_Orchestrator/overview.md](AI_Orchestrator/overview.md) | Full project overview: tech stack, API routes, DB, security |
-| [docs/AI_Orchestrator/architecture-guide.md](AI_Orchestrator/architecture-guide.md) | How the architecture docs are organized |
-| [docs/AI_Orchestrator/roles/core-feature-swap-expert.md](AI_Orchestrator/roles/core-feature-swap-expert.md) | Step-by-step: swap the core feature to a different product |
-| [docs/AI_Orchestrator/roles/code-organization-expert.md](AI_Orchestrator/roles/code-organization-expert.md) | Code structure and organization patterns |
-| [docs/AI_Orchestrator/roles/security-engineer.md](AI_Orchestrator/roles/security-engineer.md) | Security best practices and implementation |
-| [docs/AI_Orchestrator/roles/UI-design-expert.md](AI_Orchestrator/roles/UI-design-expert.md) | UI/UX design patterns |
-| [docs/AI_Orchestrator/architecture/core/](AI_Orchestrator/architecture/core/) | Reusable patterns: auth, API, DB, security, error handling, etc. |
-| [docs/AI_Orchestrator/architecture/domain/](AI_Orchestrator/architecture/domain/) | Default implementation docs: calculator, subscriptions, payments, admin |
-| [docs/AI_Orchestrator/troubleshooting/](AI_Orchestrator/troubleshooting/) | Fixes for Stripe, subscription, translation issues |
-| [docs/adr/](adr/) | Architecture Decision Records (why we chose Next.js, Firebase, PostgreSQL, Stripe, etc.) |
+| [docs/architecture/overview.md](architecture/overview.md) | Full project overview: tech stack, API routes, DB, security |
+| [docs/architecture/core/](architecture/core/) | Reusable patterns: auth, API, DB, security, error handling, etc. |
+| [docs/architecture/domain/](architecture/domain/) | Default implementation docs: calculator, subscriptions, payments, admin |
+| [docs/guides/ai-roles/core-feature-swap-expert.md](guides/ai-roles/core-feature-swap-expert.md) | Step-by-step: swap the core feature to a different product |
+| [docs/guides/ai-roles/security-engineer.md](guides/ai-roles/security-engineer.md) | Security best practices and implementation |
+| [docs/troubleshooting/](troubleshooting/) | Fixes for Stripe, subscription, translation issues |
+| [docs/adr/](adr/) | Architecture Decision Records (why we chose Firebase, PostgreSQL, Stripe, Bun, etc.) |
 | [docs/runbooks/](runbooks/) | Operational runbooks: deploy, rollback, DB, incidents, monitoring |
 | [docs/checklists/](checklists/) | Pre-launch checklists: security, performance, compliance, testing |
-| [CONTRIBUTING.md](../CONTRIBUTING.md) | Prerequisites, dev setup, code style, PR process |
 | [CLAUDE.md](../CLAUDE.md) | AI coding rules: fetch patterns, i18n, env vars |
 
 ---

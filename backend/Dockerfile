@@ -18,8 +18,8 @@ COPY . .
 # Expose port
 EXPOSE 3001
 
-# Start development server with hot reload
-CMD ["bun", "run", "dev"]
+# Run migrations then start dev server
+CMD ["sh", "scripts/start-dev.sh"]
 
 # Build stage
 FROM base AS builder

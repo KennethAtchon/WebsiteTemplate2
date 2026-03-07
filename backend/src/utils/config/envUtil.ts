@@ -222,10 +222,21 @@ export const FIREBASE_PROJECT_ID_SERVER = getEnvVar(
 export function getAllowedCorsOrigins(): string[] {
   if (IS_DEVELOPMENT || APP_ENV === "development") {
     return [
+      // Local development (browser access)
       "http://localhost:3000",
       "http://localhost:3001",
       "http://127.0.0.1:3000",
       "http://127.0.0.1:3001",
+      // Docker network origins (container-to-container)
+      "http://frontend:3000",
+      "http://backend:3000",
+      "http://frontend:3001",
+      "http://backend:3001",
+      // Allow empty origin for same-origin requests and certain browser behaviors
+      "", 
+      // HTTPS variants
+      "https://localhost:3000",
+      "https://127.0.0.1:3000",
     ];
   }
   return CORS_ALLOWED_ORIGINS;

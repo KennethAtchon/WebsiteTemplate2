@@ -1,6 +1,6 @@
 # Architecture Decision Records (ADRs)
 
-This directory contains the Architecture Decision Records for YourApp.
+This directory contains the Architecture Decision Records for this project.
 
 ADRs capture significant decisions about the system's architecture — what was decided, why, and what alternatives were considered.
 

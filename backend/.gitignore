@@ -120,3 +120,6 @@ playwright/.cache/
 
 # Bun specific
 bun.lockb
+
+# Prisma generated client
+src/infrastructure/database/lib/generated/

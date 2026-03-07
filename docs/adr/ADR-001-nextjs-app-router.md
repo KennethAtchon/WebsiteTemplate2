@@ -1,7 +1,9 @@
 # ADR-001: Use Next.js App Router
 
-**Date:** Nov 2025  
-**Status:** Accepted
+**Date:** Nov 2025
+**Status:** Superseded
+
+> **Superseded in 2026** by migration to Vite + TanStack Router (frontend) and Hono + Bun (backend). Next.js was removed entirely. See [architecture/overview.md](../architecture/overview.md) for the current stack.
 
 ## Context
 

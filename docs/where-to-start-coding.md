@@ -6,7 +6,7 @@ This doc points you to the places that matter when using the template: **product
 
 ## 1. Product identity (one place)
 
-**File:** `project/shared/constants/app.constants.ts`
+**File:** `frontend/src/shared/constants/app.constants.ts`
 
 Set these first so your app name and tagline appear everywhere (UI, SEO, manifest, emails):
 
@@ -27,7 +27,7 @@ No need to search the codebase for your product name; change this file and (wher
 
 The template ships with one **default implementation**: financial calculators.
 
-**Location:** `project/features/calculator/`
+**Location:** `frontend/src/features/calculator/`
 
 | Part | Path | Purpose |
 |------|------|--------|
@@ -41,8 +41,8 @@ The template ships with one **default implementation**: financial calculators.
 
 **Routes (default slug `calculator`):**
 
-- App: `/calculator` → `project/app/(customer)/(main)/calculator/`
-- API: `/api/calculator/*` → `project/app/api/calculator/`
+- App: `/calculator` → `frontend/src/routes/(customer)/calculator/`
+- API: `/api/calculator/*` → `backend/src/routes/calculator.ts`
 
 Permissions and usage limits are wired to this feature (see `project/shared/utils/permissions/` and subscription tier config).
 
@@ -90,12 +90,12 @@ If your product is not “calculators” (e.g. document generator, image tools):
 
 ## 5. Permissions and usage limits
 
-- **Permissions:** `project/shared/utils/permissions/`  
+- **Permissions:** `frontend/src/shared/utils/permissions/`  
   - Access to feature types is driven by subscription tier.  
   - The default implementation uses “calculator” types; the same pattern applies if you add another feature (tier requirement per type, check in API and UI).
 
 - **Usage limits:** Subscription tiers define “usage per month” (e.g. calculations, documents).  
-  - Config: `project/shared/constants/subscription.constants.ts` (tier features and limits).  
+  - Config: `frontend/src/shared/constants/subscription.constants.ts` (tier features and limits).  
   - Usage is recorded in the database (usage model) and checked in the API before performing a gated action.
 
 ---
@@ -117,7 +117,7 @@ If your product is not “calculators” (e.g. document generator, image tools):
 
 All user-facing strings should go through **translations** so you can switch copy per product or locale.
 
-- **Translation file:** `project/translations/en.json`  
-  Replace or add keys for your product name, tagline, feature names, and marketing copy. The template uses `next-intl`; see existing keys for patterns.
+- **Translation file:** `frontend/src/translations/en.json`  
+  Replace or add keys for your product name, tagline, feature names, and marketing copy. The template uses `react-i18next`; use `useTranslation()` in all components.
 - **Product name in code:** Use `APP_NAME` and `APP_DESCRIPTION` from `app.constants.ts` instead of hardcoding; the rest can live in translations.
 - **Topic-agnostic keys:** For a different product (e.g. “documents” instead of “calculators”), add or replace keys such as `core_feature_title`, `core_feature_usage_label`, etc., and use them in components. The default keys are calculator-oriented; you can keep them as the default set or duplicate and adapt for another topic.

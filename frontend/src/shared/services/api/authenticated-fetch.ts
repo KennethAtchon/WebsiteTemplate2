@@ -2,6 +2,8 @@ import { auth } from "@/shared/services/firebase/config";
 import { safeFetch, SafeFetchOptions } from "./safe-fetch";
 import { debugLog } from "@/shared/utils/debug";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
 } as const;
@@ -27,7 +29,24 @@ async function getCSRFToken(): Promise<string> {
 
   const token = await user.getIdToken();
 
-  const response = await safeFetch("/api/csrf", {
+  // Log the request details before making the call
+  debugLog.info(
+    "CSRF token request started",
+    { service: "authenticated-fetch" },
+    {
+      url: `${API_BASE_URL}/api/csrf`,
+      method: "GET",
+      hasUser: !!user,
+      uid: user?.uid,
+      hasToken: !!token,
+      tokenLength: token?.length,
+      cachedToken: !!csrfTokenCache,
+      cacheExpires: csrfTokenCache?.expires,
+      isCacheValid: csrfTokenCache?.expires ? csrfTokenCache.expires > new Date() : false
+    }
+  );
+
+  const response = await safeFetch(`${API_BASE_URL}/api/csrf`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -35,11 +54,63 @@ async function getCSRFToken(): Promise<string> {
     },
   });
 
+  // Log response details
+  debugLog.info(
+    "CSRF token response received",
+    { service: "authenticated-fetch" },
+    {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
+      headers: Object.fromEntries(response.headers.entries())
+    }
+  );
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch CSRF token: ${response.status}`);
+    // Try to get more error details
+    let errorDetails = "";
+    try {
+      const errorText = await response.text();
+      errorDetails = errorText;
+      debugLog.error(
+        "CSRF token request failed",
+        { service: "authenticated-fetch" },
+        {
+          status: response.status,
+          statusText: response.statusText,
+          errorBody: errorText,
+          url: `${API_BASE_URL}/api/csrf`
+        }
+      );
+    } catch (parseError) {
+      debugLog.error(
+        "CSRF token request failed (could not parse error body)",
+        { service: "authenticated-fetch" },
+        {
+          status: response.status,
+          statusText: response.statusText,
+          parseError: parseError instanceof Error ? parseError.message : String(parseError),
+          url: `${API_BASE_URL}/api/csrf`
+        }
+      );
+    }
+    
+    throw new Error(`CSRF token request failed: ${response.status} ${response.statusText}${errorDetails ? ` - ${errorDetails}` : ""}`);
   }
 
   const data = await response.json();
+  
+  debugLog.info(
+    "CSRF token parsed successfully",
+    { service: "authenticated-fetch" },
+    {
+      hasToken: !!data.csrfToken,
+      tokenLength: data.csrfToken?.length,
+      expires: data.expires,
+      cacheExpires: csrfTokenCache?.expires
+    }
+  );
+  
   csrfTokenCache = {
     token: data.csrfToken,
     expires: new Date(data.expires),
@@ -71,8 +142,30 @@ export async function authenticatedFetch(
   url: string,
   requestInit: RequestInit = {}
 ): Promise<Response> {
+  // Construct full URL if relative path provided
+  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+  
   const user = auth.currentUser;
+  
+  debugLog.info(
+    "Authenticated fetch called",
+    { service: "authenticated-fetch" },
+    {
+      url: fullUrl,
+      originalUrl: url,
+      method: requestInit.method || "GET",
+      hasUser: !!user,
+      uid: user?.uid,
+      isEmailVerified: user?.emailVerified
+    }
+  );
+  
   if (!user) {
+    debugLog.error(
+      "User not authenticated for authenticated fetch",
+      { service: "authenticated-fetch" },
+      { url: fullUrl, method: requestInit.method || "GET" }
+    );
     throw new Error("User not authenticated");
   }
 
@@ -99,9 +192,17 @@ export async function authenticatedFetch(
       debugLog.error(
         "Failed to get CSRF token",
         { service: "authenticated-fetch" },
-        error
+        {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          url: fullUrl,
+          method: requestInit.method || "GET",
+          hasUser: !!auth.currentUser,
+          uid: auth.currentUser?.uid,
+          requestInit: requestInit
+        }
       );
-      throw new Error("Failed to get CSRF token");
+      throw new Error(`Failed to get CSRF token: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -129,7 +230,7 @@ export async function authenticatedFetch(
   };
 
   try {
-    const response = await safeFetch(url, safeFetchOptions);
+    const response = await safeFetch(fullUrl, safeFetchOptions);
 
     if (response.status === 403) {
       try {

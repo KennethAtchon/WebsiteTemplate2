@@ -14,6 +14,8 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    // Allow Docker service hostnames (e.g. "frontend") used by the e2e container
+    allowedHosts: ["frontend", "localhost"],
     proxy: {
       "/api": {
         target: process.env.VITE_API_URL || "http://localhost:3001",

@@ -111,9 +111,23 @@ export async function safeFetch(
 
         // Validate response
         if (!validateResponse(response)) {
-          throw new Error(
-            `Invalid response: ${response.status} ${response.statusText}`
+          const errorDetails = `Invalid response: ${response.status} ${response.statusText}`;
+          debugLog.warn(
+            "Response validation failed",
+            {
+              service: "safe-fetch",
+              operation: "response-validation",
+            },
+            {
+              requestId,
+              url: sanitizeUrl(url),
+              method: requestInit.method || "GET",
+              status: response.status,
+              statusText: response.statusText,
+              headers: Object.fromEntries(response.headers.entries())
+            }
           );
+          throw new Error(errorDetails);
         }
 
         const duration = Date.now() - startTime;
@@ -222,6 +236,18 @@ export async function safeFetch(
  * Default retry condition - retry on network errors and 5xx responses
  */
 function defaultRetryCondition(error: Error): boolean {
+  // Don't retry on authentication errors (4xx)
+  if (
+    error.message.includes("400") ||
+    error.message.includes("401") ||
+    error.message.includes("403") ||
+    error.message.includes("404") ||
+    error.message.includes("422") ||
+    error.message.includes("429")
+  ) {
+    return false;
+  }
+
   // Retry on network errors
   if (error.name === "TypeError" && error.message.includes("fetch")) {
     return true;
@@ -232,7 +258,7 @@ function defaultRetryCondition(error: Error): boolean {
     return true;
   }
 
-  // Retry on 5xx server errors (but not 4xx client errors)
+  // Retry on 5xx server errors
   if (
     error.message.includes("500") ||
     error.message.includes("502") ||
