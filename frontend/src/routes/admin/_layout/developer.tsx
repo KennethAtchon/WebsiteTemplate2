@@ -6,7 +6,7 @@ import {
   getTableConfigs,
   generateExpectedParams,
   type TableConfig,
-} from "@/shared/utils/system/prisma-introspection";
+} from "@/shared/utils/system/drizzle-introspection";
 import { debugLog } from "@/shared/utils/debug";
 import {
   Card,

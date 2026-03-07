@@ -234,7 +234,7 @@ export function isValidPhone(phone: string | null | undefined): boolean {
  */
 function parsePrice(price: unknown): number {
   if (typeof price === "object" && price !== null && "toString" in price) {
-    // Likely a Prisma Decimal
+    // Likely a Decimal object (from Drizzle/PostgreSQL)
     return parseFloat((price as { toString(): string }).toString());
   } else if (typeof price === "string") {
     return parseFloat(price);

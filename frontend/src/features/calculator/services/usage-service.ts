@@ -8,14 +8,10 @@
  *   - app/api/admin/subscriptions/route.ts   (admin view)
  */
 
-// import { prisma } from "@/shared/services/db/prisma";
 import {
   FEATURE_TIER_REQUIREMENTS,
   isFeatureFree,
 } from "@/shared/utils/permissions/core-feature-permissions";
-
-// TODO: Replace with actual Prisma client when database is integrated
-const prisma: any = null;
 import { getMonthBoundaries } from "@/shared/utils/helpers/date";
 
 /**
@@ -35,19 +31,18 @@ export function getGatedCalculatorTypes(): string[] {
  * calendar month. Free calculators are excluded from the count.
  */
 export async function getMonthlyUsageCount(userId: string): Promise<number> {
-  if (!prisma) {
-    console.warn("Prisma not available, returning 0 usage");
+  try {
+    // Use the API to get usage data instead of direct database access
+    const response = await fetch(`/api/users/${userId}/usage?period=month`);
+    if (!response.ok) {
+      console.warn("Failed to fetch usage data, returning 0");
+      return 0;
+    }
+    
+    const data = await response.json();
+    return data.usageCount || 0;
+  } catch (error) {
+    console.warn("Error fetching usage data, returning 0", error);
     return 0;
   }
-
-  const { startOfThisMonth } = getMonthBoundaries();
-  const gatedTypes = getGatedCalculatorTypes();
-
-  return prisma.featureUsage.count({
-    where: {
-      userId,
-      featureType: { notIn: gatedTypes },
-      createdAt: { gte: startOfThisMonth },
-    },
-  });
 }

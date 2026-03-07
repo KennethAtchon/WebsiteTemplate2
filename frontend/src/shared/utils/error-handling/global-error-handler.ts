@@ -70,10 +70,10 @@ function categorizeError(error: Error): ErrorCategory {
 
   // Database errors (check first - most specific)
   if (
-    message.includes("prisma") ||
     message.includes("database") ||
     (message.includes("connection") && message.includes("pool")) ||
-    stack.includes("prisma")
+    message.includes("drizzle") ||
+    stack.includes("drizzle")
   ) {
     return ErrorCategory.DATABASE;
   }

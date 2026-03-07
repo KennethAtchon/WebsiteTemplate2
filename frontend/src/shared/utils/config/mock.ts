@@ -1,36 +1,63 @@
 /**
- * Mock data and helper functions using Prisma types
+ * Mock data and helper functions using Drizzle types
  */
-// import {
-//   Order as PrismaOrder,
-//   User as PrismaUser,
-//   Prisma as _Prisma,
-// } from "@/infrastructure/database/lib/generated/prisma";
 
-// TODO: Replace with actual Prisma types when database is integrated
-export interface PrismaOrder {
+// Local type definitions matching Drizzle schema
+export interface User {
+  id: string;
+  firebaseUid?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  notes?: string;
+  timezone?: string;
+  role: string;
+  isActive: boolean;
+  isDeleted: boolean;
+  deletedAt?: Date;
+  lastLogin?: Date;
+  hasUsedFreeTrial: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Order {
   id: string;
   userId: string;
-  status: string;
-  total: number;
+  totalAmount: string;
+  status?: string;
+  stripeSessionId?: string;
+  skipPayment: boolean;
+  orderType: string;
+  isDeleted: boolean;
+  deletedAt?: Date;
+  deletedBy?: string;
   createdAt: Date;
-  updatedAt: Date;
 }
 
-export interface PrismaUser {
+export interface ContactMessage {
   id: string;
-  email: string;
   name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
   createdAt: Date;
-  updatedAt: Date;
 }
 
-export interface Prisma {
-  // Add Prisma types as needed
+export interface FeatureUsage {
+  id: string;
+  userId: string;
+  featureType: string;
+  inputData: any;
+  resultData: any;
+  usageTimeMs: number;
+  createdAt: Date;
 }
 
 // Extended types for UI components with computed fields
-export interface OrderWithDetails extends Omit<PrismaOrder, "user"> {
+export interface OrderWithDetails extends Omit<Order, "user"> {
   customer: {
     id: string;
     name: string;
@@ -40,9 +67,6 @@ export interface OrderWithDetails extends Omit<PrismaOrder, "user"> {
   };
   products?: { name: string; quantity: number; price: number }[];
 }
-
-// Re-export Prisma types for convenience
-export type { PrismaOrder as Order, PrismaUser as User };
 
 /**
  * Legacy mock data - kept for backward compatibility

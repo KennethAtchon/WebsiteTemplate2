@@ -302,19 +302,20 @@ describe("Input Validation Tests - Production Readiness", () => {
       });
     });
 
-    test("should validate that Prisma parameterized queries prevent SQL injection", () => {
-      // This test documents that Prisma uses parameterized queries
-      // We can't directly test Prisma's internal behavior, but we verify
+    test("should validate that database parameterized queries prevent SQL injection", () => {
+      // This test documents that Drizzle uses parameterized queries
+      // We can't directly test Drizzle's internal behavior, but we verify
       // that our validation schemas reject SQL injection patterns
 
       const maliciousInputs = [
-        "'; DROP TABLE users;--",
-        "1' OR '1'='1",
+        "'; DROP TABLE users; --",
+        "' OR '1'='1",
         "admin'--",
+        "'; INSERT INTO users VALUES('hacker', 'password'); --",
       ];
 
       maliciousInputs.forEach((input) => {
-        // All these should be rejected by Zod validation before reaching Prisma
+        // All these should be rejected by Zod validation before reaching Drizzle
         const result = contactFormValidationSchema.safeParse({
           name: input,
           email: "test@example.com",
@@ -323,7 +324,7 @@ describe("Input Validation Tests - Production Readiness", () => {
         expect(result.success).toBe(false);
       });
 
-      // Note: Even if validation passes, Prisma's parameterized queries
+      // Note: Even if validation passes, Drizzle's parameterized queries
       // would prevent SQL injection, but validation is the first line of defense
     });
   });

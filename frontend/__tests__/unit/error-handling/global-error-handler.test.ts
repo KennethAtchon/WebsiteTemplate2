@@ -40,7 +40,7 @@ describe("global-error-handler", () => {
     });
 
     it("categorizes database errors", () => {
-      const out = reportError(new Error("Prisma connection failed"));
+      const out = reportError(new Error("Database connection failed"));
       expect(out.category).toBe(ErrorCategory.DATABASE);
     });
 

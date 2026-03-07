@@ -1,14 +1,65 @@
 {
   "permissions": {
     "allow": [
-      "Bash(*)"
+      "Bash(*)",
+      "Filesystem(*)",
+      "Git(*)",
+      "Browser(*)",
+      "Memory(*)",
+      "SequentialThinking(*)"
     ],
     "deny": [
       "Bash(rm -rf /)",
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~)",
-      "Bash(rm -rf ~/*)"
+      "Bash(rm -rf ~/*)",
+      "Bash(sudo rm -rf /)",
+      "Bash(sudo rm -rf /*)",
+      "Bash(sudo rm -rf ~)",
+      "Bash(sudo rm -rf ~/*)",
+      "Bash(chmod -R 777 /)",
+      "Bash(chmod -R 777 /*)",
+      "Bash(chmod -R 777 ~)",
+      "Bash(chmod -R 777 ~/*)",
+      "Bash(dd if=/dev/zero of=/)",
+      "Bash(dd if=/dev/zero of=/*)",
+      "Bash(dd if=/dev/zero of=~)",
+      "Bash(dd if=/dev/zero of=~/*)"
     ],
-    "ask": []
+    "ask": [
+      "Bash(sudo *)",
+      "Bash(docker system prune -a)",
+      "Bash(kubectl delete *)",
+      "Bash(git push --force)",
+      "Bash(git reset --hard)",
+      "Bash(git clean -fd)"
+    ]
+  },
+  "settings": {
+    "autoRunWorkflows": true,
+    "enableWorkflowTurbo": true,
+    "enableMemorySystem": true,
+    "enableSequentialThinking": true,
+    "maxConcurrentTools": 10,
+    "defaultTimeout": 30000,
+    "enableParallelExecution": true
+  },
+  "workflows": {
+    "autoRun": ["test", "lint", "format"],
+    "turboEnabled": ["setup", "deploy", "migrate"],
+    "contextAware": true
+  },
+  "aiFeatures": {
+    "enableCodeGeneration": true,
+    "enableRefactoring": true,
+    "enableDocumentation": true,
+    "enableTesting": true,
+    "enableDebugging": true
+  },
+  "development": {
+    "enableHotReload": true,
+    "enableAutoSave": true,
+    "enableAutoFormatting": true,
+    "enableAutoImportOrganization": true
   }
 }

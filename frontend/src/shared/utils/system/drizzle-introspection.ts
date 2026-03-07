@@ -2,6 +2,7 @@ import debugLog from "@/shared/utils/debug/debug";
 
 export interface TableConfig {
   name: string;
+  tableName: string;
   keyFields: string[];
   apiEndpoint: string;
   fieldsInfo: Record<string, FieldInfo>;
@@ -9,14 +10,15 @@ export interface TableConfig {
 
 export interface FieldInfo {
   type: string;
-  isRequired: boolean;
-  isId: boolean;
+  nullable: boolean;
   hasDefaultValue: boolean;
+  primaryKey: boolean;
+  unique: boolean;
 }
 
 // Cache for schema data
-let schemaCache: { models: any[] } | null = null;
-let schemaPromise: Promise<{ models: any[] } | null> | null = null;
+let schemaCache: { tables: any[] } | null = null;
+let schemaPromise: Promise<{ tables: any[] } | null> | null = null;
 
 // Export a function to clear cache for testing
 export function __clearCache() {
@@ -25,7 +27,7 @@ export function __clearCache() {
 }
 
 // Fetch schema from API endpoint
-async function fetchSchema(): Promise<{ models: any[] } | null> {
+async function fetchSchema(): Promise<{ tables: any[] } | null> {
   if (schemaCache) {
     return schemaCache;
   }
@@ -49,7 +51,7 @@ async function fetchSchema(): Promise<{ models: any[] } | null> {
     } catch (error) {
       debugLog.error(
         "Error fetching schema",
-        { service: "prisma-introspection", operation: "fetchSchema" },
+        { service: "drizzle-introspection", operation: "fetchSchema" },
         error
       );
       return null;
@@ -62,28 +64,30 @@ async function fetchSchema(): Promise<{ models: any[] } | null> {
 }
 
 // Extract field information from fetched schema
-async function getPrismaFieldInfo(
-  modelName: string
+async function getDrizzleFieldInfo(
+  tableName: string
 ): Promise<{ fields: string[]; fieldsInfo: Record<string, FieldInfo> }> {
   try {
     const schema = await fetchSchema();
 
-    if (!schema || !schema.models) {
+    if (!schema || !schema.tables) {
       debugLog.warn(
-        `Schema not available for model ${modelName}`,
-        { service: "prisma-introspection", operation: "getPrismaFieldInfo" },
-        { modelName }
+        `Schema not available for table ${tableName}`,
+        { service: "drizzle-introspection", operation: "getDrizzleFieldInfo" },
+        { tableName }
       );
       return { fields: [], fieldsInfo: {} };
     }
 
-    const model = schema.models.find((m: any) => m.name === modelName);
+    const table = schema.tables.find((t: any) => 
+      t.name === tableName || t.tableName === tableName
+    );
 
-    if (!model) {
+    if (!table) {
       debugLog.warn(
-        `Model ${modelName} not found in schema`,
-        { service: "prisma-introspection", operation: "getPrismaFieldInfo" },
-        { modelName }
+        `Table ${tableName} not found in schema`,
+        { service: "drizzle-introspection", operation: "getDrizzleFieldInfo" },
+        { tableName }
       );
       return { fields: [], fieldsInfo: {} };
     }
@@ -91,30 +95,31 @@ async function getPrismaFieldInfo(
     const fields: string[] = [];
     const fieldsInfo: Record<string, FieldInfo> = {};
 
-    model.fields.forEach((field: any) => {
-      // Skip null/undefined fields and fields without required properties
+    table.columns.forEach((column: any) => {
+      // Skip null/undefined columns and columns without required properties
       if (
-        !field ||
-        typeof field.name !== "string" ||
-        typeof field.type !== "string"
+        !column ||
+        typeof column.name !== "string" ||
+        typeof column.dataType !== "string"
       ) {
         return;
       }
 
-      fields.push(field.name);
-      fieldsInfo[field.name] = {
-        type: field.type,
-        isRequired: Boolean(field.isRequired),
-        isId: Boolean(field.isId),
-        hasDefaultValue: Boolean(field.hasDefaultValue),
+      fields.push(column.name);
+      fieldsInfo[column.name] = {
+        type: column.dataType,
+        nullable: Boolean(column.nullable),
+        hasDefaultValue: Boolean(column.hasDefault),
+        primaryKey: Boolean(column.primaryKey),
+        unique: Boolean(column.unique),
       };
     });
 
     return { fields, fieldsInfo };
   } catch (error) {
     debugLog.error(
-      `Error extracting fields for ${modelName}`,
-      { service: "prisma-introspection", operation: "getPrismaFieldInfo" },
+      `Error extracting fields for ${tableName}`,
+      { service: "drizzle-introspection", operation: "getDrizzleFieldInfo" },
       error
     );
     return { fields: [], fieldsInfo: {} };
@@ -123,17 +128,18 @@ async function getPrismaFieldInfo(
 
 export async function getTableConfigs(): Promise<TableConfig[]> {
   const modelConfigs = [
-    { name: "User", apiEndpoint: "/api/users" },
-    { name: "Order", apiEndpoint: "/api/admin/orders" },
-    { name: "ContactMessage", apiEndpoint: "/api/shared/contact-messages" },
-    { name: "FeatureUsage", apiEndpoint: "/api/admin/feature-usages" },
+    { name: "User", tableName: "user", apiEndpoint: "/api/users" },
+    { name: "Order", tableName: "order", apiEndpoint: "/api/admin/orders" },
+    { name: "ContactMessage", tableName: "contact_message", apiEndpoint: "/api/shared/contact-messages" },
+    { name: "FeatureUsage", tableName: "feature_usage", apiEndpoint: "/api/admin/feature-usages" },
   ];
 
   const configs = await Promise.all(
     modelConfigs.map(async (config) => {
-      const { fields, fieldsInfo } = await getPrismaFieldInfo(config.name);
+      const { fields, fieldsInfo } = await getDrizzleFieldInfo(config.name);
       return {
         name: config.name,
+        tableName: config.tableName,
         keyFields: fields,
         apiEndpoint: config.apiEndpoint,
         fieldsInfo,
@@ -145,9 +151,9 @@ export async function getTableConfigs(): Promise<TableConfig[]> {
 }
 
 export async function generateExpectedParams(
-  modelName: string
+  tableName: string
 ): Promise<Record<string, string>> {
-  const { fieldsInfo } = await getPrismaFieldInfo(modelName);
+  const { fieldsInfo } = await getDrizzleFieldInfo(tableName);
   const params: Record<string, string> = {};
 
   Object.entries(fieldsInfo).forEach(([fieldName, info]) => {
@@ -162,27 +168,26 @@ export async function generateExpectedParams(
 
     let typeStr = info.type.toLowerCase();
 
-    // Map Prisma types to more readable formats
+    // Map Drizzle types to more readable formats
     switch (info.type) {
-      case "String":
+      case "string":
         typeStr = "string";
         break;
-      case "Int":
-      case "Float":
-      case "Decimal":
+      case "number":
+      case "decimal":
         typeStr = "number";
         break;
-      case "Boolean":
+      case "boolean":
         typeStr = "boolean";
         break;
-      case "DateTime":
+      case "timestamp":
         typeStr = "string (ISO date)";
         break;
-      case "Json":
+      case "json":
         typeStr = "object/array (JSON)";
         break;
       default:
-        // Handle arrays and enums
+        // Handle arrays and other types
         if (info.type.includes("[]")) {
           typeStr = "array";
         } else {
@@ -190,8 +195,7 @@ export async function generateExpectedParams(
         }
     }
 
-    const required =
-      info.isRequired && !info.hasDefaultValue ? "required" : "optional";
+    const required = !info.nullable && !info.hasDefaultValue ? "required" : "optional";
     params[fieldName] = `${typeStr} (${required})`;
   });
 

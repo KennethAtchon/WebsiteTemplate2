@@ -3,16 +3,18 @@
  * This file re-exports all commonly used types to avoid duplication
  */
 
-// Re-export Prisma types and extensions from mock.ts
+// Re-export Drizzle types and extensions from mock.ts
 export {
   // Extended UI types
   type OrderWithDetails,
   type MockOrder,
   type ProductData,
 
-  // Re-exported Prisma types
+  // Re-exported Drizzle types
   type Order,
   type User,
+  type ContactMessage,
+  type FeatureUsage,
 
   // Helper functions
   generateUserInitials,

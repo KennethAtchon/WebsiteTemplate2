@@ -17,7 +17,7 @@
 
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { PrismaClient } from "../../../backend/src/infrastructure/database/lib/generated/prisma/index.js";
+import { db } from "../../../backend/src/services/db/db.js";
 import path from "path";
 import fs from "fs";
 import { config } from "dotenv";
@@ -105,19 +105,27 @@ async function upsertFirebaseUser(
   }
 }
 
-async function upsertPrismaUser(
-  prisma: PrismaClient,
+async function upsertDrizzleUser(
+  db: any,
   firebaseUid: string,
   email: string,
   name: string,
   role: "user" | "admin"
 ) {
-  await prisma.user.upsert({
-    where: { firebaseUid },
-    create: { firebaseUid, email, name, role, isActive: true },
-    update: { email, name, role, lastLogin: new Date() },
+  const { users } = await import("../../../backend/src/infrastructure/database/drizzle/schema.js");
+  
+  await db.insert(users).values({
+    firebaseUid,
+    email,
+    name,
+    role,
+    isActive: true,
+  }).onConflictDoUpdate({
+    target: users.firebaseUid,
+    set: { email, name, role, lastLogin: new Date() },
   });
-  console.log(`  [prisma]   Upserted user: ${email} (role: ${role})`);
+  
+  console.log(`  [drizzle]   Upserted user: ${email} (role: ${role})`);
 }
 
 async function setFirebaseClaims(
@@ -147,7 +155,6 @@ async function seed() {
   console.log("\n[e2e-seed] Seeding E2E test users...\n");
 
   const auth = initFirebaseAdmin();
-  const prisma = new PrismaClient();
 
   try {
     for (const user of TEST_USERS) {
@@ -158,7 +165,7 @@ async function seed() {
         user.password,
         user.name
       );
-      await upsertPrismaUser(prisma, uid, user.email, user.name, user.role);
+      await upsertDrizzleUser(db, uid, user.email, user.name, user.role);
       await setFirebaseClaims(auth, uid, user.role);
       console.log();
     }
@@ -167,8 +174,8 @@ async function seed() {
     clearAuthStateFiles();
 
     console.log("[e2e-seed] Done. All test users are ready.\n");
-  } finally {
-    await prisma.$disconnect();
+  } catch (error) {
+    console.error("[e2e-seed] Error during seeding:", error);
   }
 }
 
