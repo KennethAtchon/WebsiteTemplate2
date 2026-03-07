@@ -1,7 +1,8 @@
 import type { Context, MiddlewareHandler } from "hono";
 import { z } from "zod";
 import { adminAuth } from "../services/firebase/admin";
-import { prisma } from "../services/db/prisma";
+import { db } from "../services/db/db";
+import { users } from "../infrastructure/database/drizzle/schema";
 import { validateCSRFToken } from "../services/csrf/csrf-protection";
 import { checkRateLimit } from "../services/rate-limit/rate-limit-redis";
 import { getRateLimitConfig } from "../constants/rate-limit.config";
@@ -81,19 +82,21 @@ export function authMiddleware(
         return c.json({ error: "Firebase token missing email", code: "INVALID_TOKEN" }, 401);
       }
 
-      const user = await prisma.user.upsert({
-        where: { firebaseUid: decodedToken.uid },
-        update: { lastLogin: new Date() },
-        create: {
+      const [user] = await db
+        .insert(users)
+        .values({
           firebaseUid: decodedToken.uid,
           email,
-          name: decodedToken.name || decodedToken.email?.split("@")[0] || "User",
+          name: decodedToken.name || email.split("@")[0] || "User",
           role: "user",
           isActive: true,
           timezone: "UTC",
-        },
-        select: { id: true, email: true, role: true },
-      });
+        })
+        .onConflictDoUpdate({
+          target: users.firebaseUid,
+          set: { lastLogin: new Date() },
+        })
+        .returning({ id: users.id, email: users.email, role: users.role });
 
       if (level === "admin" && user.role !== "admin") {
         return c.json(

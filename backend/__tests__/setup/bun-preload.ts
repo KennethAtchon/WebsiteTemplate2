@@ -163,35 +163,31 @@ const adminAuthMocks = {
   setCustomUserClaims: mock(),
 };
 
-const prismaUserMocks = {
-  findUnique: mock(),
-  findMany: mock(),
-  count: mock(),
-  update: mock(),
-  create: mock(),
-};
+// Drizzle db mock — returns a chainable builder that resolves to []
+function makeChainableMock(resolveValue: any = []) {
+  const chain: any = {};
+  const chainMethods = [
+    "select", "from", "where", "insert", "values", "update", "set",
+    "delete", "innerJoin", "leftJoin", "orderBy", "limit", "offset",
+    "returning", "onConflictDoUpdate", "execute",
+  ];
+  chainMethods.forEach((m) => {
+    chain[m] = mock(() => chain);
+  });
+  // Make the chain thenable (awaitable)
+  chain.then = (resolve: any, reject: any) =>
+    Promise.resolve(resolveValue).then(resolve, reject);
+  chain[Symbol.toStringTag] = "Promise";
+  return chain;
+}
 
-const prismaFeatureUsageMocks = {
-  count: mock(),
-  create: mock(),
-  findMany: mock(),
-  findFirst: mock(),
-};
-
-const prismaOrderMocks = {
-  findUnique: mock(),
-  findFirst: mock(),
-  findMany: mock(),
-  count: mock(),
-  create: mock(),
-  update: mock(),
-  aggregate: mock(),
-};
-
-const prismaContactMessageMocks = {
-  findMany: mock(),
-  count: mock(),
-  create: mock(),
+const dbMock = {
+  select: mock(() => makeChainableMock([])),
+  insert: mock(() => makeChainableMock([])),
+  update: mock(() => makeChainableMock([])),
+  delete: mock(() => makeChainableMock([])),
+  execute: mock(() => Promise.resolve([{ health_check: 1 }])),
+  query: {},
 };
 
 const debugLogMocks = {
@@ -251,11 +247,7 @@ const systemLoggerMocks = {
 
 (global as any).__testMocks__ = {
   adminAuth: adminAuthMocks,
-  prisma: {
-    user: prismaUserMocks,
-    order: prismaOrderMocks,
-    contactMessage: prismaContactMessageMocks,
-  },
+  db: dbMock,
   debugLog: debugLogMocks,
   requireAuth: requireAuthMock,
   requireAdmin: requireAdminMock,
@@ -309,57 +301,8 @@ mock.module("@/services/firebase/admin", () => ({
   adminAuth: adminAuthMocks,
 }));
 
-const prismaMock = {
-  user: prismaUserMocks,
-  featureUsage: prismaFeatureUsageMocks,
-  order: prismaOrderMocks,
-  contactMessage: prismaContactMessageMocks,
-  $queryRaw: mock().mockResolvedValue([{ health_check: 1 }]),
-};
-
-// Default featureUsage mocks
-prismaFeatureUsageMocks.count.mockResolvedValue(0);
-prismaFeatureUsageMocks.create.mockResolvedValue({});
-prismaFeatureUsageMocks.findMany.mockResolvedValue([]);
-prismaFeatureUsageMocks.findFirst.mockResolvedValue(null);
-// Default order mocks
-prismaOrderMocks.findMany.mockResolvedValue([]);
-prismaOrderMocks.findUnique.mockResolvedValue(null);
-prismaOrderMocks.findFirst.mockResolvedValue(null);
-prismaOrderMocks.count.mockResolvedValue(0);
-prismaOrderMocks.create.mockResolvedValue({});
-prismaOrderMocks.update.mockResolvedValue({});
-prismaOrderMocks.aggregate.mockResolvedValue({ _sum: { totalAmount: null } });
-// Default contactMessage mocks
-prismaContactMessageMocks.findMany.mockResolvedValue([]);
-prismaContactMessageMocks.count.mockResolvedValue(0);
-prismaContactMessageMocks.create.mockResolvedValue({
-  id: "msg-new",
-  name: "Test User",
-  email: "test@example.com",
-  subject: "Test Subject",
-  createdAt: new Date(),
-});
-
-mock.module("@/infrastructure/database/lib/generated/prisma", () => ({
-  PrismaClient: class MockPrismaClient {
-    contactMessage = prismaContactMessageMocks;
-    user = prismaUserMocks;
-    featureUsage = prismaFeatureUsageMocks;
-    order = prismaOrderMocks;
-    $queryRaw = mock().mockResolvedValue([{ health_check: 1 }]);
-    $connect = mock(() => Promise.resolve());
-    $disconnect = mock(() => Promise.resolve());
-  },
-  Prisma: {
-    PrismaClientKnownRequestError: class extends Error {},
-    PrismaClientInitializationError: class extends Error {},
-  },
-}));
-
-mock.module("@/services/db/prisma", () => ({
-  prisma: prismaMock,
-  default: prismaMock,
+mock.module("@/services/db/db", () => ({
+  db: dbMock,
   getQueryStats: mock(() => ({
     totalQueries: 0,
     averageTime: 0,
@@ -374,6 +317,19 @@ mock.module("@/services/db/prisma", () => ({
     peakConnections: 0,
     poolUtilization: 0,
   })),
+  ensureConnectionHealth: mock(() => Promise.resolve(true)),
+  gracefulShutdown: mock(() => Promise.resolve()),
+  timedQuery: mock((_m: any, _o: any, fn: any) => fn()),
+}));
+
+mock.module("@/infrastructure/database/drizzle/schema", () => ({
+  users: {},
+  orders: {},
+  contactMessages: {},
+  featureUsages: {},
+  usersRelations: {},
+  ordersRelations: {},
+  featureUsagesRelations: {},
 }));
 
 mock.module("@/utils/debug/debug", () => ({

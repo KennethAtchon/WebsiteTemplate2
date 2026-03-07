@@ -8,7 +8,9 @@
  *   - app/api/admin/subscriptions/route.ts   (admin view)
  */
 
-import { prisma } from "@/services/db/prisma";
+import { db } from "@/services/db/db";
+import { featureUsages } from "@/infrastructure/database/drizzle/schema";
+import { eq, and, notInArray, gte, sql } from "drizzle-orm";
 import {
   FEATURE_TIER_REQUIREMENTS,
   isFeatureFree,
@@ -35,11 +37,15 @@ export async function getMonthlyUsageCount(userId: string): Promise<number> {
   const { startOfThisMonth } = getMonthBoundaries();
   const gatedTypes = getGatedCalculatorTypes();
 
-  return prisma.featureUsage.count({
-    where: {
-      userId,
-      featureType: { notIn: gatedTypes },
-      createdAt: { gte: startOfThisMonth },
-    },
-  });
+  const [{ total }] = await db
+    .select({ total: sql<number>`count(*)::int` })
+    .from(featureUsages)
+    .where(
+      and(
+        eq(featureUsages.userId, userId),
+        notInArray(featureUsages.featureType, gatedTypes),
+        gte(featureUsages.createdAt, startOfThisMonth),
+      ),
+    );
+  return total;
 }

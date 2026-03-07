@@ -5,7 +5,9 @@ import {
   rateLimiter,
 } from "../../middleware/protection";
 import type { HonoEnv } from "../../middleware/protection";
-import { prisma } from "../../services/db/prisma";
+import { db } from "../../services/db/db";
+import { users as usersTable, orders as ordersTable } from "../../infrastructure/database/drizzle/schema";
+import { eq, and, or, ilike, desc, gte, lte, sql } from "drizzle-orm";
 import { adminAuth } from "../../services/firebase/admin";
 import { FirebaseUserSync } from "../../services/firebase/sync";
 
@@ -21,22 +23,17 @@ users.get("/", rateLimiter("admin"), authMiddleware("admin"), async (c) => {
     const includeDeleted = c.req.query("includeDeleted") === "true";
     const skip = (page - 1) * limit;
 
-    const where: any = includeDeleted ? {} : { isDeleted: false };
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { email: { contains: search, mode: "insensitive" } },
-      ];
-    }
+    const conditions = [
+      ...(includeDeleted ? [] : [eq(usersTable.isDeleted, false)]),
+      ...(search
+        ? [or(ilike(usersTable.name, `%${search}%`), ilike(usersTable.email, `%${search}%`))]
+        : []),
+    ];
+    const whereClause = conditions.length > 0 ? and(...(conditions as any)) : undefined;
 
-    const [allUsers, total] = await Promise.all([
-      prisma.user.findMany({
-        where,
-        orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
-        take: limit,
-        skip,
-      }),
-      prisma.user.count({ where }),
+    const [allUsers, [{ total }]] = await Promise.all([
+      db.select().from(usersTable).where(whereClause).orderBy(desc(usersTable.isActive), desc(usersTable.createdAt)).limit(limit).offset(skip),
+      db.select({ total: sql<number>`count(*)::int` }).from(usersTable).where(whereClause),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -87,16 +84,10 @@ users.post(
         firebaseUid = syncResult.firebaseUid || null;
       }
 
-      const newUser = await prisma.user.create({
-        data: {
-          name,
-          email,
-          firebaseUid,
-          role: "user",
-          isActive: true,
-          timezone: timezone || "UTC",
-        },
-      });
+      const [newUser] = await db
+        .insert(usersTable)
+        .values({ name, email, firebaseUid, role: "user", isActive: true, timezone: timezone || "UTC" })
+        .returning();
 
       return c.json(newUser, 201);
     } catch (error) {
@@ -129,22 +120,23 @@ users.patch(
 
       if (!id) return c.json({ error: "User id is required" }, 400);
 
-      const existingUser = await prisma.user.findUnique({ where: { id } });
+      const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
       if (!existingUser) return c.json({ error: "User not found" }, 404);
 
-      const updatedUser = await prisma.user.update({
-        where: { id },
-        data: {
-          ...(phone !== undefined && { phone }),
-          ...(address !== undefined && { address }),
-          ...(role !== undefined && { role }),
-          ...(name !== undefined && { name }),
-          ...(password !== undefined && { password }),
-          ...(email !== undefined && { email }),
-          ...(isActive !== undefined && { isActive }),
-          ...(timezone !== undefined && { timezone }),
-        },
-      });
+      const updateData: Record<string, unknown> = {};
+      if (phone !== undefined) updateData.phone = phone;
+      if (address !== undefined) updateData.address = address;
+      if (role !== undefined) updateData.role = role;
+      if (name !== undefined) updateData.name = name;
+      if (email !== undefined) updateData.email = email;
+      if (isActive !== undefined) updateData.isActive = isActive;
+      if (timezone !== undefined) updateData.timezone = timezone;
+
+      const [updatedUser] = await db
+        .update(usersTable)
+        .set(updateData)
+        .where(eq(usersTable.id, id))
+        .returning();
 
       if (existingUser.firebaseUid) {
         const syncData: Record<string, unknown> = {};
@@ -184,13 +176,13 @@ users.delete(
 
       if (!id) return c.json({ error: "User id is required" }, 400);
 
-      const existingUser = await prisma.user.findUnique({ where: { id } });
+      const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
       if (!existingUser) return c.json({ error: "User not found" }, 404);
 
       if (hardDelete) {
-        await prisma.user.delete({ where: { id } });
+        await db.delete(usersTable).where(eq(usersTable.id, id));
       } else {
-        await prisma.user.update({ where: { id }, data: { isActive: false } });
+        await db.update(usersTable).set({ isActive: false }).where(eq(usersTable.id, id));
       }
 
       if (existingUser.firebaseUid) {
@@ -230,27 +222,12 @@ users.get(
       );
       const endOfLastMonth = new Date(startOfThisMonth.getTime() - 1);
 
-      const [totalCustomers, thisMonthCustomers, lastMonthCustomers] =
+      const baseWhere = and(eq(usersTable.role, "user"), eq(usersTable.isActive, true), eq(usersTable.isDeleted, false));
+      const [[{ totalCustomers }], [{ thisMonthCustomers }], [{ lastMonthCustomers }]] =
         await Promise.all([
-          prisma.user.count({
-            where: { role: "user", isActive: true, isDeleted: false },
-          }),
-          prisma.user.count({
-            where: {
-              role: "user",
-              isActive: true,
-              isDeleted: false,
-              createdAt: { gte: startOfThisMonth, lte: now },
-            },
-          }),
-          prisma.user.count({
-            where: {
-              role: "user",
-              isActive: true,
-              isDeleted: false,
-              createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-            },
-          }),
+          db.select({ totalCustomers: sql<number>`count(*)::int` }).from(usersTable).where(baseWhere),
+          db.select({ thisMonthCustomers: sql<number>`count(*)::int` }).from(usersTable).where(and(baseWhere, gte(usersTable.createdAt, startOfThisMonth), lte(usersTable.createdAt, now))),
+          db.select({ lastMonthCustomers: sql<number>`count(*)::int` }).from(usersTable).where(and(baseWhere, gte(usersTable.createdAt, startOfLastMonth), lte(usersTable.createdAt, endOfLastMonth))),
         ]);
 
       let percentChange = 0;
@@ -286,25 +263,23 @@ users.delete(
     try {
       const auth = c.get("auth");
 
-      const user = await prisma.user.findUnique({
-        where: { firebaseUid: auth.firebaseUser.uid, isDeleted: false },
-      });
+      const [user] = await db
+        .select().from(usersTable)
+        .where(and(eq(usersTable.firebaseUid, auth.firebaseUser.uid), eq(usersTable.isDeleted, false)))
+        .limit(1);
 
       if (!user) return c.json({ error: "User not found" }, 404);
 
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          isDeleted: true,
-          deletedAt: new Date(),
-          name: "Deleted User",
-          email: `deleted-${user.id}@example.com`,
-          phone: null,
-          address: null,
-          firebaseUid: null,
-          isActive: false,
-        },
-      });
+      await db.update(usersTable).set({
+        isDeleted: true,
+        deletedAt: new Date(),
+        name: "Deleted User",
+        email: `deleted-${user.id}@example.com`,
+        phone: null,
+        address: null,
+        firebaseUid: null,
+        isActive: false,
+      }).where(eq(usersTable.id, user.id));
 
       try {
         await adminAuth.deleteUser(auth.firebaseUser.uid);
@@ -330,25 +305,18 @@ users.get(
     try {
       const auth = c.get("auth");
 
-      const user = await prisma.user.findUnique({
-        where: { id: auth.user.id },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          address: true,
-          timezone: true,
-          createdAt: true,
-        },
-      });
+      const [user] = await db
+        .select({ id: usersTable.id, name: usersTable.name, email: usersTable.email, phone: usersTable.phone, address: usersTable.address, timezone: usersTable.timezone, createdAt: usersTable.createdAt })
+        .from(usersTable)
+        .where(eq(usersTable.id, auth.user.id))
+        .limit(1);
 
-      const orders = await prisma.order.findMany({
-        where: { userId: auth.user.id },
-        select: { id: true, status: true, totalAmount: true, createdAt: true },
-      });
+      const userOrders = await db
+        .select({ id: ordersTable.id, status: ordersTable.status, totalAmount: ordersTable.totalAmount, createdAt: ordersTable.createdAt })
+        .from(ordersTable)
+        .where(eq(ordersTable.userId, auth.user.id));
 
-      const exportData = { profile: user, orders };
+      const exportData = { profile: user, orders: userOrders };
 
       return new Response(JSON.stringify(exportData, null, 2), {
         headers: {
@@ -376,10 +344,7 @@ users.post(
 
       if (!userId) return c.json({ error: "userId is required" }, 400);
 
-      const user = await prisma.user.update({
-        where: { id: userId },
-        data: { isActive: false },
-      });
+      const [user] = await db.update(usersTable).set({ isActive: false }).where(eq(usersTable.id, userId)).returning();
 
       return c.json({ success: true, user });
     } catch (error) {

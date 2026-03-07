@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { rateLimiter } from "../../middleware/protection";
 import type { HonoEnv } from "../../middleware/protection";
-import { prisma, getQueryStats } from "../../services/db/prisma";
+import { db, getQueryStats, ensureConnectionHealth } from "../../services/db/db";
+import { users } from "../../infrastructure/database/drizzle/schema";
+import { sql, count } from "drizzle-orm";
 import getRedisConnection from "../../services/db/redis";
 import { getErrorMetrics } from "../../services/observability/metrics";
 
@@ -16,10 +18,10 @@ health.get("/", rateLimiter("health"), async (c) => {
 
   try {
     const healthChecks = await Promise.allSettled([
-      checkDatabaseHealth(prisma),
+      checkDatabaseHealth(db),
       checkRedisHealth(getRedisConnection),
       checkServiceHealth(),
-      checkDatabasePerformance(prisma, getQueryStats),
+      checkDatabasePerformance(getQueryStats),
     ]);
 
     const [dbResult, redisResult, serviceResult, dbPerfResult] = healthChecks;
@@ -84,13 +86,13 @@ interface HealthCheckResult {
   error?: string;
 }
 
-async function checkDatabaseHealth(prisma: any): Promise<HealthCheckResult> {
+async function checkDatabaseHealth(dbInstance: any): Promise<HealthCheckResult> {
   const start = Date.now();
   try {
     await Promise.race([
       (async () => {
-        await prisma.$queryRaw`SELECT 1 as health_check`;
-        await prisma.$queryRaw`SELECT COUNT(*) as user_count FROM "User" LIMIT 1`;
+        await dbInstance.execute(sql`SELECT 1 as health_check`);
+        await dbInstance.select({ cnt: count() }).from(users).limit(1);
       })(),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Database timeout")), 1000),
@@ -173,7 +175,6 @@ async function checkServiceHealth(): Promise<HealthCheckResult> {
 }
 
 async function checkDatabasePerformance(
-  prisma: any,
   getQueryStats: (minutes: number) => any,
 ): Promise<HealthCheckResult> {
   const start = Date.now();

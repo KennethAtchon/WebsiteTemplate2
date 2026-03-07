@@ -7,10 +7,10 @@ import {
 import type { HonoEnv } from "../../middleware/protection";
 import { ADMIN_SPECIAL_CODE_HASH } from "../../utils/config/envUtil";
 import { createHash } from "crypto";
-import { readFileSync } from "fs";
-import { resolve } from "path";
 import { adminAuth, adminDb } from "../../services/firebase/admin";
-import { prisma } from "../../services/db/prisma";
+import { db } from "../../services/db/db";
+import { users, orders, featureUsages } from "../../infrastructure/database/drizzle/schema";
+import { eq, and, or, ilike, desc, gte, lte, sql } from "drizzle-orm";
 import {
   getMonthBoundaries,
   calculatePercentChange,
@@ -74,17 +74,10 @@ admin.post(
       const auth = c.get("auth");
       const uid = auth.firebaseUser.uid;
 
-      await prisma.user.upsert({
-        where: { firebaseUid: uid },
-        create: {
-          firebaseUid: uid,
-          email: auth.firebaseUser.email || "",
-          name: (auth.firebaseUser.name as string) || "Admin User",
-          role: "admin",
-          isActive: true,
-        },
-        update: { role: "admin", lastLogin: new Date() },
-      });
+      await db
+        .insert(users)
+        .values({ firebaseUid: uid, email: auth.firebaseUser.email || "", name: (auth.firebaseUser.name as string) || "Admin User", role: "admin", isActive: true })
+        .onConflictDoUpdate({ target: users.firebaseUid, set: { role: "admin", lastLogin: new Date() } });
 
       await adminAuth.setCustomUserClaims(uid, { role: "admin" });
 
@@ -111,54 +104,26 @@ admin.get(
       const { startOfThisMonth, startOfLastMonth, endOfLastMonth } =
         getMonthBoundaries();
 
+      const usersWithPaidOrdersSubquery = db
+        .select({ userId: orders.userId })
+        .from(orders)
+        .where(eq(orders.status, "paid"))
+        .as("paid_orders_sq");
+
       const [
-        totalCustomers,
-        customersWithPaidOrders,
-        lastMonthCustomers,
-        lastMonthCustomersWithPaidOrders,
-        thisMonthCustomers,
-        thisMonthCustomersWithPaidOrders,
+        [{ totalCustomers }],
+        [{ customersWithPaidOrders }],
+        [{ lastMonthCustomers }],
+        [{ lastMonthCustomersWithPaidOrders }],
+        [{ thisMonthCustomers }],
+        [{ thisMonthCustomersWithPaidOrders }],
       ] = await Promise.all([
-        prisma.user.count({ where: { role: "user" } }),
-        prisma.user.count({
-          where: { role: "user", Orders: { some: { status: "paid" } } },
-        }),
-        prisma.user.count({
-          where: {
-            role: "user",
-            createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-          },
-        }),
-        prisma.user.count({
-          where: {
-            role: "user",
-            createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-            Orders: {
-              some: {
-                status: "paid",
-                createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-              },
-            },
-          },
-        }),
-        prisma.user.count({
-          where: {
-            role: "user",
-            createdAt: { gte: startOfThisMonth, lte: now },
-          },
-        }),
-        prisma.user.count({
-          where: {
-            role: "user",
-            createdAt: { gte: startOfThisMonth, lte: now },
-            Orders: {
-              some: {
-                status: "paid",
-                createdAt: { gte: startOfThisMonth, lte: now },
-              },
-            },
-          },
-        }),
+        db.select({ totalCustomers: sql<number>`count(*)::int` }).from(users).where(eq(users.role, "user")),
+        db.select({ customersWithPaidOrders: sql<number>`count(distinct ${users.id})::int` }).from(users).innerJoin(orders, and(eq(orders.userId, users.id), eq(orders.status, "paid"))).where(eq(users.role, "user")),
+        db.select({ lastMonthCustomers: sql<number>`count(*)::int` }).from(users).where(and(eq(users.role, "user"), gte(users.createdAt, startOfLastMonth), lte(users.createdAt, endOfLastMonth))),
+        db.select({ lastMonthCustomersWithPaidOrders: sql<number>`count(distinct ${users.id})::int` }).from(users).innerJoin(orders, and(eq(orders.userId, users.id), eq(orders.status, "paid"), gte(orders.createdAt, startOfLastMonth), lte(orders.createdAt, endOfLastMonth))).where(and(eq(users.role, "user"), gte(users.createdAt, startOfLastMonth), lte(users.createdAt, endOfLastMonth))),
+        db.select({ thisMonthCustomers: sql<number>`count(*)::int` }).from(users).where(and(eq(users.role, "user"), gte(users.createdAt, startOfThisMonth), lte(users.createdAt, now))),
+        db.select({ thisMonthCustomersWithPaidOrders: sql<number>`count(distinct ${users.id})::int` }).from(users).innerJoin(orders, and(eq(orders.userId, users.id), eq(orders.status, "paid"), gte(orders.createdAt, startOfThisMonth), lte(orders.createdAt, now))).where(and(eq(users.role, "user"), gte(users.createdAt, startOfThisMonth), lte(users.createdAt, now))),
       ]);
 
       const conversionRate =
@@ -204,29 +169,15 @@ admin.get(
       const search = c.req.query("search");
       const skip = (page - 1) * limit;
 
-      const where: any = { role: "user" };
-      if (search) {
-        where.email = { contains: search, mode: "insensitive" };
-      }
+      const customerWhere = and(
+        eq(users.role, "user"),
+        search ? ilike(users.email, `%${search}%`) : undefined,
+      );
 
-      const [customers, total] = await Promise.all([
-        prisma.user.findMany({
-          where,
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            address: true,
-            createdAt: true,
-            updatedAt: true,
-            isActive: true,
-          },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
-        }),
-        prisma.user.count({ where }),
+      const [customers, [{ total }]] = await Promise.all([
+        db.select({ id: users.id, name: users.name, email: users.email, phone: users.phone, address: users.address, createdAt: users.createdAt, updatedAt: users.updatedAt, isActive: users.isActive })
+          .from(users).where(customerWhere).orderBy(desc(users.createdAt)).limit(limit).offset(skip),
+        db.select({ total: sql<number>`count(*)::int` }).from(users).where(customerWhere),
       ]);
 
       const totalPages = Math.ceil(total / limit);
@@ -270,30 +221,28 @@ admin.get(
       const customerId = c.req.query("customerId");
       const skip = (page - 1) * limit;
 
-      const where: any = {};
-      if (customerId) where.userId = customerId;
-      if (search?.trim()) {
-        where.OR = [
-          { id: { contains: search, mode: "insensitive" } },
-          { user: { name: { contains: search, mode: "insensitive" } } },
-          { user: { email: { contains: search, mode: "insensitive" } } },
-        ];
-      }
+      const orderWhere = and(
+        customerId ? eq(orders.userId, customerId) : undefined,
+        search?.trim()
+          ? or(
+              ilike(orders.id, `%${search}%`),
+              ilike(users.name, `%${search}%`),
+              ilike(users.email, `%${search}%`),
+            )
+          : undefined,
+      );
 
-      const [orders, total] = await Promise.all([
-        prisma.order.findMany({
-          where,
-          include: { user: true },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
-        }),
-        prisma.order.count({ where }),
+      const [orderRows, [{ total }]] = await Promise.all([
+        db.select({ order: orders, user: { id: users.id, name: users.name, email: users.email } })
+          .from(orders).innerJoin(users, eq(orders.userId, users.id))
+          .where(orderWhere).orderBy(desc(orders.createdAt)).limit(limit).offset(skip),
+        db.select({ total: sql<number>`count(*)::int` }).from(orders).leftJoin(users, eq(orders.userId, users.id)).where(orderWhere),
       ]);
+      const ordersWithUser = orderRows.map(({ order, user }) => ({ ...order, user }));
 
       const totalPages = Math.ceil(total / limit);
       return c.json({
-        orders: orders.map(formatOrderResponse),
+        orders: ordersWithUser.map(formatOrderResponse),
         pagination: {
           total,
           page,
@@ -301,9 +250,9 @@ admin.get(
           totalPages,
           hasMore: page < totalPages,
           hasPrevious: page > 1,
-          showing: orders.length,
+          showing: ordersWithUser.length,
           from: skip + 1,
-          to: skip + orders.length,
+          to: skip + ordersWithUser.length,
         },
       });
     } catch (error) {
@@ -329,10 +278,9 @@ admin.post(
         return c.json({ error: "userId and totalAmount are required" }, 400);
       }
 
-      const order = await prisma.order.create({
-        data: { userId, totalAmount, status: status || "pending" },
-        include: { user: true },
-      });
+      const [newOrder] = await db.insert(orders).values({ userId, totalAmount: String(totalAmount), status: status || "pending" }).returning();
+      const [orderUser] = await db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(eq(users.id, userId)).limit(1);
+      const order = { ...newOrder, user: orderUser };
 
       return c.json({ order: formatOrderResponse(order) }, 201);
     } catch (error) {
@@ -356,16 +304,14 @@ admin.put(
 
       if (!id) return c.json({ error: "id is required" }, 400);
 
-      const updateData: any = {};
-      if (userId) updateData.user = { connect: { id: userId } };
-      if (totalAmount !== undefined) updateData.totalAmount = totalAmount;
+      const updateData: Record<string, unknown> = {};
+      if (userId) updateData.userId = userId;
+      if (totalAmount !== undefined) updateData.totalAmount = String(totalAmount);
       if (status !== undefined) updateData.status = status;
 
-      const order = await prisma.order.update({
-        where: { id },
-        data: updateData,
-        include: { user: true },
-      });
+      const [updatedOrder] = await db.update(orders).set(updateData).where(eq(orders.id, id)).returning();
+      const [orderUser] = await db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(eq(users.id, updatedOrder.userId)).limit(1);
+      const order = { ...updatedOrder, user: orderUser };
 
       return c.json({ order: formatOrderResponse(order) });
     } catch (error) {
@@ -389,18 +335,12 @@ admin.delete(
 
       if (!id) return c.json({ error: "id is required" }, 400);
 
-      const existing = await prisma.order.findUnique({ where: { id } });
+      const [existing] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
       if (!existing) return c.json({ error: "Order not found" }, 404);
 
-      const order = await prisma.order.update({
-        where: { id },
-        data: {
-          isDeleted: true,
-          deletedAt: new Date(),
-          deletedBy: deletedBy || "admin",
-        },
-        include: { user: true },
-      });
+      const [deletedOrder] = await db.update(orders).set({ isDeleted: true, deletedAt: new Date(), deletedBy: deletedBy || "admin" }).where(eq(orders.id, id)).returning();
+      const [orderUser] = await db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(eq(users.id, deletedOrder.userId)).limit(1);
+      const order = { ...deletedOrder, user: orderUser };
 
       return c.json({ order: formatOrderResponse(order), deleted: true });
     } catch (error) {
@@ -420,11 +360,10 @@ admin.get(
     try {
       const id = c.req.param("id");
 
-      const order = await prisma.order.findUnique({
-        where: { id },
-        include: { user: true },
-      });
-      if (!order) return c.json({ error: "Order not found" }, 404);
+      const [orderRow] = await db.select({ order: orders, user: { id: users.id, name: users.name, email: users.email } })
+        .from(orders).innerJoin(users, eq(orders.userId, users.id)).where(eq(orders.id, id)).limit(1);
+      if (!orderRow) return c.json({ error: "Order not found" }, 404);
+      const order = { ...orderRow.order, user: orderRow.user };
 
       return c.json({ order: formatOrderResponse(order) });
     } catch (error) {
@@ -459,10 +398,9 @@ admin.get(
         for (const subDoc of subscriptionsSnapshot.docs) {
           const subData = subDoc.data();
 
-          const dbUser = await prisma.user.findUnique({
-            where: { firebaseUid: customerDoc.id },
-            select: { id: true, name: true, email: true },
-          });
+          const [dbUser] = await db
+            .select({ id: users.id, name: users.name, email: users.email })
+            .from(users).where(eq(users.firebaseUid, customerDoc.id)).limit(1);
 
           const tierFromMetadata = extractSubscriptionTier(subData);
 
@@ -709,13 +647,9 @@ admin.get(
       const limit = Math.min(parseInt(c.req.query("limit") || "50", 10), 100);
       const skip = (page - 1) * limit;
 
-      const [usages, total] = await Promise.all([
-        prisma.featureUsage.findMany({
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
-        }),
-        prisma.featureUsage.count(),
+      const [usages, [{ total }]] = await Promise.all([
+        db.select().from(featureUsages).orderBy(desc(featureUsages.createdAt)).limit(limit).offset(skip),
+        db.select({ total: sql<number>`count(*)::int` }).from(featureUsages),
       ]);
 
       const totalPages = Math.ceil(total / limit);
@@ -733,62 +667,6 @@ admin.get(
     } catch (error) {
       console.error("Failed to fetch feature usages:", error);
       return c.json({ error: "Failed to fetch feature usages" }, 500);
-    }
-  },
-);
-
-// ─── GET /api/admin/schema ────────────────────────────────────────────────────
-
-const SCALAR_TYPES = new Set([
-  "String", "Int", "Float", "Boolean", "DateTime",
-  "Json", "Bytes", "Decimal", "BigInt",
-]);
-
-function parsePrismaSchema(content: string) {
-  const models: Array<{ name: string; fields: any[] }> = [];
-  const modelRegex = /^model\s+(\w+)\s*\{([\s\S]*?)\n\}/gm;
-  let modelMatch;
-  while ((modelMatch = modelRegex.exec(content)) !== null) {
-    const name = modelMatch[1];
-    const body = modelMatch[2];
-    const fields: any[] = [];
-    for (const line of body.split("\n")) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith("@@")) continue;
-      const fieldMatch = trimmed.match(/^(\w+)\s+(\w+)(\?|\[\])?\s*(.*)?$/);
-      if (!fieldMatch) continue;
-      const [, fieldName, fieldType, modifier = "", rest = ""] = fieldMatch;
-      if (!SCALAR_TYPES.has(fieldType)) continue; // skip relations
-      fields.push({
-        name: fieldName,
-        type: fieldType,
-        isRequired: modifier !== "?",
-        isId: rest.includes("@id"),
-        hasDefaultValue: rest.includes("@default"),
-        isList: modifier === "[]",
-      });
-    }
-    models.push({ name, fields });
-  }
-  return { models };
-}
-
-admin.get(
-  "/schema",
-  rateLimiter("admin"),
-  authMiddleware("admin"),
-  async (c) => {
-    try {
-      const schemaPath = resolve(
-        import.meta.dir,
-        "../../infrastructure/database/prisma/schema.prisma",
-      );
-      const content = readFileSync(schemaPath, "utf-8");
-      const schema = parsePrismaSchema(content);
-      return c.json(schema);
-    } catch (error) {
-      console.error("Failed to fetch schema:", error);
-      return c.json({ error: "Failed to fetch schema" }, 500);
     }
   },
 );
@@ -827,7 +705,7 @@ admin.get(
   authMiddleware("admin"),
   async (c) => {
     try {
-      await prisma.$queryRaw`SELECT 1`;
+      await db.execute(sql`SELECT 1`);
       return c.json({ status: "healthy", database: "connected" });
     } catch (error) {
       console.error("Database health check failed:", error);

@@ -116,7 +116,7 @@ describe("api-error-wrapper", () => {
 
     it("maps database error to 503", async () => {
       const handler = async () => {
-        throw new Error("Prisma connection pool timeout");
+        throw new Error("database connection pool timeout");
       };
       const wrapped = withApiErrorHandling(handler);
       const res = await wrapped(

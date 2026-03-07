@@ -5,7 +5,9 @@ import {
   rateLimiter,
 } from "../../middleware/protection";
 import type { HonoEnv } from "../../middleware/protection";
-import { prisma } from "../../services/db/prisma";
+import { db } from "../../services/db/db";
+import { users, orders } from "../../infrastructure/database/drizzle/schema";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { adminAuth } from "../../services/firebase/admin";
 
 const customer = new Hono<HonoEnv>();
@@ -23,20 +25,14 @@ customer.get(
     try {
       const auth = c.get("auth");
 
-      const user = await prisma.user.findUnique({
-        where: { id: auth.user.id, isDeleted: false },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          address: true,
-          role: true,
-          timezone: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
+      const [user] = await db
+        .select({
+          id: users.id, name: users.name, email: users.email,
+          phone: users.phone, address: users.address, role: users.role,
+          timezone: users.timezone, createdAt: users.createdAt, updatedAt: users.updatedAt,
+        })
+        .from(users)
+        .where(and(eq(users.id, auth.user.id), eq(users.isDeleted, false)));
 
       if (!user) return c.json({ error: "User not found" }, 404);
 
@@ -119,27 +115,22 @@ customer.put(
         );
       }
 
-      const updatedUser = await prisma.user.update({
-        where: { id: auth.user.id },
-        data: updateData,
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          address: true,
-          timezone: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
+      const [updatedUser] = await db
+        .update(users)
+        .set(updateData)
+        .where(eq(users.id, auth.user.id))
+        .returning({
+          id: users.id, name: users.name, email: users.email,
+          phone: users.phone, address: users.address,
+          timezone: users.timezone, createdAt: users.createdAt, updatedAt: users.updatedAt,
+        });
 
       return c.json({
         message: "Profile updated successfully",
         profile: updatedUser,
       });
     } catch (error: any) {
-      if (error?.code === "P2002") {
+      if (error?.code === "23505") {
         return c.json(
           { error: "Email already exists", code: "EMAIL_ALREADY_EXISTS" },
           400,
@@ -168,18 +159,13 @@ customer.get(
       const limit = parseInt(c.req.query("limit") || "10", 10);
       const skip = (page - 1) * limit;
 
-      const [orders, total] = await Promise.all([
-        prisma.order.findMany({
-          where: { userId: auth.user.id },
-          orderBy: { createdAt: "desc" },
-          skip,
-          take: limit,
-        }),
-        prisma.order.count({ where: { userId: auth.user.id } }),
+      const [orderRows, [{ count: total }]] = await Promise.all([
+        db.select().from(orders).where(eq(orders.userId, auth.user.id)).orderBy(desc(orders.createdAt)).offset(skip).limit(limit),
+        db.select({ count: sql<number>`count(*)::int` }).from(orders).where(eq(orders.userId, auth.user.id)),
       ]);
 
       return c.json({
-        orders,
+        orders: orderRows,
         pagination: {
           page,
           limit,
@@ -207,12 +193,10 @@ customer.post(
       const auth = c.get("auth");
       const body = await c.req.json();
 
-      const order = await prisma.order.create({
-        data: {
-          ...body,
-          userId: auth.user.id, // Always use authenticated user ID
-        },
-      });
+      const [order] = await db
+        .insert(orders)
+        .values({ ...body, userId: auth.user.id })
+        .returning();
 
       return c.json(order, 201);
     } catch (error) {
@@ -235,9 +219,10 @@ customer.get(
       const sessionId = c.req.query("sessionId");
       if (!sessionId) return c.json({ error: "sessionId is required" }, 400);
 
-      const order = await prisma.order.findFirst({
-        where: { stripeSessionId: sessionId, userId: auth.user.id },
-      });
+      const [order] = await db
+        .select().from(orders)
+        .where(and(eq(orders.stripeSessionId, sessionId), eq(orders.userId, auth.user.id)))
+        .limit(1);
 
       if (!order) return c.json({ error: "Order not found" }, 404);
       return c.json(order);
@@ -259,12 +244,12 @@ customer.get(
     try {
       const auth = c.get("auth");
 
-      const result = await prisma.order.aggregate({
-        where: { userId: auth.user.id, status: "completed" },
-        _sum: { totalAmount: true },
-      });
+      const [result] = await db
+        .select({ total: sql<string>`sum(total_amount)` })
+        .from(orders)
+        .where(and(eq(orders.userId, auth.user.id), eq(orders.status, "completed")));
 
-      return c.json({ totalRevenue: result._sum.totalAmount || 0 });
+      return c.json({ totalRevenue: result?.total || 0 });
     } catch (error) {
       console.error("Failed to fetch total revenue:", error);
       return c.json({ error: "Failed to fetch total revenue" }, 500);
@@ -284,9 +269,10 @@ customer.get(
       const auth = c.get("auth");
       const orderId = c.req.param("orderId");
 
-      const order = await prisma.order.findFirst({
-        where: { id: orderId, userId: auth.user.id },
-      });
+      const [order] = await db
+        .select().from(orders)
+        .where(and(eq(orders.id, orderId), eq(orders.userId, auth.user.id)))
+        .limit(1);
 
       if (!order) return c.json({ error: "Order not found" }, 404);
       return c.json(order);

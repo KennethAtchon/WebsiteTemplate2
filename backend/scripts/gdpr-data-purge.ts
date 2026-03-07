@@ -22,7 +22,9 @@
  *   bun scripts/gdpr-data-purge.ts --days 30   # override retention window (default: 30)
  */
 
-import { prisma } from "../src/services/db/prisma";
+import { db, gracefulShutdown } from "../src/services/db/db";
+import { users, orders, featureUsages } from "../src/infrastructure/database/drizzle/schema";
+import { and, eq, lte, isNotNull, ne, sql } from "drizzle-orm";
 import { adminAuth, adminDb } from "../src/services/firebase/admin";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -77,29 +79,24 @@ async function main() {
   console.log(` Mode:      ${DRY_RUN ? "DRY RUN (no changes)" : "LIVE"}`);
   console.log("─────────────────────────────────────────\n");
 
-  const users = await prisma.user.findMany({
-    where: {
-      isDeleted: true,
-      deletedAt: { lte: cutoff },
-      // Exclude already-purged rows (name set to specific sentinel)
-      NOT: { name: "GDPR_PURGED" },
-    },
-    select: {
-      id: true,
-      firebaseUid: true,
-      name: true,
-      email: true,
-      deletedAt: true,
-    },
-  });
+  const userRows = await db
+    .select({ id: users.id, firebaseUid: users.firebaseUid, name: users.name, email: users.email, deletedAt: users.deletedAt })
+    .from(users)
+    .where(
+      and(
+        eq(users.isDeleted, true),
+        lte(users.deletedAt, cutoff),
+        ne(users.name, "GDPR_PURGED"),
+      ),
+    );
 
-  if (users.length === 0) {
+  if (userRows.length === 0) {
     console.log("No users eligible for purge.");
     return;
   }
 
-  console.log(`Found ${users.length} user(s) eligible for purge:\n`);
-  for (const u of users) {
+  console.log(`Found ${userRows.length} user(s) eligible for purge:\n`);
+  for (const u of userRows) {
     console.log(
       `  • ${u.id} | deleted: ${u.deletedAt?.toISOString()} | firebase: ${u.firebaseUid ?? "none"}`,
     );
@@ -114,31 +111,18 @@ async function main() {
   let purged = 0;
   let failed = 0;
 
-  for (const user of users) {
+  for (const user of userRows) {
     try {
       console.log(`Purging ${user.id} …`);
 
       // 1. Delete FeatureUsage rows
-      await prisma.featureUsage.deleteMany({ where: { userId: user.id } });
+      await db.delete(featureUsages).where(eq(featureUsages.userId, user.id));
 
       // 2. Soft-delete remaining orders
-      await prisma.order.updateMany({
-        where: { userId: user.id, isDeleted: false },
-        data: { isDeleted: true, deletedAt: new Date(), deletedBy: "gdpr" },
-      });
+      await db.update(orders).set({ isDeleted: true, deletedAt: new Date(), deletedBy: "gdpr" }).where(and(eq(orders.userId, user.id), eq(orders.isDeleted, false)));
 
       // 3. Anonymise Postgres PII
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          name: "GDPR_PURGED",
-          email: anonymisedEmail(user.id),
-          phone: null,
-          address: null,
-          notes: null,
-          firebaseUid: null,
-        },
-      });
+      await db.update(users).set({ name: "GDPR_PURGED", email: anonymisedEmail(user.id), phone: null, address: null, notes: null, firebaseUid: null }).where(eq(users.id, user.id));
 
       // 4. Purge Firestore
       if (user.firebaseUid) {
@@ -162,4 +146,4 @@ main()
     console.error("Fatal error:", err);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(() => gracefulShutdown());

@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { rateLimiter } from "../../middleware/protection";
 import { adminAuth } from "../../services/firebase/admin";
-import { prisma } from "../../services/db/prisma";
+import { db } from "../../services/db/db";
+import { users } from "../../infrastructure/database/drizzle/schema";
 
 const authRoutes = new Hono();
 
@@ -31,19 +32,14 @@ authRoutes.post("/register", rateLimiter("auth"), async (c) => {
     const name =
       decoded.name || decoded.displayName || email.split("@")[0] || "User";
 
-    const user = await prisma.user.upsert({
-      where: { firebaseUid: decoded.uid },
-      update: { lastLogin: new Date() },
-      create: {
-        firebaseUid: decoded.uid,
-        email,
-        name,
-        role: "user",
-        isActive: true,
-        timezone: "UTC",
-      },
-      select: { id: true, email: true, role: true, name: true },
-    });
+    const [user] = await db
+      .insert(users)
+      .values({ firebaseUid: decoded.uid, email, name, role: "user", isActive: true, timezone: "UTC" })
+      .onConflictDoUpdate({
+        target: users.firebaseUid,
+        set: { lastLogin: new Date() },
+      })
+      .returning({ id: users.id, email: users.email, role: users.role, name: users.name });
 
     return c.json({ user }, 200);
   } catch (error) {

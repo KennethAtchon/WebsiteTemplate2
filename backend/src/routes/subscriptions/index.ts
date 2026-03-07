@@ -12,7 +12,9 @@ import {
   STRIPE_SECRET_KEY,
 } from "../../utils/config/envUtil";
 import { adminDb } from "../../services/firebase/admin";
-import { prisma } from "../../services/db/prisma";
+import { db } from "../../services/db/db";
+import { users } from "../../infrastructure/database/drizzle/schema";
+import { eq } from "drizzle-orm";
 import { STRIPE_MAP } from "../../constants/stripe.constants";
 import Stripe from "stripe";
 
@@ -45,15 +47,9 @@ subscriptions.get(
       // Mark hasUsedFreeTrial when user has any active subscription
       if (subData.status === "trialing" || subData.status === "active") {
         try {
-          const dbUser = await prisma.user.findUnique({
-            where: { id: auth.user.id },
-            select: { hasUsedFreeTrial: true },
-          });
+          const [dbUser] = await db.select({ hasUsedFreeTrial: users.hasUsedFreeTrial }).from(users).where(eq(users.id, auth.user.id)).limit(1);
           if (dbUser && !dbUser.hasUsedFreeTrial) {
-            await prisma.user.update({
-              where: { id: auth.user.id },
-              data: { hasUsedFreeTrial: true },
-            });
+            await db.update(users).set({ hasUsedFreeTrial: true }).where(eq(users.id, auth.user.id));
           }
         } catch {
           // Don't fail the request if marking fails
@@ -124,10 +120,7 @@ subscriptions.get(
     try {
       const auth = c.get("auth");
 
-      const dbUser = await prisma.user.findUnique({
-        where: { id: auth.user.id },
-        select: { hasUsedFreeTrial: true },
-      });
+      const [dbUser] = await db.select({ hasUsedFreeTrial: users.hasUsedFreeTrial }).from(users).where(eq(users.id, auth.user.id)).limit(1);
 
       if (!dbUser) return c.json({ error: "User not found" }, 404);
 
@@ -266,10 +259,7 @@ subscriptions.post(
       // Check trial eligibility
       let allowTrial = false;
       if (trialEnabled) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: auth.user.id },
-          select: { hasUsedFreeTrial: true },
-        });
+        const [dbUser] = await db.select({ hasUsedFreeTrial: users.hasUsedFreeTrial }).from(users).where(eq(users.id, auth.user.id)).limit(1);
         const trialingSnapshot = await adminDb
           .collection("customers")
           .doc(uid)

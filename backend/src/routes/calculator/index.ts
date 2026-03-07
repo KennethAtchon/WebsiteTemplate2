@@ -24,7 +24,9 @@ import {
   toSubscriptionTier,
 } from "../../constants/subscription.constants";
 import { getMonthlyUsageCount } from "../../features/calculator/services/usage-service";
-import { prisma } from "../../services/db/prisma";
+import { db } from "../../services/db/db";
+import { featureUsages } from "../../infrastructure/database/drizzle/schema";
+import { eq, and, desc, sql } from "drizzle-orm";
 
 const calculator = new Hono<HonoEnv>();
 
@@ -118,14 +120,12 @@ calculator.post(
       // Save calculation history
       try {
         const serializedResults = JSON.parse(JSON.stringify(result.results));
-        await prisma.featureUsage.create({
-          data: {
-            userId: auth.user.id,
-            featureType: type,
-            inputData: result.inputs,
-            resultData: serializedResults,
-            usageTimeMs: result.calculationTime,
-          },
+        await db.insert(featureUsages).values({
+          userId: auth.user.id,
+          featureType: type,
+          inputData: result.inputs,
+          resultData: serializedResults,
+          usageTimeMs: result.calculationTime,
         });
       } catch {
         // Don't fail if history save fails
@@ -155,17 +155,14 @@ calculator.get(
       const type = c.req.query("type");
       const skip = (page - 1) * limit;
 
-      const where: any = { userId: auth.user.id };
-      if (type) where.featureType = type;
+      const historyWhere = and(
+        eq(featureUsages.userId, auth.user.id),
+        type ? eq(featureUsages.featureType, type) : undefined,
+      );
 
-      const [history, total] = await Promise.all([
-        prisma.featureUsage.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          skip,
-          take: limit,
-        }),
-        prisma.featureUsage.count({ where }),
+      const [history, [{ total }]] = await Promise.all([
+        db.select().from(featureUsages).where(historyWhere).orderBy(desc(featureUsages.createdAt)).offset(skip).limit(limit),
+        db.select({ total: sql<number>`count(*)::int` }).from(featureUsages).where(historyWhere),
       ]);
 
       return c.json({
@@ -250,10 +247,7 @@ calculator.get(
       const auth = c.get("auth");
       const format = c.req.query("format") || "json";
 
-      const history = await prisma.featureUsage.findMany({
-        where: { userId: auth.user.id },
-        orderBy: { createdAt: "desc" },
-      });
+      const history = await db.select().from(featureUsages).where(eq(featureUsages.userId, auth.user.id)).orderBy(desc(featureUsages.createdAt));
 
       if (format === "csv") {
         const csvRows = [

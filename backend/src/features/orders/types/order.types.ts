@@ -2,7 +2,7 @@
  * Order Types
  *
  * TypeScript types for order-related data structures.
- * Maps to the Order model in schema.prisma.
+ * Maps to the orders table in the Drizzle schema.
  * NOTE: These are one-time purchase orders only. Subscriptions live in Firestore.
  */
 

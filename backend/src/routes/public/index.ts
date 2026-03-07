@@ -5,7 +5,10 @@ import {
   rateLimiter,
 } from "../../middleware/protection";
 import type { HonoEnv } from "../../middleware/protection";
-import { prisma } from "../../services/db/prisma";
+import { db } from "../../services/db/db";
+import { contactMessages } from "../../infrastructure/database/drizzle/schema";
+import { and, desc, gte, lte, or, ilike, sql } from "drizzle-orm";
+import { encrypt, decrypt } from "../../utils/security/encryption";
 import { sendOrderConfirmationEmail } from "../../services/email/resend";
 import { storage } from "../../services/storage";
 import { generateSecureFilename } from "../../utils/validation/file-validation";
@@ -27,39 +30,34 @@ publicRoutes.get(
       const dateTo = c.req.query("dateTo");
       const skip = (page - 1) * limit;
 
-      const where: any = {};
-      if (search) {
-        where.OR = [
-          { name: { contains: search, mode: "insensitive" } },
-          { email: { contains: search, mode: "insensitive" } },
-          { subject: { contains: search, mode: "insensitive" } },
-        ];
-      }
-      if (dateFrom || dateTo) {
-        where.createdAt = {
-          ...(dateFrom && { gte: new Date(dateFrom) }),
-          ...(dateTo && { lte: new Date(dateTo) }),
-        };
-      }
+      const msgWhere = and(
+        search
+          ? or(
+              ilike(contactMessages.name, `%${search}%`),
+              ilike(contactMessages.email, `%${search}%`),
+              ilike(contactMessages.subject, `%${search}%`),
+            )
+          : undefined,
+        dateFrom ? gte(contactMessages.createdAt, new Date(dateFrom)) : undefined,
+        dateTo ? lte(contactMessages.createdAt, new Date(dateTo)) : undefined,
+      );
 
-      const [messages, total] = await Promise.all([
-        prisma.contactMessage.findMany({
-          where,
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            subject: true,
-            message: true,
-            createdAt: true,
-          },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
-        }),
-        prisma.contactMessage.count({ where }),
+      const [rawMessages, [{ total }]] = await Promise.all([
+        db.select().from(contactMessages).where(msgWhere).orderBy(desc(contactMessages.createdAt)).limit(limit).offset(skip),
+        db.select({ total: sql<number>`count(*)::int` }).from(contactMessages).where(msgWhere),
       ]);
+
+      // Decrypt PII fields
+      const ENCRYPTED_FIELDS = ["name", "email", "phone", "subject", "message"] as const;
+      const messages = rawMessages.map((msg) => {
+        const decrypted = { ...msg };
+        for (const field of ENCRYPTED_FIELDS) {
+          if (decrypted[field]) {
+            try { (decrypted as any)[field] = decrypt(decrypted[field] as string); } catch { /* leave as-is */ }
+          }
+        }
+        return decrypted;
+      });
 
       const totalPages = Math.ceil(total / limit);
       return c.json({
@@ -114,16 +112,16 @@ publicRoutes.post("/contact-messages", rateLimiter("public"), async (c) => {
       );
     }
 
-    const newMessage = await prisma.contactMessage.create({
-      data: { name, email, phone: phone || null, subject, message },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        subject: true,
-        createdAt: true,
-      },
-    });
+    const [newMessage] = await db
+      .insert(contactMessages)
+      .values({
+        name: encrypt(name),
+        email: encrypt(email),
+        phone: phone ? encrypt(phone) : null,
+        subject: encrypt(subject),
+        message: encrypt(message),
+      })
+      .returning({ id: contactMessages.id, name: contactMessages.name, email: contactMessages.email, subject: contactMessages.subject, createdAt: contactMessages.createdAt });
 
     return c.json(
       {

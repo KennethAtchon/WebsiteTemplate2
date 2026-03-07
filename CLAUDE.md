@@ -29,9 +29,9 @@ bun test __tests__/unit/utils/date.test.ts
 bun dev                # Hot-reload dev server (port 3001)
 bun test               # All tests
 bun test:unit          # Unit tests only
-bun db:generate        # Prisma generate (after schema changes)
-bun db:migrate         # Prisma migrate dev
-bun db:studio          # Prisma Studio GUI
+bun db:generate        # Drizzle generate (after schema changes)
+bun db:migrate         # Drizzle migrate
+bun db:studio          # Drizzle Studio GUI
 bun lint               # ESLint
 ```
 
@@ -72,7 +72,7 @@ This is a **monorepo** with two independent servers that share no code at runtim
 | Concern | Library |
 |---|---|
 | HTTP framework | Hono |
-| Database | PostgreSQL via Prisma (schema: `src/infrastructure/database/prisma/schema.prisma`) |
+| Database | PostgreSQL via Drizzle ORM (schema: `src/infrastructure/database/drizzle/schema.ts`) |
 | Cache / rate limiting | Redis (ioredis) |
 | Auth | Firebase Admin SDK |
 | Payments | Stripe |
@@ -158,7 +158,7 @@ Both frontend and backend use **Bun's built-in test runner**.
 Test setup is in `__tests__/setup/bun-preload.ts` (loaded automatically via `bunfig.toml`). It:
 - Registers Happy DOM (DOM environment for React Testing Library)
 - Sets test env vars
-- Mocks Firebase, Prisma, auth middleware, rate limiters, and other heavy dependencies via `global.__testMocks__`
+- Mocks Firebase, auth middleware, rate limiters, and other heavy dependencies via `global.__testMocks__`
 
 To override a mock in a specific test, use `(global as any).__testMocks__.<service>.<method>.mockResolvedValue(...)`.
 

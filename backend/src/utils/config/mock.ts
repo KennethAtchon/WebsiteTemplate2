@@ -1,14 +1,10 @@
 /**
- * Mock data and helper functions using Prisma types
+ * Mock data and helper functions
  */
-import {
-  Order as PrismaOrder,
-  User as PrismaUser,
-  Prisma as _Prisma,
-} from "@/infrastructure/database/lib/generated/prisma";
+import type { Order as DrizzleOrder, User as DrizzleUser } from "@/infrastructure/database/drizzle/schema";
 
 // Extended types for UI components with computed fields
-export interface OrderWithDetails extends Omit<PrismaOrder, "user"> {
+export interface OrderWithDetails extends Omit<DrizzleOrder, "userId"> {
   customer: {
     id: string;
     name: string;
@@ -19,8 +15,8 @@ export interface OrderWithDetails extends Omit<PrismaOrder, "user"> {
   products?: { name: string; quantity: number; price: number }[];
 }
 
-// Re-export Prisma types for convenience
-export type { PrismaOrder as Order, PrismaUser as User };
+// Re-export types for convenience
+export type { DrizzleOrder as Order, DrizzleUser as User };
 
 /**
  * Legacy mock data - kept for backward compatibility

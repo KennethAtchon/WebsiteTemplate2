@@ -179,7 +179,6 @@ function classifyAndRespond(error: Error): Response {
   const message = error.message.toLowerCase();
 
   if (
-    message.includes("prisma") ||
     message.includes("database") ||
     message.includes("connection pool")
   ) {

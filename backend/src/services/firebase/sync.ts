@@ -1,5 +1,7 @@
 import { adminAuth } from "./admin";
-import { prisma } from "@/services/db/prisma";
+import { db } from "@/services/db/db";
+import { users } from "@/infrastructure/database/drizzle/schema";
+import { isNotNull } from "drizzle-orm";
 import { debugLog } from "@/utils/debug";
 
 export interface SyncResult {
@@ -189,13 +191,7 @@ export class FirebaseUserSync {
    */
   static async syncAllUsers(): Promise<SyncResult[]> {
     try {
-      const dbUsers = await prisma.user.findMany({
-        where: {
-          firebaseUid: {
-            not: null,
-          },
-        },
-      });
+      const dbUsers = await db.select().from(users).where(isNotNull(users.firebaseUid));
 
       const results: SyncResult[] = [];
 
