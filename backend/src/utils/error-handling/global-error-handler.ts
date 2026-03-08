@@ -87,7 +87,7 @@ const errorMetrics = {
  */
 function categorizeError(error: Error): ErrorCategory {
   const message = (error.message || "").toLowerCase();
-  const stack = error.stack?.toLowerCase() || "";
+  const _stack = error.stack?.toLowerCase() || "";
 
   // Database errors (check first - most specific)
   if (

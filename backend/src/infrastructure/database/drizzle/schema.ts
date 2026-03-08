@@ -34,23 +34,25 @@ export const users = pgTable("user", {
     .$onUpdateFn(() => new Date()),
 });
 
-export const orders = pgTable("order", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  userId: text("user_id").notNull(),
-  totalAmount: numeric("total_amount", { precision: 10, scale: 2 }).notNull(),
-  status: text("status"),
-  stripeSessionId: text("stripe_session_id").unique(),
-  skipPayment: boolean("skip_payment").notNull().default(false),
-  orderType: text("order_type").notNull().default("one_time"),
-  isDeleted: boolean("is_deleted").notNull().default(false),
-  deletedAt: timestamp("deleted_at"),
-  deletedBy: text("deleted_by"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-}, (t) => [
-  index("orders_user_id_idx").on(t.userId),
-]);
+export const orders = pgTable(
+  "order",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").notNull(),
+    totalAmount: numeric("total_amount", { precision: 10, scale: 2 }).notNull(),
+    status: text("status"),
+    stripeSessionId: text("stripe_session_id").unique(),
+    skipPayment: boolean("skip_payment").notNull().default(false),
+    orderType: text("order_type").notNull().default("one_time"),
+    isDeleted: boolean("is_deleted").notNull().default(false),
+    deletedAt: timestamp("deleted_at"),
+    deletedBy: text("deleted_by"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("orders_user_id_idx").on(t.userId)],
+);
 
 export const contactMessages = pgTable("contact_message", {
   id: text("id")
@@ -64,19 +66,21 @@ export const contactMessages = pgTable("contact_message", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const featureUsages = pgTable("feature_usage", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  userId: text("user_id").notNull(),
-  featureType: text("feature_type").notNull(),
-  inputData: json("input_data").notNull(),
-  resultData: json("result_data").notNull(),
-  usageTimeMs: integer("usage_time_ms").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-}, (t) => [
-  index("feature_usages_user_id_idx").on(t.userId),
-]);
+export const featureUsages = pgTable(
+  "feature_usage",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").notNull(),
+    featureType: text("feature_type").notNull(),
+    inputData: json("input_data").notNull(),
+    resultData: json("result_data").notNull(),
+    usageTimeMs: integer("usage_time_ms").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("feature_usages_user_id_idx").on(t.userId)],
+);
 
 // ─── Relations ────────────────────────────────────────────────────────────────
 

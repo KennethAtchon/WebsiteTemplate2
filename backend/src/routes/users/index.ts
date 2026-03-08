@@ -13,6 +13,7 @@ import {
 import { eq, and, or, ilike, desc, gte, lte, sql } from "drizzle-orm";
 import { adminAuth } from "../../services/firebase/admin";
 import { FirebaseUserSync } from "../../services/firebase/sync";
+import { debugLog } from "../../utils/debug/debug";
 
 const users = new Hono<HonoEnv>();
 
@@ -67,7 +68,11 @@ users.get("/", rateLimiter("admin"), authMiddleware("admin"), async (c) => {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch users:", error);
+    debugLog.error("Failed to fetch users", {
+      service: "users-route",
+      operation: "getUsers",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return c.json({ error: "Failed to fetch users" }, 500);
   }
 });
@@ -116,7 +121,11 @@ users.post(
 
       return c.json(newUser, 201);
     } catch (error) {
-      console.error("Failed to create user:", error);
+      debugLog.error("Failed to create user", {
+        service: "users-route",
+        operation: "createUser",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to create user" }, 500);
     }
   },
@@ -137,7 +146,7 @@ users.patch(
         address,
         role,
         name,
-        password,
+        password: _password,
         email,
         isActive,
         timezone,
@@ -179,14 +188,22 @@ users.patch(
             existingUser.firebaseUid,
             syncData as any,
           ).catch((err) =>
-            console.warn("Failed to sync user update to Firebase:", err),
+            debugLog.warn("Failed to sync user update to Firebase", {
+              service: "users-route",
+              operation: "updateUser",
+              error: err instanceof Error ? err.message : "Unknown error",
+            }),
           );
         }
       }
 
       return c.json(updatedUser);
     } catch (error) {
-      console.error("Failed to update user:", error);
+      debugLog.error("Failed to update user", {
+        service: "users-route",
+        operation: "updateUser",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to update user" }, 500);
     }
   },
@@ -226,7 +243,11 @@ users.delete(
           existingUser.firebaseUid,
           hardDelete,
         ).catch((err) =>
-          console.warn("Failed to sync user deletion to Firebase:", err),
+          debugLog.warn("Failed to sync user deletion to Firebase", {
+            service: "users-route",
+            operation: "deleteUser",
+            error: err instanceof Error ? err.message : "Unknown error",
+          }),
         );
       }
 
@@ -235,7 +256,11 @@ users.delete(
         message: hardDelete ? "User deleted permanently" : "User deactivated",
       });
     } catch (error) {
-      console.error("Failed to delete user:", error);
+      debugLog.error("Failed to delete user", {
+        service: "users-route",
+        operation: "deleteUser",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to delete user" }, 500);
     }
   },
@@ -310,7 +335,11 @@ users.get(
         percentChange,
       });
     } catch (error) {
-      console.error("Failed to fetch customers count:", error);
+      debugLog.error("Failed to fetch customers count", {
+        service: "users-route",
+        operation: "getCustomersCount",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch customers count" }, 500);
     }
   },
@@ -362,7 +391,11 @@ users.delete(
 
       return c.json({ success: true, message: "Account deleted successfully" });
     } catch (error) {
-      console.error("Failed to delete account:", error);
+      debugLog.error("Failed to delete account", {
+        service: "users-route",
+        operation: "deleteAccount",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to delete account" }, 500);
     }
   },
@@ -411,7 +444,11 @@ users.get(
         },
       });
     } catch (error) {
-      console.error("Failed to export data:", error);
+      debugLog.error("Failed to export data", {
+        service: "users-route",
+        operation: "exportData",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to export data" }, 500);
     }
   },
@@ -438,7 +475,11 @@ users.post(
 
       return c.json({ success: true, user });
     } catch (error) {
-      console.error("Failed to update user processing status:", error);
+      debugLog.error("Failed to update user processing status", {
+        service: "users-route",
+        operation: "updateProcessingStatus",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to update user" }, 500);
     }
   },

@@ -24,7 +24,7 @@ export interface FirebaseDecodedToken {
   name?: string;
   role?: string;
   stripeRole?: string; // Set by Firebase Stripe Extension based on subscription
-  [key: string]: any; // Allow other custom claims
+  [key: string]: unknown; // Allow other custom claims
 }
 
 export interface AuthState {

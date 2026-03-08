@@ -9,6 +9,7 @@ import { db } from "../../services/db/db";
 import { users, orders } from "../../infrastructure/database/drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { adminAuth } from "../../services/firebase/admin";
+import { debugLog } from "../../utils/debug/debug";
 
 const customer = new Hono<HonoEnv>();
 
@@ -47,7 +48,7 @@ customer.get(
         if (auth.firebaseUser?.uid) {
           const fbUser = await adminAuth.getUser(auth.firebaseUser.uid);
           isOAuthUser = !fbUser.providerData.some(
-            (p: any) => p.providerId === "password",
+            (p: { providerId?: string }) => p.providerId === "password",
           );
         }
       } catch {
@@ -56,7 +57,11 @@ customer.get(
 
       return c.json({ profile: user, isOAuthUser });
     } catch (error) {
-      console.error("Failed to fetch profile:", error);
+      debugLog.error("Failed to fetch profile", {
+        service: "customer-route",
+        operation: "getProfile",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch profile" }, 500);
     }
   },
@@ -140,14 +145,19 @@ customer.put(
         message: "Profile updated successfully",
         profile: updatedUser,
       });
-    } catch (error: any) {
-      if (error?.code === "23505") {
+    } catch (error: unknown) {
+      const err = error as { code?: string };
+      if (err?.code === "23505") {
         return c.json(
           { error: "Email already exists", code: "EMAIL_ALREADY_EXISTS" },
           400,
         );
       }
-      console.error("Failed to update profile:", error);
+      debugLog.error("Failed to update profile", {
+        service: "customer-route",
+        operation: "updateProfile",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to update profile" }, 500);
     }
   },
@@ -194,7 +204,11 @@ customer.get(
         },
       });
     } catch (error) {
-      console.error("Failed to fetch orders:", error);
+      debugLog.error("Failed to fetch orders", {
+        service: "customer-route",
+        operation: "getOrders",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch orders" }, 500);
     }
   },
@@ -220,7 +234,11 @@ customer.post(
 
       return c.json(order, 201);
     } catch (error) {
-      console.error("Failed to create order:", error);
+      debugLog.error("Failed to create order", {
+        service: "customer-route",
+        operation: "createOrder",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to create order" }, 500);
     }
   },
@@ -253,7 +271,11 @@ customer.get(
       if (!order) return c.json({ error: "Order not found" }, 404);
       return c.json(order);
     } catch (error) {
-      console.error("Failed to fetch order by session:", error);
+      debugLog.error("Failed to fetch order by session", {
+        service: "customer-route",
+        operation: "getOrderBySession",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch order" }, 500);
     }
   },
@@ -279,7 +301,11 @@ customer.get(
 
       return c.json({ totalRevenue: result?.total || 0 });
     } catch (error) {
-      console.error("Failed to fetch total revenue:", error);
+      debugLog.error("Failed to fetch total revenue", {
+        service: "customer-route",
+        operation: "getTotalRevenue",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch total revenue" }, 500);
     }
   },
@@ -306,7 +332,11 @@ customer.get(
       if (!order) return c.json({ error: "Order not found" }, 404);
       return c.json(order);
     } catch (error) {
-      console.error("Failed to fetch order:", error);
+      debugLog.error("Failed to fetch order", {
+        service: "customer-route",
+        operation: "getOrderById",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch order" }, 500);
     }
   },

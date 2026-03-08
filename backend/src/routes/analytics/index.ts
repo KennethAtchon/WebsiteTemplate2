@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { rateLimiter } from "../../middleware/protection";
+import { debugLog } from "../../utils/debug/debug";
 
 const analytics = new Hono();
 
@@ -8,7 +9,11 @@ const analytics = new Hono();
 analytics.post("/form-completion", rateLimiter("public"), async (c) => {
   try {
     const data = await c.req.json();
-    console.info("[analytics] form-completion:", JSON.stringify(data));
+    debugLog.info("Form completion event", {
+      service: "analytics",
+      operation: "form-completion",
+      data,
+    });
     return c.json({ success: true });
   } catch {
     return c.json({ success: false }, 500);
@@ -20,7 +25,11 @@ analytics.options("/form-completion", (c) => c.body(null, 200));
 analytics.post("/form-progress", rateLimiter("public"), async (c) => {
   try {
     const data = await c.req.json();
-    console.info("[analytics] form-progress:", JSON.stringify(data));
+    debugLog.info("Form progress event", {
+      service: "analytics",
+      operation: "form-progress",
+      data,
+    });
     return c.json({ success: true });
   } catch {
     return c.json({ success: false }, 500);
@@ -32,7 +41,11 @@ analytics.options("/form-progress", (c) => c.body(null, 200));
 analytics.post("/search-performance", rateLimiter("public"), async (c) => {
   try {
     const data = await c.req.json();
-    console.info("[analytics] search-performance:", JSON.stringify(data));
+    debugLog.info("Search performance event", {
+      service: "analytics",
+      operation: "search-performance",
+      data,
+    });
     return c.json({ success: true });
   } catch {
     return c.json({ success: false }, 500);
@@ -44,16 +57,12 @@ analytics.options("/search-performance", (c) => c.body(null, 200));
 analytics.post("/web-vitals", rateLimiter("public"), async (c) => {
   try {
     const data = await c.req.json();
-    console.info(
-      "[analytics] web-vitals:",
-      JSON.stringify({
-        metric: data.name,
-        value: data.value,
-        rating: data.rating,
-        url: data.url,
-      }),
-    );
-    return c.json({ success: true, message: "Web vital metric recorded" });
+    debugLog.info("Web vitals event", {
+      service: "analytics",
+      operation: "web-vitals",
+      data,
+    });
+    return c.json({ success: true });
   } catch {
     return c.json({ success: false }, 500);
   }

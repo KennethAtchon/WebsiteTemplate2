@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { debugLog } from "../debug/debug";
 
 /**
  * SQL Injection Prevention Validation Schemas
@@ -233,7 +234,9 @@ export function validateSearchInput(
       const errorMessage = error.issues.map((e) => e.message).join(", ");
 
       // Log potential security issue
-      console.warn(`[SECURITY] Input validation failed in ${context}:`, {
+      debugLog.warn(`Input validation failed in ${context}`, {
+        service: "search-validation",
+        operation: "validateSearchInput",
         input:
           typeof input === "string"
             ? input.substring(0, 100)
@@ -242,18 +245,18 @@ export function validateSearchInput(
                 "search" in input &&
                 typeof (input as any).search === "string"
               ? (input as any).search.substring(0, 100)
-              : input,
-        errors: error.issues,
-        timestamp: new Date().toISOString(),
+              : typeof input,
+        inputType: typeof input,
       });
 
       return { success: false, error: errorMessage };
     }
 
-    console.error(
-      `[SECURITY] Unexpected validation error in ${context}:`,
-      error,
-    );
+    debugLog.error(`Unexpected validation error in ${context}`, {
+      service: "search-validation",
+      operation: "validateSearchInput",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return { success: false, error: "Invalid input" };
   }
 }

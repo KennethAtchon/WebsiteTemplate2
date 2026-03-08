@@ -30,6 +30,16 @@ export default [
         clearTimeout: "readonly",
         setInterval: "readonly",
         clearInterval: "readonly",
+        crypto: "readonly",
+        Response: "readonly",
+        Request: "readonly",
+        Headers: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        URLSearchParams: "readonly",
+        AbortController: "readonly",
+        AbortSignal: "readonly",
+        RequestInit: "readonly",
       },
     },
     plugins: {
@@ -41,10 +51,10 @@ export default [
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { 
+        {
           argsIgnorePattern: "^_",
           varsIgnorePattern: "^_",
-          caughtErrorsIgnorePattern: "^_"
+          caughtErrorsIgnorePattern: "^_",
         },
       ],
       "no-useless-escape": "off",
@@ -53,31 +63,25 @@ export default [
       "no-restricted-syntax": [
         "error",
         {
-          selector: "MemberExpression[object.name='process'][property.name='env']",
-          message: "Do not access process.env directly. Use constants from src/utils/config/envUtil instead.",
+          selector:
+            "MemberExpression[object.name='process'][property.name='env']",
+          message:
+            "Do not access process.env directly. Use constants from src/utils/config/envUtil instead.",
         },
       ],
       // Guard: never use console — use structured logging
       "no-console": "error",
     },
   },
-  // Allowlist: validation files can use console for validation logging
+  // Allowlist: ONLY debug.ts and system-logger.ts can use console
   {
-    files: ["src/utils/validation/*.ts"],
+    files: ["src/utils/debug/debug.ts"],
     rules: {
       "no-console": "off",
     },
   },
-  // Allowlist: system files can use console for system logging
   {
-    files: ["src/utils/system/*.ts"],
-    rules: {
-      "no-console": "off",
-    },
-  },
-  // Allowlist: security files can use console for security logging
-  {
-    files: ["src/utils/security/*.ts"],
+    files: ["src/utils/system/system-logger.ts"],
     rules: {
       "no-console": "off",
     },
@@ -96,9 +100,28 @@ export default [
       "no-restricted-syntax": "off",
     },
   },
+  // Allowlist: index.ts can use process.env for server configuration
+  {
+    files: ["src/index.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
+    },
+  },
+  // Allowlist: security middleware can use process.env for security config
+  {
+    files: ["src/middleware/security-headers.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
+    },
+  },
   {
     files: ["*.config.ts", "*.config.js", "*.config.mjs"],
     languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
       globals: {
         __dirname: "readonly",
         process: "readonly",

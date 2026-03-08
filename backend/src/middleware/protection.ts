@@ -6,6 +6,7 @@ import { users } from "../infrastructure/database/drizzle/schema";
 import { validateCSRFToken } from "../services/csrf/csrf-protection";
 import { checkRateLimit } from "../services/rate-limit/rate-limit-redis";
 import { getRateLimitConfig } from "../constants/rate-limit.config";
+import { debugLog } from "../utils/debug/debug";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -38,8 +39,8 @@ export interface ProtectionOptions {
   skipCSRF?: boolean;
   rateLimitType?: RateLimitType;
   requireAuth?: "user" | "admin" | false;
-  bodySchema?: z.ZodSchema<any>;
-  querySchema?: z.ZodSchema<any>;
+  bodySchema?: z.ZodSchema<unknown>;
+  querySchema?: z.ZodSchema<unknown>;
 }
 
 // ─── Hono Context Variables ────────────────────────────────────────────────────
@@ -124,7 +125,11 @@ export function authMiddleware(
       c.set("auth", authResult);
       await next();
     } catch (error) {
-      console.error("Auth middleware error:", error);
+      debugLog.error("Auth middleware error", {
+        service: "protection-middleware",
+        operation: "authMiddleware",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json(
         { error: "Invalid or expired token", code: "INVALID_TOKEN" },
         401,
@@ -181,7 +186,11 @@ export function csrfMiddleware(): MiddlewareHandler<HonoEnv> {
 
       await next();
     } catch (error) {
-      console.error("CSRF validation error:", error);
+      debugLog.error("CSRF validation error", {
+        service: "protection-middleware",
+        operation: "csrfMiddleware",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json(
         { error: "Invalid authentication token", code: "INVALID_TOKEN" },
         401,
@@ -240,7 +249,11 @@ export function rateLimiter(
         });
       }
     } catch (error) {
-      console.error("Rate limit error:", error);
+      debugLog.error("Rate limit error", {
+        service: "protection-middleware",
+        operation: "rateLimiter",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json(
         {
           error: "Service temporarily unavailable",
@@ -258,7 +271,7 @@ export function rateLimiter(
  * Validates request body against a Zod schema.
  */
 export function validateBody(
-  schema: z.ZodSchema<any>,
+  schema: z.ZodSchema<unknown>,
 ): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     if (["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
@@ -298,7 +311,7 @@ export function validateBody(
  * Validates query parameters against a Zod schema.
  */
 export function validateQuery(
-  schema: z.ZodSchema<any>,
+  schema: z.ZodSchema<unknown>,
 ): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {
     const query = c.req.query();

@@ -13,6 +13,7 @@ import {
 } from "../../utils/config/envUtil";
 import { adminDb } from "../../services/firebase/admin";
 import { db } from "../../services/db/db";
+import { debugLog } from "../../utils/debug/debug";
 import { users } from "../../infrastructure/database/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { STRIPE_MAP } from "../../constants/stripe.constants";
@@ -115,7 +116,11 @@ subscriptions.get(
         isInTrial,
       });
     } catch (error) {
-      console.error("Error fetching current subscription:", error);
+      debugLog.error("Error fetching current subscription", {
+        service: "subscriptions-route",
+        operation: "getCurrentSubscription",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch subscription" }, 500);
     }
   },
@@ -159,7 +164,11 @@ subscriptions.get(
         isInTrial,
       });
     } catch (error) {
-      console.error("Error checking trial eligibility:", error);
+      debugLog.error("Error checking trial eligibility", {
+        service: "subscriptions-route",
+        operation: "checkTrialEligibility",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to check trial eligibility" }, 500);
     }
   },
@@ -239,7 +248,11 @@ subscriptions.post(
 
       return c.json({ url: portalUrl });
     } catch (error) {
-      console.error("Error creating portal link:", error);
+      debugLog.error("Error creating portal link", {
+        service: "subscriptions-route",
+        operation: "createPortalLink",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to create portal link" }, 500);
     }
   },
@@ -260,8 +273,7 @@ subscriptions.post(
 
       if (!priceId) return c.json({ error: "priceId is required" }, 400);
 
-      if (!stripe)
-        return c.json({ error: "Stripe not configured" }, 500);
+      if (!stripe) return c.json({ error: "Stripe not configured" }, 500);
 
       const origin = c.req.header("origin") || "http://localhost:5173";
       const baseUrl = BASE_URL !== "[BASE_URL]" ? BASE_URL : origin;
@@ -320,7 +332,11 @@ subscriptions.post(
 
       return c.json({ url: session.url });
     } catch (error) {
-      console.error("Error creating checkout session:", error);
+      debugLog.error("Error creating checkout session", {
+        service: "subscriptions-route",
+        operation: "createCheckoutSession",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to create checkout session" }, 500);
     }
   },

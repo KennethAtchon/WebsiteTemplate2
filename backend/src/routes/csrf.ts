@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { authMiddleware, rateLimiter } from "../middleware/protection";
 import type { HonoEnv } from "../middleware/protection";
 import { generateCSRFToken } from "../services/csrf/csrf-protection";
+import { debugLog } from "../utils/debug/debug";
 
 const app = new Hono<HonoEnv>();
 
@@ -18,7 +19,11 @@ app.get("/", rateLimiter("public"), authMiddleware("user"), async (c) => {
 
     return c.json({ csrfToken: token, expires });
   } catch (error) {
-    console.error("CSRF token generation error:", error);
+    debugLog.error("CSRF token generation error", {
+      service: "csrf-route",
+      operation: "generateCSRFToken",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return c.json({ error: "Failed to generate CSRF token" }, 500);
   }
 });

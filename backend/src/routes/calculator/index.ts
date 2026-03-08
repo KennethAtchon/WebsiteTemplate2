@@ -27,6 +27,7 @@ import { getMonthlyUsageCount } from "../../features/calculator/services/usage-s
 import { db } from "../../services/db/db";
 import { featureUsages } from "../../infrastructure/database/drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
+import { debugLog } from "../../utils/debug/debug";
 
 const calculator = new Hono<HonoEnv>();
 
@@ -133,7 +134,11 @@ calculator.post(
 
       return c.json(result);
     } catch (error) {
-      console.error("Calculation error:", error);
+      debugLog.error("Calculation error", {
+        service: "calculator-route",
+        operation: "calculate",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to perform calculation" }, 500);
     }
   },
@@ -184,7 +189,11 @@ calculator.get(
         },
       });
     } catch (error) {
-      console.error("Failed to fetch history:", error);
+      debugLog.error("Failed to fetch history", {
+        service: "calculator-route",
+        operation: "getHistory",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch calculation history" }, 500);
     }
   },
@@ -212,7 +221,11 @@ calculator.get(
         remaining: limit === -1 ? "unlimited" : Math.max(0, limit - usageCount),
       });
     } catch (error) {
-      console.error("Failed to fetch usage:", error);
+      debugLog.error("Failed to fetch usage", {
+        service: "calculator-route",
+        operation: "getUsage",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch usage" }, 500);
     }
   },
@@ -238,7 +251,11 @@ calculator.get(
 
       return c.json({ types });
     } catch (error) {
-      console.error("Failed to fetch types:", error);
+      debugLog.error("Failed to fetch types", {
+        service: "calculator-route",
+        operation: "getTypes",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch calculator types" }, 500);
     }
   },
@@ -280,7 +297,11 @@ calculator.get(
 
       return c.json({ history });
     } catch (error) {
-      console.error("Failed to export:", error);
+      debugLog.error("Failed to export", {
+        service: "calculator-route",
+        operation: "export",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to export calculations" }, 500);
     }
   },

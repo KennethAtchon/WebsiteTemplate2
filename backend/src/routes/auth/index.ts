@@ -3,6 +3,7 @@ import { rateLimiter } from "../../middleware/protection";
 import { adminAuth } from "../../services/firebase/admin";
 import { db } from "../../services/db/db";
 import { users } from "../../infrastructure/database/drizzle/schema";
+import { debugLog } from "../../utils/debug/debug";
 
 const authRoutes = new Hono();
 
@@ -55,7 +56,11 @@ authRoutes.post("/register", rateLimiter("auth"), async (c) => {
 
     return c.json({ user }, 200);
   } catch (error) {
-    console.error("Auth register error:", error);
+    debugLog.error("Auth register error", {
+      service: "auth-route",
+      operation: "register",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return c.json({ error: "Invalid or expired token" }, 401);
   }
 });

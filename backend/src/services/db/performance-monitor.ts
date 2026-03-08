@@ -47,7 +47,11 @@ class DatabasePerformanceMonitor {
           current_setting('max_connections')::int as max_connections
         FROM pg_stat_activity
         WHERE datname = current_database()
-      `)) as any[];
+      `)) as Array<{
+        active_connections: string;
+        idle_connections: string;
+        max_connections: string;
+      }>;
 
       if (rows[0]) {
         const active = Number(rows[0].active_connections) || 0;

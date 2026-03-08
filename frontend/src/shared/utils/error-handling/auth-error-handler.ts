@@ -5,6 +5,7 @@
  */
 
 import { FirebaseError } from "firebase/app";
+import { debugLog } from "../debug/debug";
 
 /**
  * Maps Firebase authentication error codes to user-friendly messages
@@ -62,7 +63,11 @@ export function getAuthErrorMessage(
 
       default:
         // For unknown Firebase errors, log the code but show generic message
-        console.warn("Unhandled Firebase error code:", errorCode);
+        debugLog.warn("Unhandled Firebase error code", {
+          service: "auth-error-handler",
+          operation: "getAuthErrorMessage",
+          errorCode,
+        });
         return t("auth_error_generic");
     }
   }

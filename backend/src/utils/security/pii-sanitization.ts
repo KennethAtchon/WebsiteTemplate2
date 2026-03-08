@@ -8,6 +8,7 @@
  */
 
 import { IS_PRODUCTION, IS_DEVELOPMENT } from "@/utils/config/envUtil";
+import { debugLog } from "../debug/debug";
 
 export interface SanitizationConfig {
   preserveLength?: boolean; // Keep original length with asterisks
@@ -345,7 +346,12 @@ export function safeLogError(message: string, error: any, context?: any): void {
     // Don't include the full error object to prevent PII leakage
   };
 
-  console.error(sanitizedMessage, sanitizedError, sanitizedContext);
+  debugLog.error(sanitizedMessage, {
+    service: "pii-sanitization",
+    operation: "logSecureError",
+    error: sanitizedError,
+    context: sanitizedContext,
+  });
 }
 
 /**

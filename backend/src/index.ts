@@ -2,11 +2,16 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "./middleware/security-headers";
-import { getAllowedCorsOrigins, METRICS_SECRET } from "./utils/config/envUtil";
+import {
+  getAllowedCorsOrigins,
+  METRICS_SECRET,
+  getEnvVar,
+} from "./utils/config/envUtil";
 import {
   getMetricsContent,
   isMetricsEnabled,
 } from "./services/observability/metrics";
+import { debugLog } from "./utils/debug/debug";
 
 // Route imports
 import healthRoutes from "./routes/health";
@@ -94,9 +99,13 @@ app.get("/api/metrics", async (c) => {
 
 // ─── Start Server ──────────────────────────────────────────────────────────────
 
-const port = parseInt(process.env.PORT || "3001", 10);
+const port = parseInt(getEnvVar("PORT", false, "3001"), 10);
 
-console.log(`🚀 Hono backend starting on port ${port}`);
+debugLog.info(`Hono backend starting on port ${port}`, {
+  service: "index",
+  operation: "server-start",
+  port,
+});
 
 export default {
   port,

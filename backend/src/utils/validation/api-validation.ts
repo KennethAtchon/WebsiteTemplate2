@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { debugLog } from "../debug/debug";
 
 /**
  * Comprehensive API Request Validation Schemas
@@ -360,7 +361,9 @@ export function validateInput<T>(
         code: e.code,
       }));
 
-      console.warn(`[VALIDATION] Failed validation in ${context}:`, {
+      debugLog.warn(`Failed validation in ${context}`, {
+        service: "api-validation",
+        operation: "validateWithSchema",
         context,
         errors: formattedErrors,
         inputType: typeof input,
@@ -380,10 +383,11 @@ export function validateInput<T>(
       };
     }
 
-    console.error(
-      `[VALIDATION] Unexpected validation error in ${context}:`,
-      error,
-    );
+    debugLog.error(`Unexpected validation error in ${context}`, {
+      service: "api-validation",
+      operation: "validateWithSchema",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return { success: false, error: "Invalid input format" };
   }
 }

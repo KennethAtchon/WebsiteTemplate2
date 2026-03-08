@@ -4,6 +4,7 @@
  */
 
 import { Metric } from "web-vitals";
+import { debugLog } from "../debug/debug";
 
 // Performance thresholds for medical/healthcare applications
 const PERFORMANCE_THRESHOLDS = {
@@ -73,9 +74,13 @@ function sendToAnalytics(metric: Metric): void {
   const isPoorPerformance = rating === "poor";
 
   if (isPoorPerformance) {
-    console.warn(
-      `⚠️ Poor performance detected: ${metric.name} (${metric.value})`
-    );
+    debugLog.warn(`Poor performance detected`, {
+      service: "web-vitals",
+      operation: "sendToAnalytics",
+      metricName: metric.name,
+      metricValue: metric.value,
+      rating,
+    });
   }
 
   // Store in session storage for medical compliance tracking

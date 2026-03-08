@@ -1,4 +1,5 @@
 import type { MiddlewareHandler } from "hono";
+import { getEnvVar } from "../utils/config/envUtil";
 
 /**
  * Security headers middleware — equivalent to Next.js middleware.ts applySecurityHeaders
@@ -8,8 +9,8 @@ import type { MiddlewareHandler } from "hono";
  */
 export function secureHeaders(): MiddlewareHandler {
   const IS_PRODUCTION =
-    process.env.APP_ENV === "production" ||
-    process.env.NODE_ENV === "production";
+    getEnvVar("APP_ENV", false) === "production" ||
+    getEnvVar("NODE_ENV", false) === "production";
 
   return async (c, next) => {
     await next();

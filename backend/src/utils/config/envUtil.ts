@@ -244,3 +244,6 @@ export function getAllowedCorsOrigins(): string[] {
 export function shouldUseSecureCookies(): boolean {
   return IS_PRODUCTION;
 }
+
+// Export utility functions for external use
+export { getEnvVar, getEnvVarAsBoolean, _getEnvVarAsNumber, getEnvVarAsArray };

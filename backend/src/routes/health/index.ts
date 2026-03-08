@@ -4,12 +4,13 @@ import type { HonoEnv } from "../../middleware/protection";
 import {
   db,
   getQueryStats,
-  ensureConnectionHealth,
+  ensureConnectionHealth as _ensureConnectionHealth,
 } from "../../services/db/db";
 import { users } from "../../infrastructure/database/drizzle/schema";
 import { sql, count } from "drizzle-orm";
 import getRedisConnection from "../../services/db/redis";
 import { getErrorMetrics } from "../../services/observability/metrics";
+import { getEnvVar } from "../../utils/config/envUtil";
 
 const health = new Hono<HonoEnv>();
 
@@ -34,8 +35,8 @@ health.get("/", rateLimiter("health"), async (c) => {
       status: "healthy",
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      version: process.env.PACKAGE_VERSION || "0.1.0",
-      environment: process.env.APP_ENV || "development",
+      version: getEnvVar("PACKAGE_VERSION", false, "0.1.0"),
+      environment: getEnvVar("APP_ENV", false, "development"),
       checks: {
         database: extractResult(dbResult, "database"),
         redis: extractResult(redisResult, "redis"),
@@ -125,7 +126,7 @@ async function checkRedisHealth(
 ): Promise<HealthCheckResult> {
   const start = Date.now();
   try {
-    if (!process.env.REDIS_URL) {
+    if (!getEnvVar("REDIS_URL", false)) {
       return {
         status: "unhealthy",
         message: "Redis not configured",

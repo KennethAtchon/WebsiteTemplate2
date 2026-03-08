@@ -9,6 +9,7 @@ import { ADMIN_SPECIAL_CODE_HASH } from "../../utils/config/envUtil";
 import { createHash } from "crypto";
 import { adminAuth, adminDb } from "../../services/firebase/admin";
 import { db } from "../../services/db/db";
+import { debugLog } from "../../utils/debug/debug";
 import {
   users,
   orders,
@@ -100,7 +101,11 @@ admin.post(
         message: "Admin role granted successfully",
       });
     } catch (error) {
-      console.error("Admin verification error:", error);
+      debugLog.error("Admin verification error", {
+        service: "admin-route",
+        operation: "verifyAdmin",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Admin verification failed" }, 500);
     }
   },
@@ -118,7 +123,7 @@ admin.get(
       const { startOfThisMonth, startOfLastMonth, endOfLastMonth } =
         getMonthBoundaries();
 
-      const usersWithPaidOrdersSubquery = db
+      const _usersWithPaidOrdersSubquery = db
         .select({ userId: orders.userId })
         .from(orders)
         .where(eq(orders.status, "paid"))
@@ -234,7 +239,11 @@ admin.get(
         percentChange,
       });
     } catch (error) {
-      console.error("Failed to fetch analytics:", error);
+      debugLog.error("Failed to fetch analytics", {
+        service: "admin-route",
+        operation: "getAnalytics",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch analytics data" }, 500);
     }
   },
@@ -302,7 +311,11 @@ admin.get(
         },
       });
     } catch (error) {
-      console.error("Failed to fetch customers:", error);
+      debugLog.error("Failed to fetch customers", {
+        service: "admin-route",
+        operation: "getCustomers",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch customers" }, 500);
     }
   },
@@ -373,7 +386,11 @@ admin.get(
         },
       });
     } catch (error) {
-      console.error("Failed to fetch orders:", error);
+      debugLog.error("Failed to fetch orders", {
+        service: "admin-route",
+        operation: "getOrders",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch orders" }, 500);
     }
   },
@@ -412,7 +429,11 @@ admin.post(
 
       return c.json({ order: formatOrderResponse(order) }, 201);
     } catch (error) {
-      console.error("Failed to create order:", error);
+      debugLog.error("Failed to create order", {
+        service: "admin-route",
+        operation: "createOrder",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to create order" }, 500);
     }
   },
@@ -452,7 +473,11 @@ admin.put(
 
       return c.json({ order: formatOrderResponse(order) });
     } catch (error) {
-      console.error("Failed to update order:", error);
+      debugLog.error("Failed to update order", {
+        service: "admin-route",
+        operation: "updateOrder",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to update order" }, 500);
     }
   },
@@ -497,7 +522,11 @@ admin.delete(
 
       return c.json({ order: formatOrderResponse(order), deleted: true });
     } catch (error) {
-      console.error("Failed to delete order:", error);
+      debugLog.error("Failed to delete order", {
+        service: "admin-route",
+        operation: "deleteOrder",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to delete order" }, 500);
     }
   },
@@ -527,7 +556,11 @@ admin.get(
 
       return c.json({ order: formatOrderResponse(order) });
     } catch (error) {
-      console.error("Failed to fetch order:", error);
+      debugLog.error("Failed to fetch order", {
+        service: "admin-route",
+        operation: "getOrderById",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch order" }, 500);
     }
   },
@@ -663,7 +696,11 @@ admin.get(
         },
       });
     } catch (error) {
-      console.error("Failed to fetch subscriptions:", error);
+      debugLog.error("Failed to fetch subscriptions", {
+        service: "admin-route",
+        operation: "getSubscriptions",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch subscriptions" }, 500);
     }
   },
@@ -762,7 +799,11 @@ admin.get(
         growthRate: 0,
       });
     } catch (error) {
-      console.error("Failed to fetch subscription analytics:", error);
+      debugLog.error("Failed to fetch subscription analytics", {
+        service: "admin-route",
+        operation: "getSubscriptionAnalytics",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch subscription analytics" }, 500);
     }
   },
@@ -791,7 +832,11 @@ admin.get(
 
       return c.json({ error: "Subscription not found" }, 404);
     } catch (error) {
-      console.error("Failed to fetch subscription:", error);
+      debugLog.error("Failed to fetch subscription", {
+        service: "admin-route",
+        operation: "getSubscriptionById",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch subscription" }, 500);
     }
   },
@@ -832,7 +877,11 @@ admin.get(
         },
       });
     } catch (error) {
-      console.error("Failed to fetch feature usages:", error);
+      debugLog.error("Failed to fetch feature usages", {
+        service: "admin-route",
+        operation: "getFeatureUsages",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch feature usages" }, 500);
     }
   },
@@ -851,14 +900,18 @@ admin.post(
 
       const summary = {
         total: results.length,
-        successful: results.filter((r: any) => r.success).length,
-        failed: results.filter((r: any) => !r.success).length,
+        successful: results.filter((r: { success?: boolean }) => r.success).length,
+        failed: results.filter((r: { success?: boolean }) => !r.success).length,
         results,
       };
 
       return c.json({ success: true, summary });
     } catch (error) {
-      console.error("Failed to sync Firebase:", error);
+      debugLog.error("Failed to sync Firebase", {
+        service: "admin-route",
+        operation: "syncFirebase",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to sync with Firebase" }, 500);
     }
   },
@@ -875,7 +928,11 @@ admin.get(
       await db.execute(sql`SELECT 1`);
       return c.json({ status: "healthy", database: "connected" });
     } catch (error) {
-      console.error("Database health check failed:", error);
+      debugLog.error("Database health check failed", {
+        service: "admin-route",
+        operation: "databaseHealthCheck",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json(
         { status: "unhealthy", database: "disconnected", error: String(error) },
         503,
@@ -894,7 +951,7 @@ admin.get(
     try {
       // Return actual Drizzle schema structure
       const getTableName = (table: any) => {
-        const firstColumn = Object.values(table)[0] as any;
+        const firstColumn = Object.values(table)[0] as { tableName?: string };
         return firstColumn?.tableName || "unknown";
       };
 
@@ -953,7 +1010,11 @@ admin.get(
 
       return c.json(schema);
     } catch (error) {
-      console.error("Failed to fetch schema:", error);
+      debugLog.error("Failed to fetch schema", {
+        service: "admin-route",
+        operation: "getSchema",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch schema" }, 500);
     }
   },

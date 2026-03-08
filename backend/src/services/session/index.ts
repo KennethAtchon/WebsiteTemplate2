@@ -6,6 +6,8 @@
  * This service is for any additional session-related functionality needed.
  */
 
+import { debugLog } from "../../utils/debug/debug";
+
 export interface SessionData {
   userId: string;
   firebaseUid: string;
@@ -20,13 +22,20 @@ export class SessionService {
   static async createSession(data: SessionData): Promise<void> {
     // Implementation depends on specific requirements
     // Most session handling should be delegated to Firebase Auth
-    console.log("Session creation delegated to Firebase Auth:", data);
+    debugLog.info("Session creation delegated to Firebase Auth", {
+      service: "session-service",
+      operation: "createSession",
+      userId: data.userId,
+      firebaseUid: data.firebaseUid,
+    });
   }
 
   /**
    * Validate session (complements Firebase token validation)
    */
-  static async validateSession(sessionId: string): Promise<SessionData | null> {
+  static async validateSession(
+    _sessionId: string,
+  ): Promise<SessionData | null> {
     // This would be used if we have additional session tracking
     // beyond Firebase's built-in session management
     return null;
@@ -37,7 +46,10 @@ export class SessionService {
    */
   static async cleanupExpiredSessions(): Promise<void> {
     // Implementation for cleaning up any additional session data
-    console.log("Session cleanup completed");
+    debugLog.info("Session cleanup completed", {
+      service: "session-service",
+      operation: "cleanupExpiredSessions",
+    });
   }
 }
 

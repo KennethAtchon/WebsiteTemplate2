@@ -12,6 +12,7 @@ import { encrypt, decrypt } from "../../utils/security/encryption";
 import { sendOrderConfirmationEmail } from "../../services/email/resend";
 import { storage } from "../../services/storage";
 import { generateSecureFilename } from "../../utils/validation/file-validation";
+import { debugLog } from "../../utils/debug/debug";
 
 const publicRoutes = new Hono<HonoEnv>();
 
@@ -93,7 +94,11 @@ publicRoutes.get(
         },
       });
     } catch (error) {
-      console.error("Failed to fetch contact messages:", error);
+      debugLog.error("Failed to fetch contact messages", {
+        service: "public-route",
+        operation: "getContactMessages",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to fetch contact messages" }, 500);
     }
   },
@@ -160,7 +165,11 @@ publicRoutes.post("/contact-messages", rateLimiter("public"), async (c) => {
       201,
     );
   } catch (error) {
-    console.error("Failed to create contact message:", error);
+    debugLog.error("Failed to create contact message", {
+      service: "public-route",
+      operation: "createContactMessage",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return c.json(
       {
         error:
@@ -215,7 +224,11 @@ publicRoutes.post("/emails", rateLimiter("public"), async (c) => {
       );
     }
   } catch (error) {
-    console.error("Failed to send email:", error);
+    debugLog.error("Failed to send email", {
+      service: "public-route",
+      operation: "sendOrderConfirmationEmail",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return c.json({ error: "Failed to send email" }, 500);
   }
 });
@@ -258,7 +271,11 @@ publicRoutes.post(
 
       return c.json({ success: true, url, filename });
     } catch (error) {
-      console.error("Failed to upload file:", error);
+      debugLog.error("Failed to upload file", {
+        service: "public-route",
+        operation: "uploadFile",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return c.json({ error: "Failed to upload file" }, 500);
     }
   },

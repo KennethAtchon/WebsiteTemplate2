@@ -15,11 +15,17 @@ import { APP_ENV } from "@/shared/utils/config/envUtil";
 
 // TODO: Implement these when backend services are available
 const installGlobalErrorHandlers = () => {
-  console.log("Global error handlers not yet implemented");
+  debugLog.info("Global error handlers not yet implemented", {
+    service: "app-initialization",
+    operation: "installGlobalErrorHandlers",
+  });
 };
 
 const getRedisConnection = (): any => {
-  console.log("Redis connection not yet implemented");
+  debugLog.info("Redis connection not yet implemented", {
+    service: "app-initialization",
+    operation: "getRedisConnection",
+  });
   return null;
 };
 

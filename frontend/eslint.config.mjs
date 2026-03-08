@@ -104,51 +104,15 @@ export default [
       "no-console": "error",
     },
   },
-  // Allowlist: web-vitals.ts uses console for development logging
-  {
-    files: ["src/shared/utils/system/web-vitals.ts"],
-    rules: {
-      "no-console": "off",
-    },
-  },
-  // Allowlist: system-logger.ts uses console for logging
-  {
-    files: ["src/shared/utils/system/system-logger.ts"],
-    rules: {
-      "no-console": "off",
-    },
-  },
-  // Allowlist: app-initialization.ts uses console for startup logging
-  {
-    files: ["src/shared/utils/system/app-initialization.ts"],
-    rules: {
-      "no-console": "off",
-    },
-  },
-  // Allowlist: pii-sanitization.ts uses console for security logging
-  {
-    files: ["src/shared/utils/security/pii-sanitization.ts"],
-    rules: {
-      "no-console": "off",
-    },
-  },
-  // Allowlist: envUtil.ts uses console for environment logging
-  {
-    files: ["src/shared/utils/config/envUtil.ts"],
-    rules: {
-      "no-console": "off",
-    },
-  },
-  // Allowlist: debug.ts uses console for debugging
+  // Allowlist: ONLY debug.ts and system-logger.ts can use console
   {
     files: ["src/shared/utils/debug/debug.ts"],
     rules: {
       "no-console": "off",
     },
   },
-  // Allowlist: auth-error-handler.ts uses console for error logging
   {
-    files: ["src/shared/utils/error-handling/auth-error-handler.ts"],
+    files: ["src/shared/utils/system/system-logger.ts"],
     rules: {
       "no-console": "off",
     },
