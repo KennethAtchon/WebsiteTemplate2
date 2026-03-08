@@ -328,10 +328,9 @@ export function clearErrorMetrics(): void {
 /**
  * Utility for wrapping async functions with error handling
  */
-export function withErrorHandling<T extends (...args: any[]) => Promise<unknown>>(
-  fn: T,
-  context: Partial<ErrorContext> = {}
-): T {
+export function withErrorHandling<
+  T extends (...args: any[]) => Promise<unknown>,
+>(fn: T, context: Partial<ErrorContext> = {}): T {
   return (async (...args: any[]) => {
     try {
       return await fn(...args);
