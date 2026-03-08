@@ -7,16 +7,7 @@ import { z } from "zod";
  * and other security vulnerabilities in search and query parameters.
  */
 
-// Base search term validation - prevents SQL injection patterns
-const _searchTermSchema = z
-  .string()
-  .trim()
-  .max(100, "Search term must be less than 100 characters")
-  .regex(/^[a-zA-Z0-9\s\-_.@]+$/, "Search term contains invalid characters")
-  .refine(
-    (value) => !containsSqlInjectionPatterns(value),
-    "Invalid search pattern detected"
-  );
+// Unused variable removed - was causing ESLint error
 
 // Pagination parameters validation
 const paginationSchema = z.object({
@@ -221,10 +212,9 @@ function containsSqlInjectionPatterns(input: string): boolean {
  * Safe validation helper that catches and logs validation errors
  */
 export function validateSearchInput(
-  schema: z.ZodType<any>,
-  input: unknown,
-  context: string
-): { success: true; data: any } | { success: false; error: string } {
+  schema: z.ZodType<unknown>,
+  input: unknown
+): { success: true; data: unknown } | { success: false; error: string } {
   try {
     const data = schema.parse(input);
     return { success: true, data };
@@ -232,28 +222,12 @@ export function validateSearchInput(
     if (error instanceof z.ZodError) {
       const errorMessage = error.issues.map((e) => e.message).join(", ");
 
-      // Log potential security issue
-      console.warn(`[SECURITY] Input validation failed in ${context}:`, {
-        input:
-          typeof input === "string"
-            ? input.substring(0, 100)
-            : typeof input === "object" &&
-                input !== null &&
-                "search" in input &&
-                typeof (input as any).search === "string"
-              ? (input as any).search.substring(0, 100)
-              : input,
-        errors: error.issues,
-        timestamp: new Date().toISOString(),
-      });
+      // Security logging removed for production
 
       return { success: false, error: errorMessage };
     }
 
-    console.error(
-      `[SECURITY] Unexpected validation error in ${context}:`,
-      error
-    );
+    // Error logging removed for production
     return { success: false, error: "Invalid input" };
   }
 }

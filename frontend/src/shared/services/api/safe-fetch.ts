@@ -12,8 +12,8 @@ export interface SafeFetchOptions extends RequestInit {
   timeout?: number;
   retryAttempts?: number;
   retryDelay?: number;
-  retryOn?: (error: Error) => boolean;
-  validateResponse?: (response: Response) => boolean;
+  retryOn?: (_error: Error) => boolean;
+  validateResponse?: (_response: Response) => boolean;
   logRequests?: boolean;
 }
 
@@ -291,7 +291,7 @@ function combineAbortSignals(signals: AbortSignal[]): AbortSignal {
       controller.abort();
       return;
     }
-    signal.addEventListener("abort", onAbort);
+    signal.addEventListener("abort", onAbort, { once: true });
   });
 
   return controller.signal;
@@ -344,7 +344,7 @@ function sleep(ms: number): Promise<void> {
  * Generates a unique request ID for tracking
  */
 function generateRequestId(): string {
-  return `fetch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `fetch_${crypto.randomUUID()}`;
 }
 
 /**

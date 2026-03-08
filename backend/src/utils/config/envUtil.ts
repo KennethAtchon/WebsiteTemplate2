@@ -13,10 +13,6 @@ function getEnvVar(
 ): string {
   const envValue = value !== undefined ? value : process.env[name];
 
-  // In backend/server environment, we don't need client-side checks
-  // All environment variables are available on the server
-  const isPublicVar = name.startsWith("NEXT_PUBLIC_");
-
   if (required && (!envValue || envValue.length === 0)) {
     if (defaultValue !== undefined) {
       return defaultValue;

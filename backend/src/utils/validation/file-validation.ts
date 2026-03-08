@@ -3,11 +3,11 @@ import { IS_TEST } from "@/utils/config/envUtil";
 
 // Declare FileReader for server-side compatibility
 declare class FileReader {
-  readAsArrayBuffer(blob: Blob): void;
+  readAsArrayBuffer(_blob: Blob): void;
   result: ArrayBuffer | string | null;
   error: DOMException | null;
-  onload: ((event: any) => void) | null;
-  onerror: ((event: any) => void) | null;
+  onload: ((_event: any) => void) | null;
+  onerror: ((_event: any) => void) | null;
 }
 
 export interface FileValidationConfig {

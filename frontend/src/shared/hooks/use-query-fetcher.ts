@@ -21,8 +21,8 @@ import { TimeService } from "@/shared/services/timezone/TimeService";
 export type QueryFetcher<T = unknown> = (url: string) => Promise<T>;
 
 export function useQueryFetcher<T = unknown>(): QueryFetcher<T> {
-  return useCallback(async (url: string): Promise<T> => {
-    return authenticatedFetchJson<T>(url, {
+  return useCallback(async (_url: string): Promise<T> => {
+    return authenticatedFetchJson<T>(_url, {
       headers: {
         "x-timezone": TimeService.getBrowserTimezone(),
       },

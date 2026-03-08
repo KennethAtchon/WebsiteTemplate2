@@ -7,39 +7,44 @@
 import debugLog from "@/shared/utils/debug/debug";
 
 // No-ops replacing the removed server-side metric recording
-function recordErrorMetric(_category: string, _severity: string) {}
-function recordUnhandledRejectionMetric() {}
-function recordUncaughtExceptionMetric() {}
+function recordErrorMetric(): void {}
 
-// Error severity levels
-export enum ErrorSeverity {
+// Error severity levels (used internally)
+enum ErrorSeverity {
   LOW = "low",
+
   MEDIUM = "medium",
+
   HIGH = "high",
+
   CRITICAL = "critical",
 }
 
-// Error categories for better classification
-export enum ErrorCategory {
+// Error categories for better classification (used internally)
+enum ErrorCategory {
   DATABASE = "database",
+
   EXTERNAL_API = "external_api",
+
   AUTHENTICATION = "authentication",
+
   VALIDATION = "validation",
+
   RATE_LIMIT = "rate_limit",
+
   NETWORK = "network",
+
   UNKNOWN = "unknown",
 }
 
 interface ErrorContext {
   userId?: string;
   requestId?: string;
-  path?: string;
-  method?: string;
+  sessionId?: string;
   userAgent?: string;
-  ip?: string;
+  url?: string;
   timestamp?: Date;
-  stackTrace?: string;
-  additionalData?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 interface StructuredError {
@@ -48,25 +53,24 @@ interface StructuredError {
   category: ErrorCategory;
   severity: ErrorSeverity;
   context: ErrorContext;
-  originalError?: Error;
+  originalError: Error;
   isRecoverable: boolean;
 }
 
-// In-memory error tracking for monitoring
+// Error metrics tracking
 const errorMetrics = {
-  unhandledRejections: 0,
-  uncaughtExceptions: 0,
-  lastErrorTime: null as Date | null,
+  totalErrors: 0,
+  lastErrorTime: new Date(),
   errorsByCategory: new Map<ErrorCategory, number>(),
   errorsBySeverity: new Map<ErrorSeverity, number>(),
 };
 
 /**
- * Categorizes errors based on their message and type
+ * Categorizes errors based on message and stack trace
  */
 function categorizeError(error: Error): ErrorCategory {
   const message = (error.message || "").toLowerCase();
-  const stack = error.stack?.toLowerCase() || "";
+  const stack = (error.stack || "").toLowerCase();
 
   // Database errors (check first - most specific)
   if (
@@ -190,15 +194,24 @@ function isErrorRecoverable(error: Error, category: ErrorCategory): boolean {
     );
   }
 
-  // Most other errors are potentially recoverable
-  return category !== ErrorCategory.UNKNOWN;
+  // Network errors might be recoverable
+  if (
+    category === ErrorCategory.NETWORK ||
+    category === ErrorCategory.EXTERNAL_API
+  ) {
+    return true;
+  }
+
+  // Validation errors are recoverable
+  if (category === ErrorCategory.VALIDATION) {
+    return true;
+  }
+
+  return false;
 }
 
-/**
- * Generates a unique error ID for tracking
- */
 function generateErrorId(): string {
-  return `err_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `err_${crypto.randomUUID()}`;
 }
 
 /**
@@ -206,8 +219,7 @@ function generateErrorId(): string {
  */
 function structureError(
   error: Error,
-  context: Partial<ErrorContext> = {},
-  _source: "unhandledRejection" | "uncaughtException" | "manual" = "manual"
+  context: Partial<ErrorContext> = {}
 ): StructuredError {
   const category = categorizeError(error);
   const severity = determineErrorSeverity(error, category);
@@ -243,7 +255,7 @@ function structureError(
     (errorMetrics.errorsBySeverity.get(severity) || 0) + 1
   );
 
-  recordErrorMetric(category, severity);
+  recordErrorMetric();
 
   return structuredError;
 }
@@ -251,7 +263,10 @@ function structureError(
 /**
  * Logs structured error information
  */
-function logStructuredError(structuredError: StructuredError, source: string) {
+function logStructuredError(
+  structuredError: StructuredError,
+  source: string
+): void {
   const logLevel =
     structuredError.severity === ErrorSeverity.CRITICAL
       ? "error"
@@ -280,8 +295,11 @@ function logStructuredError(structuredError: StructuredError, source: string) {
 /**
  * Manual error reporting for custom error handling
  */
-export function reportError(error: Error, context: Partial<ErrorContext> = {}) {
-  const structuredError = structureError(error, context, "manual");
+export function reportError(
+  error: Error,
+  context: Partial<ErrorContext> = {}
+): StructuredError {
+  const structuredError = structureError(error, context);
   logStructuredError(structuredError, "manual-report");
   return structuredError;
 }
@@ -298,12 +316,11 @@ export function getErrorMetrics() {
 }
 
 /**
- * Resets error metrics (for testing)
+ * Clears error metrics (useful for testing)
  */
-export function resetErrorMetrics() {
-  errorMetrics.unhandledRejections = 0;
-  errorMetrics.uncaughtExceptions = 0;
-  errorMetrics.lastErrorTime = null;
+export function clearErrorMetrics(): void {
+  errorMetrics.totalErrors = 0;
+  errorMetrics.lastErrorTime = new Date();
   errorMetrics.errorsByCategory.clear();
   errorMetrics.errorsBySeverity.clear();
 }
@@ -311,15 +328,16 @@ export function resetErrorMetrics() {
 /**
  * Utility for wrapping async functions with error handling
  */
-export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
+export function withErrorHandling<T extends () => Promise<unknown>>(
   fn: T,
   context: Partial<ErrorContext> = {}
 ): T {
-  return (async (...args: Parameters<T>) => {
+  return (async () => {
     try {
-      return await fn(...args);
+      return await fn();
     } catch (error) {
-      const _structuredError = reportError(error as Error, context);
+      // Error reported but result unused
+      reportError(error as Error, context);
 
       // Re-throw the error so the caller can handle it appropriately
       throw error;
@@ -328,39 +346,48 @@ export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
 }
 
 /**
- * Timeout wrapper for promises to prevent hanging
+ * Creates a timeout promise that rejects with a structured error
  */
-export function withTimeout<T>(
-  promise: Promise<T>,
+export function createTimeoutError(
   timeoutMs: number,
-  errorMessage: string = "Operation timed out"
-): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    let isResolved = false;
-
-    // Set up timeout first to ensure it gets priority in tests where setTimeout is mocked
-    const timeoutId = setTimeout(() => {
-      if (!isResolved) {
-        isResolved = true;
-        reject(new Error(`${errorMessage} after ${timeoutMs}ms`));
-      }
+  operation: string
+): Promise<never> {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      const error = new Error(
+        `Operation timed out after ${timeoutMs}ms: ${operation}`
+      );
+      reject(reportError(error, { operation }));
     }, timeoutMs);
-
-    // Then handle the promise
-    promise
-      .then((value) => {
-        if (!isResolved) {
-          isResolved = true;
-          clearTimeout(timeoutId);
-          resolve(value);
-        }
-      })
-      .catch((error) => {
-        if (!isResolved) {
-          isResolved = true;
-          clearTimeout(timeoutId);
-          reject(error);
-        }
-      });
   });
 }
+
+/**
+ * Wraps a promise with timeout and error handling
+ */
+export async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  operation: string
+): Promise<T> {
+  try {
+    return await Promise.race([
+      promise,
+      createTimeoutError(timeoutMs, operation),
+    ]);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw reportError(error, { operation });
+    }
+    throw error;
+  }
+}
+
+export default {
+  reportError,
+  getErrorMetrics,
+  clearErrorMetrics,
+  withErrorHandling,
+  createTimeoutError,
+  withTimeout,
+};

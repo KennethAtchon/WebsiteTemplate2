@@ -18,6 +18,10 @@ import { eq } from "drizzle-orm";
 import { STRIPE_MAP } from "../../constants/stripe.constants";
 import Stripe from "stripe";
 
+const stripe = STRIPE_SECRET_KEY
+  ? new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2025-02-24.acacia" })
+  : null;
+
 const subscriptions = new Hono<HonoEnv>();
 
 // ─── GET /api/subscriptions/current ─────────────────────────────────────────
@@ -256,12 +260,8 @@ subscriptions.post(
 
       if (!priceId) return c.json({ error: "priceId is required" }, 400);
 
-      if (!STRIPE_SECRET_KEY)
+      if (!stripe)
         return c.json({ error: "Stripe not configured" }, 500);
-
-      const stripe = new Stripe(STRIPE_SECRET_KEY, {
-        apiVersion: "2025-02-24.acacia",
-      });
 
       const origin = c.req.header("origin") || "http://localhost:5173";
       const baseUrl = BASE_URL !== "[BASE_URL]" ? BASE_URL : origin;

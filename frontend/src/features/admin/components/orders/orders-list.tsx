@@ -242,14 +242,6 @@ export function OrdersList({
   const displayOrders = orders || [];
 
   /**
-   * Handle viewing order products
-   */
-  const _handleViewProducts = (order: Order): void => {
-    setViewProductsOrder(order);
-    setViewProductsOpen(true);
-  };
-
-  /**
    * Handle editing an order
    */
   const handleEditOrder = (order: Order): void => {

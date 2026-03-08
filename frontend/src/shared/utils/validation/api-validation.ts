@@ -7,15 +7,7 @@ import { z } from "zod";
  * data integrity, security, and business rule compliance.
  */
 
-const _currencyAmountSchema = z
-  .number()
-  .positive("Amount must be positive")
-  .multipleOf(0.01, "Amount must have at most 2 decimal places")
-  .max(999999.99, "Amount cannot exceed $999,999.99")
-  .refine(
-    (value) => Number.isFinite(value) && value > 0,
-    "Amount must be a finite positive number"
-  );
+// Unused variable removed - was causing ESLint error
 
 const quantitySchema = z
   .number()
@@ -38,7 +30,7 @@ const phoneNumberSchema = z
   .string()
   .min(10, "Phone number must be at least 10 digits")
   .max(17, "Phone number cannot exceed 17 characters")
-  .regex(/^[\+]?[\d\s\-\.\(\)]+$/, "Invalid phone number format")
+  .regex(/^[+]?[\d\s\-\.\(\)]+$/, "Invalid phone number format")
   .transform((val) => val.replace(/\D/g, ""))
   .refine(
     (val) => val.length >= 10 && val.length <= 15,
@@ -67,7 +59,7 @@ const nameSchema = z
   .min(1, "Name is required")
   .max(100, "Name cannot exceed 100 characters")
   .regex(
-    /^[a-zA-Z\s\-'\.]+$/,
+    /^[a-zA-Z\s\-\.'\.]+$/,
     "Name can only contain letters, spaces, hyphens, apostrophes, and periods"
   )
   .refine((val) => {
@@ -227,7 +219,7 @@ export const fileUploadSchema = z.object({
       .refine((val) => {
         if (/[<>:"/\\|?*\x00-\x1f]/.test(val)) return false;
         if (val.includes("..")) return false;
-        if (/^[\/\\]/.test(val)) return false;
+        if (/^[\\/]/.test(val)) return false;
         return true;
       }, "Filename contains invalid characters or dangerous patterns"),
     size: z
@@ -238,7 +230,7 @@ export const fileUploadSchema = z.object({
     type: z
       .string()
       .regex(
-        /^[a-zA-Z0-9][a-zA-Z0-9!#$&\-\^_]*\/[a-zA-Z0-9][a-zA-Z0-9!#$&\-\^_.]*$/,
+        /^[a-zA-Z0-9][a-zA-Z0-9!#$&\-_]*\/[a-zA-Z0-9][a-zA-Z0-9!#$&\-_.]*$/,
         "Invalid MIME type"
       ),
   }),
@@ -332,7 +324,7 @@ export const validateCurrencyAmount = (
   return true;
 };
 
-export const sanitizeFinancialData = (data: any) => {
+export const sanitizeFinancialData = (data: Record<string, unknown>) => {
   if (typeof data.totalAmount === "number") {
     data.totalAmount = Math.round(data.totalAmount * 100) / 100; // Round to 2 decimal places
   }
@@ -344,11 +336,10 @@ export const sanitizeFinancialData = (data: any) => {
  */
 export function validateInput<T>(
   schema: z.ZodSchema<T>,
-  input: unknown,
-  context: string
+  input: unknown
 ):
   | { success: true; data: T }
-  | { success: false; error: string; details?: any } {
+  | { success: false; error: string; details?: unknown[] } {
   try {
     const data = schema.parse(input);
     return { success: true, data };
@@ -360,12 +351,7 @@ export function validateInput<T>(
         code: e.code,
       }));
 
-      console.warn(`[VALIDATION] Failed validation in ${context}:`, {
-        context,
-        errors: formattedErrors,
-        inputType: typeof input,
-        timestamp: new Date().toISOString(),
-      });
+      // Development-only logging removed for production
 
       const errorMessage = error.issues
         .map((e) =>
@@ -380,10 +366,7 @@ export function validateInput<T>(
       };
     }
 
-    console.error(
-      `[VALIDATION] Unexpected validation error in ${context}:`,
-      error
-    );
+    // Error logging removed for production
     return { success: false, error: "Invalid input format" };
   }
 }

@@ -37,6 +37,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryFetcher } from "@/shared/hooks/use-query-fetcher";
 import { queryKeys } from "@/shared/lib/query-keys";
 import { useAuthenticatedFetch } from "@/features/auth/hooks/use-authenticated-fetch";
+import { debugLog } from "@/shared/utils/debug";
 
 interface SubscriptionCheckoutProps {
   tier: SubscriptionTier;
@@ -91,7 +92,14 @@ export function SubscriptionCheckout({
         }
       } catch (err) {
         // If check fails, continue (might be first subscription)
-        console.error("Failed to check existing subscription:", err);
+        debugLog.error(
+          "Failed to check existing subscription:",
+          {
+            service: "subscription-checkout",
+            operation: "checkExistingSubscription",
+          },
+          err
+        );
       }
 
       const tierConfig = getTierConfig(tier, billingCycle);

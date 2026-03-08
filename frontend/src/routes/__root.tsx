@@ -1,12 +1,19 @@
 import { Suspense } from "react";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { PageLayout } from "@/shared/components/layout/page-layout";
+import { ErrorBoundary } from "@/shared/components/layout/error-boundary";
+import { useTranslation } from "react-i18next";
 
 function RootLayout() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="p-6 text-center">Loading…</div>}>
-      <Outlet />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense
+        fallback={<div className="p-6 text-center">{t("common_loading")}</div>}
+      >
+        <Outlet />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 

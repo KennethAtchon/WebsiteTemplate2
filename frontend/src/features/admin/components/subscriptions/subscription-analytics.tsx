@@ -61,7 +61,7 @@ export function SubscriptionAnalytics() {
     error,
     isLoading: loading,
   } = useQuery({
-    queryKey: queryKeys.api.admin.subscriptionAnalytics(),
+    queryKey: queryKeys.api.admin.subscriptionsAnalytics(),
     queryFn: () => fetcher("/api/admin/subscriptions/analytics"),
     enabled: !!user,
   });

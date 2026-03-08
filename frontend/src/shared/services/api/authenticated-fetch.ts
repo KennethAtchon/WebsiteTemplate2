@@ -1,8 +1,9 @@
 import { auth } from "@/shared/services/firebase/config";
 import { safeFetch, SafeFetchOptions } from "./safe-fetch";
 import { debugLog } from "@/shared/utils/debug";
+import { API_URL } from "@/shared/utils/config/envUtil";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
+const API_BASE_URL = API_URL;
 
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json",

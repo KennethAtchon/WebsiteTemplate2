@@ -323,6 +323,7 @@ admin.get(
       const skip = (page - 1) * limit;
 
       const orderWhere = and(
+        eq(orders.isDeleted, false),
         customerId ? eq(orders.userId, customerId) : undefined,
         search?.trim()
           ? or(

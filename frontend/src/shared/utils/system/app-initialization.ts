@@ -270,10 +270,7 @@ function setupProcessMonitoring() {
 
     // Log error metrics periodically
     const errorMetrics = getErrorMetrics();
-    if (
-      errorMetrics.unhandledRejections > 0 ||
-      errorMetrics.uncaughtExceptions > 0
-    ) {
+    if (errorMetrics.totalErrors > 0) {
       systemLogger.error(
         "Error metrics update",
         {

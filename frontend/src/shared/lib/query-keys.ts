@@ -29,8 +29,6 @@ export const queryKeys = {
       subscriptions: () => ["api", "admin", "subscriptions"] as const,
       subscriptionStats: () =>
         ["api", "admin", "subscriptions", "stats"] as const,
-      subscriptionAnalytics: () =>
-        ["api", "admin", "subscriptions", "analytics"] as const,
       contactMessages: (params?: { page?: number; limit?: number }) =>
         ["api", "shared", "contact-messages", params] as const,
     },

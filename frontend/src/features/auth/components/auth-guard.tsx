@@ -32,8 +32,6 @@ const INITIAL_VERIFICATION_STATE: VerificationState = {
   skipAuthentication: false,
 };
 
-const SIGN_IN_ROUTE = "/sign-in";
-
 /**
  * Determines if the current route is a public route
  */

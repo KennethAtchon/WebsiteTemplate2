@@ -228,7 +228,7 @@ export function sanitizeString(
  * @param maxDepth - Maximum recursion depth to prevent infinite loops
  * @returns Sanitized object (or original in development)
  */
-export function sanitizeObject(obj: any, depth = 0, maxDepth = 5): any {
+export function sanitizeObject(obj: any, depth = 0, maxDepth = 5): unknown {
   // SECURITY WARNING: In development, skip sanitization for easier debugging
   // This means PII may appear in development logs - be careful with test data
   if (IS_DEVELOPMENT) {
@@ -290,7 +290,7 @@ export function sanitizeObject(obj: any, depth = 0, maxDepth = 5): any {
     if (isSensitiveField && !isPlainNumericId) {
       // Redact sensitive fields
       if (typeof value === "string" && value.length > 0) {
-        sanitized[key] = getFieldRedaction(lowerKey, value);
+        sanitized[key] = getFieldRedaction(lowerKey);
       } else {
         sanitized[key] = "[REDACTED]";
       }
@@ -312,7 +312,7 @@ export function sanitizeObject(obj: any, depth = 0, maxDepth = 5): any {
 /**
  * Get appropriate redaction for specific field types
  */
-function getFieldRedaction(fieldName: string, _value: string): string {
+function getFieldRedaction(fieldName: string): string {
   if (fieldName.includes("email")) return "[EMAIL_REDACTED]";
   if (fieldName.includes("phone")) return "[PHONE_REDACTED]";
   if (fieldName.includes("password")) return "[PASSWORD_REDACTED]";

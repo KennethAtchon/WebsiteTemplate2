@@ -10,7 +10,6 @@ function safeSanitize(content: string): string {
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const DOMPurify = require("dompurify");
     return DOMPurify.sanitize(content);
   } catch {

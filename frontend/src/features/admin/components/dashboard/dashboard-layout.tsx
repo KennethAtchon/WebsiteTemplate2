@@ -34,8 +34,43 @@ interface AdminNavItem {
   label: string;
 }
 
-// Nav items and brand config are now translated - moved to component
 const BRAND_ICON = LayoutDashboard;
+
+function useAdminNavItems(): AdminNavItem[] {
+  const { t } = useTranslation();
+  return [
+    {
+      href: "/admin/dashboard",
+      icon: LayoutDashboard,
+      label: t("admin_help_dashboard_section"),
+    },
+    {
+      href: "/admin/subscriptions",
+      icon: CreditCard,
+      label: t("metadata_admin_subscriptions_title"),
+    },
+    {
+      href: "/admin/orders",
+      icon: ShoppingCart,
+      label: t("metadata_admin_orders_title"),
+    },
+    {
+      href: "/admin/customers",
+      icon: Users,
+      label: t("metadata_admin_customers_title"),
+    },
+    {
+      href: "/admin/contactmessages",
+      icon: Mail,
+      label: t("admin_nav_messages"),
+    },
+    {
+      href: "/admin/developer",
+      icon: Code,
+      label: t("admin_help_developer_section"),
+    },
+  ];
+}
 
 function findNavItemByPath(
   pathname: string,
@@ -112,10 +147,10 @@ interface SidebarProps {
   pathname: string;
 }
 
-function BrandHeader() {
+function BrandHeader({ onClose }: { onClose?: () => void }) {
   const { t } = useTranslation();
   return (
-    <div className="flex h-16 items-center border-b border-border bg-gradient-to-r from-primary/5 to-purple-500/5 px-6">
+    <div className="flex h-16 items-center justify-between border-b border-border bg-gradient-to-r from-primary/5 to-purple-500/5 px-6">
       <Link
         to="/admin/dashboard"
         className="flex items-center gap-3 font-bold text-lg"
@@ -127,6 +162,11 @@ function BrandHeader() {
           {t("admin_brand_name")}
         </span>
       </Link>
+      {onClose && (
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="h-5 w-5" />
+        </Button>
+      )}
     </div>
   );
 }
@@ -157,39 +197,7 @@ function NavigationLink({
 }
 
 function DesktopSidebar({ pathname }: SidebarProps) {
-  const { t } = useTranslation();
-  const adminNavItems: AdminNavItem[] = [
-    {
-      href: "/admin/dashboard",
-      icon: LayoutDashboard,
-      label: t("admin_help_dashboard_section"),
-    },
-    {
-      href: "/admin/subscriptions",
-      icon: CreditCard,
-      label: t("metadata_admin_subscriptions_title"),
-    },
-    {
-      href: "/admin/orders",
-      icon: ShoppingCart,
-      label: t("metadata_admin_orders_title"),
-    },
-    {
-      href: "/admin/customers",
-      icon: Users,
-      label: t("metadata_admin_customers_title"),
-    },
-    {
-      href: "/admin/contactmessages",
-      icon: Mail,
-      label: t("admin_nav_messages"),
-    },
-    {
-      href: "/admin/developer",
-      icon: Code,
-      label: t("admin_help_developer_section"),
-    },
-  ];
+  const adminNavItems = useAdminNavItems();
 
   return (
     <div className="hidden w-64 flex-col border-r border-border bg-background md:flex">
@@ -218,62 +226,8 @@ interface MobileSidebarProps {
   pathname: string;
 }
 
-function MobileBrandHeader({ onClose }: { onClose: () => void }) {
-  const { t } = useTranslation();
-  return (
-    <div className="flex h-16 items-center justify-between border-b border-border bg-gradient-to-r from-primary/5 to-purple-500/5 px-6">
-      <Link
-        to="/admin/dashboard"
-        className="flex items-center gap-3 font-bold text-lg"
-      >
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-          <BRAND_ICON className="h-5 w-5 text-primary" />
-        </div>
-        <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-          {t("admin_brand_name")}
-        </span>
-      </Link>
-      <Button variant="ghost" size="icon" onClick={onClose}>
-        <X className="h-5 w-5" />
-      </Button>
-    </div>
-  );
-}
-
 function MobileSidebar({ isOpen, onClose, pathname }: MobileSidebarProps) {
-  const { t } = useTranslation();
-  const adminNavItems: AdminNavItem[] = [
-    {
-      href: "/admin/dashboard",
-      icon: LayoutDashboard,
-      label: t("admin_help_dashboard_section"),
-    },
-    {
-      href: "/admin/subscriptions",
-      icon: CreditCard,
-      label: t("metadata_admin_subscriptions_title"),
-    },
-    {
-      href: "/admin/orders",
-      icon: ShoppingCart,
-      label: t("metadata_admin_orders_title"),
-    },
-    {
-      href: "/admin/customers",
-      icon: Users,
-      label: t("metadata_admin_customers_title"),
-    },
-    {
-      href: "/admin/contactmessages",
-      icon: Mail,
-      label: t("admin_nav_messages"),
-    },
-    {
-      href: "/admin/developer",
-      icon: Code,
-      label: t("admin_help_developer_section"),
-    },
-  ];
+  const adminNavItems = useAdminNavItems();
 
   return (
     <>
@@ -289,7 +243,7 @@ function MobileSidebar({ isOpen, onClose, pathname }: MobileSidebarProps) {
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <MobileBrandHeader onClose={onClose} />
+        <BrandHeader onClose={onClose} />
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="grid gap-1 px-3">
             {adminNavItems.map((item) => (
@@ -322,6 +276,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const location = useLocation();
   const pathname = location.pathname;
+  const adminNavItems = useAdminNavItems();
 
   const [layoutState, setLayoutState] = useState({
     mobileNavOpen: false,
@@ -331,39 +286,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const updateLayoutState = (updates: Partial<typeof layoutState>) => {
     setLayoutState((prev) => ({ ...prev, ...updates }));
   };
-
-  const adminNavItems: AdminNavItem[] = [
-    {
-      href: "/admin/dashboard",
-      icon: LayoutDashboard,
-      label: t("admin_help_dashboard_section"),
-    },
-    {
-      href: "/admin/subscriptions",
-      icon: CreditCard,
-      label: t("metadata_admin_subscriptions_title"),
-    },
-    {
-      href: "/admin/orders",
-      icon: ShoppingCart,
-      label: t("metadata_admin_orders_title"),
-    },
-    {
-      href: "/admin/customers",
-      icon: Users,
-      label: t("metadata_admin_customers_title"),
-    },
-    {
-      href: "/admin/contactmessages",
-      icon: Mail,
-      label: t("admin_nav_messages"),
-    },
-    {
-      href: "/admin/developer",
-      icon: Code,
-      label: t("admin_help_developer_section"),
-    },
-  ];
 
   useEffect(() => {
     startTransition(() => {

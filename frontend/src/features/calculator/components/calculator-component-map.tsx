@@ -6,17 +6,8 @@
  * Uses dynamic imports for code splitting and performance optimization.
  */
 
-import { lazy, Suspense, ComponentType } from "react";
+import { lazy, ComponentType } from "react";
 import type { CalculationType } from "../types/calculator.types";
-
-// Loading component for lazy-loaded calculators
-const LoadingCalculator = () => (
-  <div className="flex items-center justify-center p-8">
-    <div className="animate-pulse text-muted-foreground">
-      Loading calculator...
-    </div>
-  </div>
-);
 
 // Dynamic imports with loading states for better performance
 const MortgageCalculator = lazy(() =>

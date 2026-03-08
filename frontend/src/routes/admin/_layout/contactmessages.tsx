@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, startTransition } from "react";
+import React, { useState, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   MoreHorizontal,
@@ -73,12 +73,8 @@ function ContactMessagesPage() {
   const { user } = useApp();
   const fetcher = useQueryFetcher<ContactMessagesResponse>();
   const [currentPage, setCurrentPage] = useState(1);
-  const [adminTimezone, setAdminTimezone] = useState("UTC");
-
-  useEffect(() => {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-    startTransition(() => setAdminTimezone(tz));
-  }, []);
+  const adminTimezone =
+    Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
   const url = useMemo(() => {
     const params = new URLSearchParams({

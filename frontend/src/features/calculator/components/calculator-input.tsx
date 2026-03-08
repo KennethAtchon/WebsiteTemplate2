@@ -14,7 +14,7 @@ interface CalculatorInputProps {
   label: string;
   name: string;
   value: number;
-  onChange: (value: number) => void;
+  onChange: (_value: number) => void;
   type?: "number" | "currency" | "percentage";
   placeholder?: string;
   required?: boolean;

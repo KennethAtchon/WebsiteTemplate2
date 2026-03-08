@@ -14,6 +14,7 @@ import { FirebaseError } from "firebase/app";
  */
 export function getAuthErrorMessage(
   error: unknown,
+
   t: (key: string) => string
 ): string {
   // Check if it's a Firebase error

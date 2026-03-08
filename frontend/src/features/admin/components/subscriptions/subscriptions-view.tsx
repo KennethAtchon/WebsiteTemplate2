@@ -39,12 +39,8 @@ export function SubscriptionsView() {
   const fetcher = useQueryFetcher<SubscriptionStats>();
 
   // Admin layout wraps with AuthGuard; user is guaranteed when this renders.
-  const {
-    data: _stats,
-    error: profileError,
-    isLoading: loading,
-  } = useQuery({
-    queryKey: queryKeys.api.admin.subscriptionAnalytics(),
+  const { error: profileError, isLoading: loading } = useQuery({
+    queryKey: queryKeys.api.admin.subscriptionsAnalytics(),
     queryFn: () => fetcher("/api/admin/subscriptions/analytics"),
     enabled: !!user,
   });

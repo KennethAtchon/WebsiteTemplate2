@@ -20,11 +20,11 @@ import {
   APP_DESCRIPTION,
   CORE_FEATURE_PATH,
 } from "@/shared/constants/app.constants";
+import { REDIRECT_PATHS } from "@/shared/utils/redirect/redirect-util";
 
 // Company tagline, contact info, and business hours are now translated
 const ADMIN_VERIFY_ENDPOINT = "/api/admin/verify";
 const ADMIN_DASHBOARD_ROUTE = "/admin/dashboard";
-const SIGN_IN_ROUTE = "/sign-in";
 
 /**
  * Custom footer component with company information, navigation, and admin access.
@@ -68,7 +68,7 @@ export default function FooterCustom() {
       }
     } else {
       // Redirect unauthenticated users to sign-in
-      navigate({ to: SIGN_IN_ROUTE });
+      navigate({ to: REDIRECT_PATHS.SIGN_IN });
     }
   };
 

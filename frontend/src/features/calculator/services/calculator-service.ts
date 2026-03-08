@@ -58,12 +58,13 @@ export class CalculatorService {
       const totalInterest = totalPayment - principal;
 
       // Generate amortization schedule
-      const amortizationSchedule = this.generateMortgageAmortizationSchedule(
-        principal,
-        monthlyRate,
-        numPayments,
-        monthlyPrincipalAndInterest
-      );
+      const amortizationSchedule =
+        CalculatorService.generateAmortizationSchedule(
+          principal,
+          monthlyRate,
+          numPayments,
+          monthlyPrincipalAndInterest
+        );
 
       const calculationTime = Date.now() - startTime;
 
@@ -122,12 +123,13 @@ export class CalculatorService {
       const totalInterest = totalPayment - principal;
 
       // Generate amortization schedule
-      const amortizationSchedule = this.generateLoanAmortizationSchedule(
-        principal,
-        monthlyRate,
-        term,
-        monthlyPayment
-      );
+      const amortizationSchedule =
+        CalculatorService.generateAmortizationSchedule(
+          principal,
+          monthlyRate,
+          term,
+          monthlyPayment
+        );
 
       const calculationTime = Date.now() - startTime;
 
@@ -347,9 +349,9 @@ export class CalculatorService {
   }
 
   /**
-   * Generate mortgage amortization schedule
+   * Generate amortization schedule (shared by mortgage and loan calculators)
    */
-  private static generateMortgageAmortizationSchedule(
+  private static generateAmortizationSchedule(
     principal: number,
     monthlyRate: number,
     numPayments: number,
@@ -359,35 +361,6 @@ export class CalculatorService {
     let remainingBalance = principal;
 
     for (let month = 1; month <= numPayments; month++) {
-      const interestPayment = remainingBalance * monthlyRate;
-      const principalPayment = monthlyPayment - interestPayment;
-      remainingBalance -= principalPayment;
-
-      schedule.push({
-        month,
-        payment: Math.round(monthlyPayment * 100) / 100,
-        principal: Math.round(principalPayment * 100) / 100,
-        interest: Math.round(interestPayment * 100) / 100,
-        remainingBalance: Math.round(Math.max(0, remainingBalance) * 100) / 100,
-      });
-    }
-
-    return schedule;
-  }
-
-  /**
-   * Generate loan amortization schedule
-   */
-  private static generateLoanAmortizationSchedule(
-    principal: number,
-    monthlyRate: number,
-    term: number,
-    monthlyPayment: number
-  ) {
-    const schedule = [];
-    let remainingBalance = principal;
-
-    for (let month = 1; month <= term; month++) {
       const interestPayment = remainingBalance * monthlyRate;
       const principalPayment = monthlyPayment - interestPayment;
       remainingBalance -= principalPayment;

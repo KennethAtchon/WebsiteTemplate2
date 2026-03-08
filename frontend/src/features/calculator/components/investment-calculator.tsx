@@ -125,12 +125,6 @@ export function InvestmentCalculator() {
     []
   );
 
-  const _handleCompoundFrequencyChange = useCallback(
-    (value: number) =>
-      setInputs((prev) => ({ ...prev, compoundFrequency: value })),
-    []
-  );
-
   return (
     <div className="space-y-6">
       <Card>
@@ -215,7 +209,7 @@ export function InvestmentCalculator() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("calculator_mortgage_calculating")}
+                {t("calculator_calculating")}
               </>
             ) : (
               t("calculator_investment_calculate")
@@ -227,7 +221,7 @@ export function InvestmentCalculator() {
       {result && (
         <Card>
           <CardHeader>
-            <CardTitle>{t("calculator_mortgage_results")}</CardTitle>
+            <CardTitle>{t("calculator_results")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">

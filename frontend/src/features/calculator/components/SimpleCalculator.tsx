@@ -9,7 +9,7 @@ function SimpleCalculator() {
       // Simple evaluation - in real app this would be more sophisticated
       const evalResult = Function('"use strict"; return (' + input + ")")();
       setResult(evalResult);
-    } catch (error) {
+    } catch {
       setResult(0);
     }
   };

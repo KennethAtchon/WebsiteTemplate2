@@ -6,23 +6,94 @@ import prettier from "eslint-config-prettier";
 export default [
   js.configs.recommended,
   {
-    files: ["*.ts", "*.tsx"],
+    files: ["src/**/*.ts"],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",
       },
+      globals: {
+        console: "readonly",
+        File: "readonly",
+        Blob: "readonly",
+        DOMException: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        module: "readonly",
+        require: "readonly",
+        exports: "readonly",
+        global: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+      },
     },
     plugins: {
       "@typescript-eslint": tseslint,
     },
     rules: {
+      // Disable base ESLint no-unused-vars in favor of TypeScript version
+      "no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { argsIgnorePattern: "^_" },
+        { 
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_"
+        },
       ],
+      "no-useless-escape": "off",
+      "no-control-regex": "off",
+      // Guard: never use process.env directly — use envUtil instead
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "MemberExpression[object.name='process'][property.name='env']",
+          message: "Do not access process.env directly. Use constants from src/utils/config/envUtil instead.",
+        },
+      ],
+      // Guard: never use console — use structured logging
+      "no-console": "error",
+    },
+  },
+  // Allowlist: validation files can use console for validation logging
+  {
+    files: ["src/utils/validation/*.ts"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+  // Allowlist: system files can use console for system logging
+  {
+    files: ["src/utils/system/*.ts"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+  // Allowlist: security files can use console for security logging
+  {
+    files: ["src/utils/security/*.ts"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+  // Allowlist: envUtil is the one place allowed to read process.env
+  {
+    files: ["src/utils/config/envUtil.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
+    },
+  },
+  // Allowlist: encryption file can use process.env for encryption keys
+  {
+    files: ["src/utils/security/encryption.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
     },
   },
   {

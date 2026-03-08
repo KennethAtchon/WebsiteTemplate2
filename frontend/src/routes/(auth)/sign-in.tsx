@@ -4,7 +4,7 @@
  * Modern sign-in page with email/password and Google OAuth support.
  */
 
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useApp } from "@/shared/contexts/app-context";
 import { Button } from "@/shared/components/ui/button";
@@ -25,7 +25,7 @@ import { useTranslation } from "react-i18next";
 import { getAuthErrorMessage } from "@/shared/utils/error-handling/auth-error-handler";
 import {
   useSmartRedirect,
-  REDIRECT_PATHS,
+  REDIRECT_PATHS as _REDIRECT_PATHS,
 } from "@/shared/utils/redirect/redirect-util";
 
 const SIGN_UP_PATH = "/sign-up";
@@ -41,7 +41,6 @@ function SignInPage() {
   const redirectUrl = (search as any)?.redirect_url;
 
   const { signIn, signInWithGoogle, user, authLoading } = useApp();
-  const navigate = useNavigate();
   const { smartRedirect } = useSmartRedirect();
 
   // Redirect authenticated users away from sign-in page
@@ -57,7 +56,7 @@ function SignInPage() {
         isNewUser: false, // This is a returning user
       });
     }
-  }, [user, authLoading, redirectUrl, navigate, smartRedirect]);
+  }, [user, authLoading, redirectUrl, smartRedirect]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

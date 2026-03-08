@@ -25,7 +25,6 @@
  *   }
  * );
  */
-/* eslint-disable react-hooks/preserve-manual-memoization -- page/limit state drives url; queryFn depends on url */
 import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useApp } from "@/shared/contexts/app-context";
@@ -64,7 +63,7 @@ export interface UsePaginatedDataOptions {
   /**
    * Custom error message formatter
    */
-  formatError?: (error: unknown) => string;
+  formatError?: (_error: unknown) => string;
   /**
    * Service name for logging
    */
@@ -78,7 +77,7 @@ export interface UsePaginatedDataOptions {
    * Transform the API response to match PaginatedResponse format
    * Useful when API returns different structure (e.g., { orders: [], pagination: {} })
    */
-  transformResponse?: (response: unknown) => PaginatedResponse<unknown>;
+  transformResponse?: (_response: unknown) => PaginatedResponse<unknown>;
 }
 
 const DEFAULT_OPTIONS: Required<

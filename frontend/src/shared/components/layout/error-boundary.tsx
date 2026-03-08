@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
+import { debugLog } from "@/shared/utils/debug";
 import { Button } from "@/shared/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { IS_DEVELOPMENT } from "@/shared/utils/config/envUtil";
@@ -36,7 +37,7 @@ export class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
+    debugLog.error("ErrorBoundary caught an error:", { error, errorInfo });
   }
 
   handleReset = () => {

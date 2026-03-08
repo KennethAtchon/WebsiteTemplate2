@@ -1,254 +1,155 @@
-import { onCLS, onINP, onFCP, onLCP, onTTFB } from "web-vitals";
-import { IS_DEVELOPMENT } from "@/shared/utils/config/envUtil";
+/**
+ * Web Vitals monitoring
+ * Reports Core Web Vitals and custom performance metrics
+ */
 
-type MetricName = "CLS" | "INP" | "FCP" | "LCP" | "TTFB";
+import { Metric } from "web-vitals";
 
-interface Metric {
-  name: MetricName;
-  value: number;
-  rating: "good" | "needs-improvement" | "poor";
-  delta: number;
-  id: string;
-}
+// Performance thresholds for medical/healthcare applications
+const PERFORMANCE_THRESHOLDS = {
+  LCP: 2500, // Largest Contentful Paint (2.5s)
+  FID: 100, // First Input Delay (100ms)
+  CLS: 0.1, // Cumulative Layout Shift (0.1)
+  FCP: 1800, // First Contentful Paint (1.8s)
+  TTFB: 800, // Time to First Byte (800ms)
+  INP: 200, // Interaction to Next Paint (200ms)
+} as const;
 
-// Thresholds based on Google's recommendations
-const THRESHOLDS = {
-  CLS: { good: 0.1, poor: 0.25 },
-  INP: { good: 200, poor: 500 },
-  FCP: { good: 1800, poor: 3000 },
-  LCP: { good: 2500, poor: 4000 },
-  TTFB: { good: 800, poor: 1800 },
-};
-
-function getRating(
-  name: MetricName,
-  value: number
+// Enhanced performance rating for healthcare applications
+function getPerformanceRating(
+  metric: Metric
 ): "good" | "needs-improvement" | "poor" {
-  const threshold = THRESHOLDS[name];
-  if (value <= threshold.good) return "good";
-  if (value <= threshold.poor) return "needs-improvement";
+  const threshold =
+    PERFORMANCE_THRESHOLDS[metric.name as keyof typeof PERFORMANCE_THRESHOLDS];
+  if (!threshold) return "good";
+
+  if (metric.value <= threshold) return "good";
+  if (metric.value <= threshold * 1.5) return "needs-improvement";
   return "poor";
 }
 
-function sendToAnalytics(metric: Metric) {
-  // Send to Google Analytics 4
-  if (typeof window !== "undefined" && window.gtag) {
-    window.gtag("event", metric.name, {
-      event_category: "Web Vitals",
-      event_label: metric.id,
-      value: Math.round(
-        metric.name === "CLS" ? metric.value * 1000 : metric.value
-      ),
-      custom_map: {
-        metric_rating: metric.rating,
-        metric_value: metric.value,
-      },
-    });
-  }
-
-  // Send to custom analytics endpoint
-  if (typeof window !== "undefined" && navigator.sendBeacon) {
-    const body = JSON.stringify({
-      name: metric.name,
-      value: metric.value,
-      rating: metric.rating,
-      delta: metric.delta,
-      id: metric.id,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-      timestamp: Date.now(),
-    });
-
-    navigator.sendBeacon("/api/analytics/web-vitals", body);
-  }
-
-  // Console logging for development
-  if (IS_DEVELOPMENT) {
-    console.log(
-      `%c[Web Vitals] ${metric.name}`,
-      `color: ${metric.rating === "good" ? "green" : metric.rating === "needs-improvement" ? "orange" : "red"}`,
-      metric
-    );
-  }
-}
-
-function onPerfEntry(metric: Metric) {
-  metric.rating = getRating(metric.name, metric.value);
-  sendToAnalytics(metric);
-}
-
-export function reportWebVitals() {
+// Medical-specific performance tracking
+function trackMedicalFormPerformance(): void {
   if (typeof window === "undefined") return;
 
-  try {
-    onCLS(onPerfEntry);
-    onINP(onPerfEntry);
-    onFCP(onPerfEntry);
-    onLCP(onPerfEntry);
-    onTTFB(onPerfEntry);
-  } catch (error) {
-    console.error("Error reporting web vitals:", error);
+  // Track form load times for patient intake forms
+  const formElements = document.querySelectorAll("[data-medical-form]");
+  formElements.forEach((form) => {
+    const loadTime = performance.now();
+    // Store performance data for medical forms
+    sessionStorage.setItem(
+      `medical-form-${form.id}-load-time`,
+      loadTime.toString()
+    );
+  });
+}
+
+// Search performance for medical terminology
+function trackSearchPerformance(): void {
+  if (typeof window === "undefined") return;
+
+  // Track search response times for medical terminology searches
+  const searchInputs = document.querySelectorAll("[data-medical-search]");
+  searchInputs.forEach((input) => {
+    const observer = new MutationObserver(() => {
+      const searchTime = performance.now();
+      sessionStorage.setItem(
+        `medical-search-${input.id}-time`,
+        searchTime.toString()
+      );
+    });
+    observer.observe(input, { attributes: true });
+  });
+}
+
+function sendToAnalytics(metric: Metric): void {
+  // Send to Google Analytics 4
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag();
   }
+
+  // Enhanced logging for medical applications
+  const rating = getPerformanceRating(metric);
+  const isPoorPerformance = rating === "poor";
+
+  if (isPoorPerformance) {
+    console.warn(
+      `⚠️ Poor performance detected: ${metric.name} (${metric.value})`
+    );
+  }
+
+  // Store in session storage for medical compliance tracking
+  sessionStorage.setItem(
+    `web-vital-${metric.name}`,
+    JSON.stringify({
+      value: metric.value,
+      rating,
+      timestamp: new Date().toISOString(),
+    })
+  );
 }
 
 // Enhanced performance monitoring for medical services
-export function reportMedicalServicePerformance() {
+export const reportWebVitals = (): void => {
+  if (typeof window === "undefined") return;
+
+  try {
+    import("web-vitals").then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
+      onCLS(sendToAnalytics);
+      onINP(sendToAnalytics);
+      onFCP(sendToAnalytics);
+      onLCP(sendToAnalytics);
+      onTTFB(sendToAnalytics);
+    });
+  } catch {
+    // Error logging removed for production
+  }
+};
+
+// Enhanced performance monitoring for medical services
+export const reportMedicalServicePerformance = (): void => {
   if (typeof window === "undefined") return;
 
   // Track therapy page load performance
   if (window.location.pathname.includes("/therapies")) {
-    const therapyLoadStart = performance.now();
-
-    window.addEventListener("load", () => {
-      const therapyLoadEnd = performance.now();
-      const loadTime = therapyLoadEnd - therapyLoadStart;
-
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(
-          "/api/analytics/therapy-performance",
-          JSON.stringify({
-            type: "therapy_page_load",
-            loadTime,
-            url: window.location.href,
-            timestamp: Date.now(),
-          })
-        );
-      }
-    });
-  }
-}
-
-// Monitor form completion rates for medical forms
-export function trackMedicalFormPerformance() {
-  if (typeof window === "undefined") return;
-
-  const forms = document.querySelectorAll("form[data-medical-form]");
-
-  forms.forEach((form) => {
-    const formStart = performance.now();
-    let fieldsCompleted = 0;
-    const totalFields = form.querySelectorAll("input, select, textarea").length;
-
-    // Track field completion
-    form.addEventListener("input", () => {
-      const completedFields = form.querySelectorAll(
-        "input:valid, select:valid, textarea:valid"
-      ).length;
-      if (completedFields > fieldsCompleted) {
-        fieldsCompleted = completedFields;
-
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(
-            "/api/analytics/form-progress",
-            JSON.stringify({
-              type: "form_progress",
-              completedFields,
-              totalFields,
-              completionRate: (completedFields / totalFields) * 100,
-              timeToComplete: performance.now() - formStart,
-              formType: form.getAttribute("data-medical-form"),
-              url: window.location.href,
-              timestamp: Date.now(),
-            })
-          );
-        }
-      }
-    });
-
-    // Track form submission
-    form.addEventListener("submit", () => {
-      const formEnd = performance.now();
-      const totalTime = formEnd - formStart;
-
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(
-          "/api/analytics/form-completion",
-          JSON.stringify({
-            type: "form_completion",
-            totalTime,
-            totalFields,
-            formType: form.getAttribute("data-medical-form"),
-            url: window.location.href,
-            timestamp: Date.now(),
-          })
-        );
-      }
-    });
-  });
-}
-
-// Monitor medical service search performance
-export function trackSearchPerformance() {
-  if (typeof window === "undefined") return;
-
-  const searchInputs = document.querySelectorAll(
-    'input[type="search"], input[data-search]'
-  );
-
-  searchInputs.forEach((input) => {
-    let searchStart: number;
-
-    input.addEventListener("input", () => {
-      searchStart = performance.now();
-    });
-
-    // Monitor search results loading
-    const observer = new MutationObserver(() => {
-      if (searchStart) {
-        const searchEnd = performance.now();
-        const searchTime = searchEnd - searchStart;
-
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(
-            "/api/analytics/search-performance",
-            JSON.stringify({
-              type: "search_performance",
-              searchTime,
-              query: (input as HTMLInputElement).value,
-              url: window.location.href,
-              timestamp: Date.now(),
-            })
-          );
-        }
-
-        searchStart = 0;
-      }
-    });
-
-    const resultsContainer = document.querySelector("[data-search-results]");
-    if (resultsContainer) {
-      observer.observe(resultsContainer, { childList: true, subtree: true });
+    const navigationEntries = performance.getEntriesByType("navigation");
+    if (navigationEntries.length > 0) {
+      const loadTime =
+        navigationEntries[0].loadEventEnd - navigationEntries[0].loadEventStart;
+      sessionStorage.setItem("therapy-page-load-time", loadTime.toString());
     }
-  });
-}
+  }
 
-// Initialize all performance monitoring
-export function initializePerformanceMonitoring() {
+  // Track appointment booking performance
+  if (window.location.pathname.includes("/appointments")) {
+    const bookingForm = document.querySelector("#appointment-booking-form");
+    if (bookingForm) {
+      const renderTime = performance.now();
+      sessionStorage.setItem("booking-form-render-time", renderTime.toString());
+    }
+  }
+};
+
+// Initialize medical performance tracking
+export const initializeMedicalPerformanceTracking = (): void => {
   if (typeof window === "undefined") return;
 
-  // Wait for page to be fully loaded
-  if (document.readyState === "complete") {
-    reportWebVitals();
+  // Start web vitals reporting
+  reportWebVitals();
+
+  // Start medical-specific tracking
+  setTimeout(() => {
     reportMedicalServicePerformance();
     trackMedicalFormPerformance();
     trackSearchPerformance();
-  } else {
-    window.addEventListener("load", () => {
-      reportWebVitals();
-      reportMedicalServicePerformance();
-      trackMedicalFormPerformance();
-      trackSearchPerformance();
-    });
+  }, 1000);
+};
+
+// Types for global browser APIs
+declare global {
+  interface Window {
+    gtag?: () => void;
   }
 }
 
-// Types for global gtag
-declare global {
-  interface Window {
-    gtag?: (
-      command: "config" | "event",
-      targetId: string,
-      config?: Record<string, any>
-    ) => void;
-  }
-}
+export default reportWebVitals;

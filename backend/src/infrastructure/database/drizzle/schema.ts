@@ -6,6 +6,7 @@ import {
   integer,
   numeric,
   json,
+  index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -47,7 +48,9 @@ export const orders = pgTable("order", {
   deletedAt: timestamp("deleted_at"),
   deletedBy: text("deleted_by"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (t) => [
+  index("orders_user_id_idx").on(t.userId),
+]);
 
 export const contactMessages = pgTable("contact_message", {
   id: text("id")
@@ -71,7 +74,9 @@ export const featureUsages = pgTable("feature_usage", {
   resultData: json("result_data").notNull(),
   usageTimeMs: integer("usage_time_ms").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (t) => [
+  index("feature_usages_user_id_idx").on(t.userId),
+]);
 
 // ─── Relations ────────────────────────────────────────────────────────────────
 

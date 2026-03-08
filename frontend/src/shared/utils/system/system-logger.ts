@@ -22,7 +22,7 @@ type SystemLogLevel = "info" | "warn" | "error" | "critical";
 interface SystemContext {
   service: string;
   operation: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 class SystemLogger {
@@ -30,7 +30,7 @@ class SystemLogger {
     level: SystemLogLevel,
     message: string,
     context: SystemContext,
-    data?: any
+    data?: unknown
   ): void {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
@@ -76,35 +76,35 @@ class SystemLogger {
   /**
    * System info logs - general system information
    */
-  info(message: string, context: SystemContext, data?: any) {
+  info(message: string, context: SystemContext, data?: unknown) {
     this.formatSystemMessage("info", message, context, data);
   }
 
   /**
    * System warnings - performance issues, high resource usage, etc.
    */
-  warn(message: string, context: SystemContext, data?: any) {
+  warn(message: string, context: SystemContext, data?: unknown) {
     this.formatSystemMessage("warn", message, context, data);
   }
 
   /**
    * System errors - service failures, connection issues, etc.
    */
-  error(message: string, context: SystemContext, data?: any) {
+  error(message: string, context: SystemContext, data?: unknown) {
     this.formatSystemMessage("error", message, context, data);
   }
 
   /**
    * Critical system events - security issues, data corruption, etc.
    */
-  critical(message: string, context: SystemContext, data?: any) {
+  critical(message: string, context: SystemContext, data?: unknown) {
     this.formatSystemMessage("critical", message, context, data);
   }
 
   /**
    * Memory monitoring logs
    */
-  memory(message: string, operation: string, data: any) {
+  memory(message: string, operation: string, data: unknown) {
     this.warn(
       message,
       {
@@ -118,7 +118,12 @@ class SystemLogger {
   /**
    * Redis monitoring logs
    */
-  redis(level: SystemLogLevel, message: string, operation: string, data?: any) {
+  redis(
+    level: SystemLogLevel,
+    message: string,
+    operation: string,
+    data?: unknown
+  ) {
     this.formatSystemMessage(
       level,
       message,
@@ -137,7 +142,7 @@ class SystemLogger {
     level: SystemLogLevel,
     message: string,
     operation: string,
-    data?: any
+    data?: unknown
   ) {
     this.formatSystemMessage(
       level,
@@ -157,7 +162,7 @@ class SystemLogger {
     level: SystemLogLevel,
     message: string,
     operation: string,
-    data?: any
+    data?: unknown
   ) {
     this.formatSystemMessage(
       level,
@@ -173,7 +178,7 @@ class SystemLogger {
   /**
    * Rate limiting logs
    */
-  rateLimit(message: string, operation: string, data?: any) {
+  rateLimit(message: string, operation: string, data?: unknown) {
     this.warn(
       message,
       {
@@ -187,7 +192,12 @@ class SystemLogger {
   /**
    * Authentication/authorization logs
    */
-  auth(level: SystemLogLevel, message: string, operation: string, data?: any) {
+  auth(
+    level: SystemLogLevel,
+    message: string,
+    operation: string,
+    data?: unknown
+  ) {
     this.formatSystemMessage(
       level,
       message,
@@ -202,7 +212,7 @@ class SystemLogger {
   /**
    * CSRF protection logs
    */
-  csrf(message: string, operation: string, data?: any) {
+  csrf(message: string, operation: string, data?: unknown) {
     this.warn(
       message,
       {
@@ -216,7 +226,7 @@ class SystemLogger {
   /**
    * Performance monitoring logs
    */
-  performance(message: string, operation: string, data?: any) {
+  performance(message: string, operation: string, data?: unknown) {
     this.info(
       message,
       {
@@ -234,7 +244,7 @@ class SystemLogger {
     level: SystemLogLevel,
     message: string,
     operation: string,
-    data?: any
+    data?: unknown
   ) {
     this.formatSystemMessage(
       level,
@@ -255,34 +265,34 @@ export const systemLogger = new SystemLogger();
 export const logSystemMemory = (
   message: string,
   operation: string,
-  data: any
+  data: unknown
 ) => systemLogger.memory(message, operation, data);
 
 export const logRedisEvent = (
   level: SystemLogLevel,
   message: string,
   operation: string,
-  data?: any
+  data?: unknown
 ) => systemLogger.redis(level, message, operation, data);
 
 export const logSecurityEvent = (
   level: SystemLogLevel,
   message: string,
   operation: string,
-  data?: any
+  data?: unknown
 ) => systemLogger.security(level, message, operation, data);
 
 export const logAuthEvent = (
   level: SystemLogLevel,
   message: string,
   operation: string,
-  data?: any
+  data?: unknown
 ) => systemLogger.auth(level, message, operation, data);
 
 export const logPerformanceEvent = (
   message: string,
   operation: string,
-  data?: any
+  data?: unknown
 ) => systemLogger.performance(message, operation, data);
 
 export default systemLogger;

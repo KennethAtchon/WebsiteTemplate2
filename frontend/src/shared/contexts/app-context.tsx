@@ -343,9 +343,8 @@ export function AppProvider({ children }: AppProviderProps) {
     queryFn: () => fetcher("/api/customer/profile"),
     enabled: !!user && !authLoading && backendReady,
     staleTime: QUERY_STALE.long,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchInterval: 300000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     gcTime: QUERY_STALE.long,
   });
 

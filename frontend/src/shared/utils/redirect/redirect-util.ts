@@ -138,7 +138,7 @@ function wouldCreateRedirectLoop(
  */
 export function useSmartRedirect() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useApp();
+  const { isAuthenticated } = useApp();
   const { role, hasBasicAccess } = useSubscription();
 
   /**
@@ -147,14 +147,12 @@ export function useSmartRedirect() {
   const smartRedirect = (
     options: {
       intendedDestination?: string;
-      fallbackDestination?: string;
       forceRedirect?: boolean;
       isNewUser?: boolean;
     } = {}
   ) => {
     const {
       intendedDestination,
-      fallbackDestination = REDIRECT_PATHS.HOME,
       forceRedirect = false,
       isNewUser = false,
     } = options;

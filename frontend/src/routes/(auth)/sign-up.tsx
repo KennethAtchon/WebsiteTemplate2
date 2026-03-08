@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/shared/components/ui/card";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import {
   Eye,
   EyeOff,
@@ -29,7 +29,6 @@ import {
   REDIRECT_PATHS,
 } from "@/shared/utils/redirect/redirect-util";
 
-const SIGN_IN_PATH = "/sign-in";
 const MIN_PASSWORD_LENGTH = 6;
 
 function SignUpPage() {
@@ -45,7 +44,6 @@ function SignUpPage() {
   const [error, setError] = useState<string>("");
 
   const { signUp, signInWithGoogle, user, authLoading } = useApp();
-  const navigate = useNavigate();
   const { smartRedirect } = useSmartRedirect();
   const search = useSearch({ from: "/(auth)/sign-up" });
   const redirectUrl = (search as Record<string, string | undefined>)
@@ -78,7 +76,7 @@ function SignUpPage() {
         isNewUser: true, // This is a new user who just signed up
       });
     }
-  }, [user, authLoading, redirectUrl, navigate, smartRedirect]);
+  }, [user, authLoading, redirectUrl, smartRedirect]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -355,7 +353,7 @@ function SignUpPage() {
                   {t("auth_have_account")}{" "}
                 </span>
                 <Link
-                  to={SIGN_IN_PATH}
+                  to={REDIRECT_PATHS.SIGN_IN}
                   className="text-primary hover:underline font-medium"
                 >
                   {t("navigation_signIn")}

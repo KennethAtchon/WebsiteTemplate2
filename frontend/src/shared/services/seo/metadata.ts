@@ -5,7 +5,7 @@
  */
 
 // import { Metadata } from "next";
-import { APP_NAME, APP_DESCRIPTION } from "@/shared/constants/app.constants";
+import { APP_NAME } from "@/shared/constants/app.constants";
 import { BASE_URL, APP_ENV } from "@/shared/utils/config/envUtil";
 
 // TODO: Replace with proper Next.js Metadata type when Next.js is integrated
@@ -172,9 +172,6 @@ export function generateBusinessMetadata(
     description: string;
   }
 ): Metadata {
-  const _businessName = DEFAULT_CONFIG.siteName;
-  const _businessDescription = APP_DESCRIPTION;
-
   return generateMetadata({
     keywords: [
       ...DEFAULT_CONFIG.defaultKeywords,

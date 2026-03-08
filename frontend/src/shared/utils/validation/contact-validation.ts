@@ -12,10 +12,10 @@ const nameSchema = z
   .min(1, "Name is required")
   .max(100, "Name cannot exceed 100 characters")
   .regex(
-    /^[a-zA-ZÀ-ÿ\u00C0-\u017F\s\-'\.]+$/,
+    /^[a-zA-ZÀ-ÿ\u00C0-\u017F\s\\-\\.']+$/,
     "Name can only contain letters, spaces, hyphens, apostrophes, and periods"
   )
-  .refine((val) => {
+  .refine((val: string) => {
     // Reject SQL injection patterns
     const sqlPatterns = [
       /;\s*(DROP|DELETE|UPDATE|INSERT|SELECT|ALTER|CREATE|EXEC|EXECUTE)/i,
@@ -44,7 +44,7 @@ const phoneNumberSchema = z
   .string()
   .min(10, "Phone number must be at least 10 digits")
   .max(17, "Phone number cannot exceed 17 characters")
-  .regex(/^[\+]?[\d\s\-\.\(\)]+$/, "Invalid phone number format")
+  .regex(/^[+]?[\d\s\-\.\(\)]+$/, "Invalid phone number format")
   .transform((val) => val.replace(/\D/g, ""))
   .refine(
     (val) => val.length >= 10 && val.length <= 15,
@@ -157,7 +157,7 @@ export const formatContactPhoneNumber = (value: string): string => {
 
 // Validate entire form data
 export const validateContactForm = (
-  data: any
+  data: unknown
 ): { isValid: boolean; errors: Record<string, string> } => {
   const result = contactFormValidationSchema.safeParse(data);
 

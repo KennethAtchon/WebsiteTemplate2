@@ -13,7 +13,6 @@ function SimpleContactForm({ onSuccess }: SimpleContactFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
     onSuccess();
     setFormData({ name: "", email: "", message: "" });
   };

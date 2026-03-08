@@ -211,7 +211,6 @@ export function useCalculator(): UseCalculatorResult {
             q.queryKey[1] === "calculator" &&
             q.queryKey[2] === "history",
         });
-        await refetchUsageStats();
 
         setIsLoading(false);
         return result;
@@ -233,7 +232,7 @@ export function useCalculator(): UseCalculatorResult {
         return null;
       }
     },
-    [user, role, checkAccess, queryClient, refetchUsageStats]
+    [user, role, checkAccess, queryClient]
   );
 
   return {

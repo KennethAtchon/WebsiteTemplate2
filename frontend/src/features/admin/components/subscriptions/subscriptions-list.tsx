@@ -104,45 +104,39 @@ export function SubscriptionsList() {
   );
 
   // Fetch subscriptions with pagination using SWR
-  const {
-    data,
-    loading,
-    error,
-    pagination,
-    fetchPage,
-    refetch: _refetch,
-  } = usePaginatedData<Subscription>(urlBuilder, {
-    initialLimit: 20,
-    serviceName: "subscriptions-list",
-    transformResponse: (response: unknown) => {
-      const apiResponse = response as {
-        subscriptions: Subscription[];
-        pagination: PaginationInfo;
-      };
-      // Response is auto-unwrapped by authenticatedFetchJson
-      const subscriptions = Array.isArray(apiResponse.subscriptions)
-        ? apiResponse.subscriptions
-        : [];
-      const paginationData = apiResponse.pagination || {
-        total: subscriptions.length,
-        page: 1,
-        limit: 20,
-        totalPages: Math.ceil(subscriptions.length / 20),
-        hasMore: false,
-      };
+  const { data, loading, error, pagination, fetchPage } =
+    usePaginatedData<Subscription>(urlBuilder, {
+      initialLimit: 20,
+      serviceName: "subscriptions-list",
+      transformResponse: (response: unknown) => {
+        const apiResponse = response as {
+          subscriptions: Subscription[];
+          pagination: PaginationInfo;
+        };
+        // Response is auto-unwrapped by authenticatedFetchJson
+        const subscriptions = Array.isArray(apiResponse.subscriptions)
+          ? apiResponse.subscriptions
+          : [];
+        const paginationData = apiResponse.pagination || {
+          total: subscriptions.length,
+          page: 1,
+          limit: 20,
+          totalPages: Math.ceil(subscriptions.length / 20),
+          hasMore: false,
+        };
 
-      return {
-        data: subscriptions,
-        pagination: {
-          page: paginationData.page,
-          limit: paginationData.limit,
-          total: paginationData.total,
-          totalPages: paginationData.totalPages,
-          hasMore: paginationData.hasMore || false,
-        },
-      };
-    },
-  });
+        return {
+          data: subscriptions,
+          pagination: {
+            page: paginationData.page,
+            limit: paginationData.limit,
+            total: paginationData.total,
+            totalPages: paginationData.totalPages,
+            hasMore: paginationData.hasMore || false,
+          },
+        };
+      },
+    });
 
   // Refetch when filters change
   useEffect(() => {

@@ -8,6 +8,7 @@ import {
   type TableConfig,
 } from "@/shared/utils/system/drizzle-introspection";
 import { debugLog } from "@/shared/utils/debug";
+import { IS_DEVELOPMENT as _IS_DEVELOPMENT } from "@/shared/utils/config/envUtil";
 import {
   Card,
   CardContent,
@@ -68,11 +69,13 @@ function DeveloperPage() {
         const tableConfigs = await getTableConfigs();
         setTables(tableConfigs);
 
-        const paramsMap: Record<string, object> = {};
-        for (const table of tableConfigs) {
-          paramsMap[table.name] = await generateExpectedParams(table.name);
-        }
-        setExpectedParamsMap(paramsMap);
+        const paramEntries = await Promise.all(
+          tableConfigs.map(
+            async (table) =>
+              [table.name, await generateExpectedParams(table.name)] as const
+          )
+        );
+        setExpectedParamsMap(Object.fromEntries(paramEntries));
       } catch (err) {
         debugLog.error(`Failed to load schema: ${err}`);
         setError(t("admin_developer_error_load_schema"));
@@ -436,18 +439,6 @@ function DeveloperPage() {
                 </Alert>
               ) : tableData && tableData.length > 0 ? (
                 <div className="space-y-4">
-                  {/* Debug info */}
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
-                    <div>Table: {selectedTable.name}</div>
-                    <div>
-                      KeyFields: {JSON.stringify(selectedTable.keyFields)}
-                    </div>
-                    <div>Data count: {tableData.length}</div>
-                    <div>
-                      Sample data: {JSON.stringify(tableData[0], null, 2)}
-                    </div>
-                  </div>
-
                   <div className="overflow-x-auto border rounded-lg">
                     <table className="w-full text-sm">
                       <thead className="bg-muted">

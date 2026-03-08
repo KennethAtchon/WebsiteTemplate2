@@ -20,7 +20,6 @@ import {
   CreditCard,
   Calculator,
   Wrench,
-  CheckCircle2,
   ArrowRight,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -57,7 +56,7 @@ function SupportPage() {
     },
   ];
 
-  const troubleshootingFAQs = [
+  const _troubleshootingFAQs = [
     {
       question: t("support_calc_not_loading"),
       answer: t("support_calc_not_loading_answer"),

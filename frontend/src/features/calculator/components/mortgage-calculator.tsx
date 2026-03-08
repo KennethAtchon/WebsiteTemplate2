@@ -124,11 +124,6 @@ export function MortgageCalculator() {
     []
   );
 
-  const _handleHomeInsuranceChange = useCallback(
-    (value: number) => setInputs((prev) => ({ ...prev, homeInsurance: value })),
-    []
-  );
-
   const handlePmiChange = useCallback(
     (value: number) => setInputs((prev) => ({ ...prev, pmi: value })),
     []

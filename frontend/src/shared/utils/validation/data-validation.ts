@@ -103,10 +103,10 @@ export function validateStaff(
     staff !== null &&
     "id" in staff &&
     "name" in staff &&
-    typeof (staff as any).id === "string" &&
-    (staff as any).id.length > 0 &&
-    typeof (staff as any).name === "string" &&
-    (staff as any).name.length > 0
+    typeof (staff as { id: string; name: string }).id === "string" &&
+    (staff as { id: string; name: string }).id.length > 0 &&
+    typeof (staff as { id: string; name: string }).name === "string" &&
+    (staff as { id: string; name: string }).name.length > 0
   );
 }
 
@@ -134,11 +134,52 @@ export function validateTimeSlot(slot: unknown): boolean {
     "startTime" in slot &&
     "endTime" in slot &&
     "staff" in slot &&
-    typeof (slot as any).id === "string" &&
-    (slot as any).id.length > 0 &&
-    safeParseDate((slot as any).startTime) &&
-    safeParseDate((slot as any).endTime) &&
-    validateStaff((slot as any).staff)
+    typeof (
+      slot as {
+        id: string;
+        startTime: unknown;
+        endTime: unknown;
+        staff: unknown;
+      }
+    ).id === "string" &&
+    (
+      slot as {
+        id: string;
+        startTime: unknown;
+        endTime: unknown;
+        staff: unknown;
+      }
+    ).id.length > 0 &&
+    safeParseDate(
+      (
+        slot as {
+          id: string;
+          startTime: string | Date | null | undefined;
+          endTime: string | Date | null | undefined;
+          staff: unknown;
+        }
+      ).startTime
+    ) &&
+    safeParseDate(
+      (
+        slot as {
+          id: string;
+          startTime: string | Date | null | undefined;
+          endTime: string | Date | null | undefined;
+          staff: unknown;
+        }
+      ).endTime
+    ) &&
+    validateStaff(
+      (
+        slot as {
+          id: string;
+          startTime: string | Date | null | undefined;
+          endTime: string | Date | null | undefined;
+          staff: unknown;
+        }
+      ).staff
+    )
   );
 }
 
@@ -232,7 +273,7 @@ export function isValidPhone(phone: string | null | undefined): boolean {
 /**
  * Helper function to parse price from various formats
  */
-function parsePrice(price: unknown): number {
+export function parsePrice(price: unknown): number {
   if (typeof price === "object" && price !== null && "toString" in price) {
     // Likely a Decimal object (from Drizzle/PostgreSQL)
     return parseFloat((price as { toString(): string }).toString());

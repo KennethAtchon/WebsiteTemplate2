@@ -36,7 +36,7 @@ root.render(
     <I18nextProvider i18n={i18n}>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+          <ThemeProvider storageKey="ui-theme">
             <AppProvider>
               <RouterProvider router={router} />
               <ReactQueryDevtools initialIsOpen={false} />

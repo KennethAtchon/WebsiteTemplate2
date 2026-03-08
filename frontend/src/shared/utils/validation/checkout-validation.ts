@@ -87,7 +87,7 @@ export const checkoutValidationSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .regex(/^[\+]?[\d\s\-\.\(\)]+$/, "Please enter a valid phone number")
+    .regex(/^[+]?[\d\s\-\.\(\)]+$/, "Please enter a valid phone number")
     .refine((val) => {
       // Must not contain letters
       if (/[a-zA-Z]/.test(val)) return false;
@@ -121,7 +121,7 @@ export const checkoutValidationSchema = z.object({
     .min(2, "City must be at least 2 characters")
     .max(100, "City must be less than 100 characters")
     .regex(
-      /^[a-zA-Z\s\-'\.]+$/,
+      /^[a-zA-Z\s\-.'\.]+$/,
       "City can only contain letters, spaces, hyphens, apostrophes, and periods"
     ),
 
@@ -130,7 +130,60 @@ export const checkoutValidationSchema = z.object({
     .length(2, "State must be 2 characters")
     .regex(/^[A-Z]{2}$/, "State must be uppercase abbreviation (e.g., CA, NY)")
     .refine(
-      (val) => US_STATES.includes(val as any),
+      (val) =>
+        US_STATES.includes(
+          val as
+            | "AL"
+            | "AK"
+            | "AZ"
+            | "AR"
+            | "CA"
+            | "CO"
+            | "CT"
+            | "DE"
+            | "FL"
+            | "GA"
+            | "HI"
+            | "ID"
+            | "IL"
+            | "IN"
+            | "IA"
+            | "KS"
+            | "KY"
+            | "LA"
+            | "ME"
+            | "MD"
+            | "MA"
+            | "MI"
+            | "MN"
+            | "MS"
+            | "MO"
+            | "MT"
+            | "NE"
+            | "NV"
+            | "NH"
+            | "NJ"
+            | "NM"
+            | "NY"
+            | "NC"
+            | "ND"
+            | "OH"
+            | "OK"
+            | "OR"
+            | "PA"
+            | "RI"
+            | "SC"
+            | "SD"
+            | "TN"
+            | "TX"
+            | "UT"
+            | "VT"
+            | "VA"
+            | "WA"
+            | "WV"
+            | "WI"
+            | "WY"
+        ),
       "Please enter a valid US state abbreviation"
     ),
 

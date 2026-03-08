@@ -43,7 +43,7 @@ export function createPageMetadata({
   description,
   path,
   revalidate = 3600,
-  additionalMetadata: _additionalMetadata,
+  // additionalMetadata: Additional metadata,
 }: CreatePageMetadataOptions): {
   metadata: Metadata;
   revalidate: number;

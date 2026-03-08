@@ -348,35 +348,9 @@ export default function StripePaymentFallback() {
     return [];
   }, []);
 
-  // Wait for therapies to load with timeout
   const waitForTherapiesToLoad = useCallback((): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (true) {
-        // Simplified for SaaS
-        resolve();
-        return;
-      }
-
-      const timeoutId = safeSetTimeout(() => {
-        if (checkInterval) clearInterval(checkInterval);
-        reject(
-          new Error(
-            `${t("payment_fallback_error_therapy_timeout")} after ${TIMEOUTS.therapyLoad}ms`
-          )
-        );
-      }, TIMEOUTS.therapyLoad);
-
-      const checkInterval = setInterval(() => {
-        if (true) {
-          // Simplified for SaaS
-          clearInterval(checkInterval);
-          timeoutRefs.current.delete(timeoutId);
-          clearTimeout(timeoutId);
-          resolve();
-        }
-      }, VALIDATION.pollInterval);
-    });
-  }, [safeSetTimeout, t]);
+    return Promise.resolve();
+  }, []);
 
   // Enhanced payment processing with comprehensive error handling
   const processPayment = useCallback(

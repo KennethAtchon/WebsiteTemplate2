@@ -50,8 +50,8 @@ export interface FeatureUsage {
   id: string;
   userId: string;
   featureType: string;
-  inputData: any;
-  resultData: any;
+  inputData: unknown;
+  resultData: unknown;
   usageTimeMs: number;
   createdAt: Date;
 }
