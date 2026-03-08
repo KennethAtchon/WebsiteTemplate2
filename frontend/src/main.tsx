@@ -10,6 +10,10 @@ import i18n from "@/shared/lib/i18n";
 import { ThemeProvider } from "@/shared/providers/theme-provider";
 import { AppProvider } from "@/shared/contexts/app-context";
 
+// Initialize Sentry for error tracking
+import { initializeSentry } from "@/shared/services/monitoring/sentry";
+initializeSentry();
+
 import "./styles/globals.css";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
@@ -39,7 +43,9 @@ root.render(
           <ThemeProvider storageKey="ui-theme">
             <AppProvider>
               <RouterProvider router={router} />
-              <ReactQueryDevtools initialIsOpen={false} />
+              {import.meta.env.DEV && (
+                <ReactQueryDevtools initialIsOpen={false} />
+              )}
             </AppProvider>
           </ThemeProvider>
         </QueryClientProvider>

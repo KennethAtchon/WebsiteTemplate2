@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach } from "bun:test";
 import {
   reportError,
   getErrorMetrics,
-  resetErrorMetrics,
+  clearErrorMetrics,
   withErrorHandling,
   withTimeout,
   ErrorCategory,
@@ -17,7 +17,7 @@ import {
 
 describe("global-error-handler", () => {
   beforeEach(() => {
-    resetErrorMetrics();
+    clearErrorMetrics();
   });
 
   describe("reportError", () => {
@@ -85,10 +85,9 @@ describe("global-error-handler", () => {
   });
 
   describe("getErrorMetrics", () => {
-    it("returns unhandledRejections and uncaughtExceptions counts", () => {
+    it("returns totalErrors and lastErrorTime", () => {
       const m = getErrorMetrics();
-      expect(m).toHaveProperty("unhandledRejections", 0);
-      expect(m).toHaveProperty("uncaughtExceptions", 0);
+      expect(m).toHaveProperty("totalErrors", 0);
       expect(m).toHaveProperty("lastErrorTime");
       expect(m).toHaveProperty("errorsByCategory");
       expect(m).toHaveProperty("errorsBySeverity");
@@ -105,11 +104,12 @@ describe("global-error-handler", () => {
   describe("resetErrorMetrics", () => {
     it("clears counts and maps", () => {
       reportError(new Error("one"));
-      resetErrorMetrics();
+      clearErrorMetrics();
       const m = getErrorMetrics();
-      expect(m.unhandledRejections).toBe(0);
-      expect(m.uncaughtExceptions).toBe(0);
-      expect(m.lastErrorTime).toBeNull();
+      expect(m.totalErrors).toBe(0);
+      expect(m.lastErrorTime).toBeInstanceOf(Date);
+      expect(Object.keys(m.errorsByCategory)).toHaveLength(0);
+      expect(Object.keys(m.errorsBySeverity)).toHaveLength(0);
     });
   });
 
@@ -141,7 +141,7 @@ describe("global-error-handler", () => {
           10,
           "slow op"
         )
-      ).rejects.toThrow(/slow op.*10ms/);
+      ).rejects.toThrow("Operation timed out after 10ms: slow op");
     });
 
     it("rejects with inner error when promise rejects", async () => {

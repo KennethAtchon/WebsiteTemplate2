@@ -161,7 +161,7 @@ describe("query-keys", () => {
     });
 
     it("subscriptionAnalytics", () => {
-      expect(queryKeys.api.admin.subscriptionAnalytics()).toEqual([
+      expect(queryKeys.api.admin.subscriptionsAnalytics()).toEqual([
         "api",
         "admin",
         "subscriptions",

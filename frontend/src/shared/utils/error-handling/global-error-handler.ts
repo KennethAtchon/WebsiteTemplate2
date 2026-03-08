@@ -10,7 +10,7 @@ import debugLog from "@/shared/utils/debug/debug";
 function recordErrorMetric(): void {}
 
 // Error severity levels (used internally)
-enum ErrorSeverity {
+export enum ErrorSeverity {
   LOW = "low",
 
   MEDIUM = "medium",
@@ -21,7 +21,7 @@ enum ErrorSeverity {
 }
 
 // Error categories for better classification (used internally)
-enum ErrorCategory {
+export enum ErrorCategory {
   DATABASE = "database",
 
   EXTERNAL_API = "external_api",
@@ -328,13 +328,13 @@ export function clearErrorMetrics(): void {
 /**
  * Utility for wrapping async functions with error handling
  */
-export function withErrorHandling<T extends () => Promise<unknown>>(
+export function withErrorHandling<T extends (...args: any[]) => Promise<unknown>>(
   fn: T,
   context: Partial<ErrorContext> = {}
 ): T {
-  return (async () => {
+  return (async (...args: any[]) => {
     try {
-      return await fn();
+      return await fn(...args);
     } catch (error) {
       // Error reported but result unused
       reportError(error as Error, context);

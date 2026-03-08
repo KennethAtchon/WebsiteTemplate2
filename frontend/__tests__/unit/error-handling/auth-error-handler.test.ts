@@ -2,7 +2,16 @@
  * Unit tests for auth error handler: getAuthErrorMessage mapping Firebase codes to messages.
  */
 
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, mock } from "bun:test";
+
+// Mock the debugLog module before importing the function under test
+const mockWarn = mock(() => {});
+mock.module("@/shared/utils/debug/debug", () => ({
+  debugLog: {
+    warn: mockWarn,
+  },
+}));
+
 import { getAuthErrorMessage } from "@/shared/utils/error-handling/auth-error-handler";
 
 // Error with code property (Firebase-style)
@@ -111,15 +120,14 @@ describe("auth-error-handler", () => {
 
     it("returns generic for unknown Firebase code", () => {
       const err = new ErrorWithCode("Weird", "auth/unknown-code");
-      const warn = console.warn;
-      let called: unknown[] = [];
-      console.warn = (...args: unknown[]) => {
-        called = args;
-      };
+
       expect(getAuthErrorMessage(err, t)).toBe("translated:auth_error_generic");
-      expect(called[0]).toBe("Unhandled Firebase error code:");
-      expect(called[1]).toBe("auth/unknown-code");
-      console.warn = warn;
+
+      // Verify debugLog.warn was called with the expected message
+      expect(mockWarn).toHaveBeenCalled();
+      expect(mockWarn.mock.calls[0][0]).toContain(
+        "Unhandled Firebase error code"
+      );
     });
 
     it("returns error.message for non-Firebase Error", () => {
