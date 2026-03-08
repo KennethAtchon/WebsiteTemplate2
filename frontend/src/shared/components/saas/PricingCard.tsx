@@ -85,7 +85,7 @@ export function PricingCard({
   const { data: trialEligibilityData } = useQuery({
     queryKey: queryKeys.api.trialEligibility(),
     queryFn: () => trialFetcher("/api/subscriptions/trial-eligibility"),
-    enabled: !!user && !hasActiveSubscription,
+    enabled: !!user && !role,
   });
 
   const trialEligible = trialEligibilityData?.isEligible ?? false;
@@ -95,6 +95,8 @@ export function PricingCard({
       service: "pricing-card",
       operation: "handleButtonClick",
       hasActiveSubscription,
+      hasRole: !!role,
+      role,
       isAuthenticated: !!user,
       portalUrlAvailable: !!portalUrl,
       currentTier: currentSubscription?.tier,
@@ -102,9 +104,9 @@ export function PricingCard({
       billingCycle: tier.billingCycle,
     });
 
-    if (hasActiveSubscription && portalUrl) {
+    if (role && portalUrl) {
       // Check if this is an upgrade
-      const currentTier = currentSubscription?.tier;
+      const currentTier = role;
       const tierHierarchy: Record<string, number> = {
         basic: 1,
         pro: 2,
@@ -150,7 +152,7 @@ export function PricingCard({
           });
         }
       }
-    } else if (!hasActiveSubscription) {
+    } else if (!role) {
       debugLog.info("User without subscription, proceeding to checkout", {
         service: "pricing-card",
         operation: "newUserCheckout",
@@ -182,18 +184,14 @@ export function PricingCard({
   };
 
   const showTrial =
-    trialEligible === true &&
-    SUBSCRIPTION_TRIAL_DAYS > 0 &&
-    !hasActiveSubscription;
+    trialEligible === true && SUBSCRIPTION_TRIAL_DAYS > 0 && !role;
 
-  const buttonText = hasActiveSubscription
+  const buttonText = role
     ? t("account_subscription_manage_subscription")
     : showTrial
       ? t("home_hero_cta_start_trial")
       : t("common_get_started");
-  const isButtonDisabled = Boolean(
-    hasActiveSubscription && (!portalUrl || portalLoading)
-  );
+  const isButtonDisabled = Boolean(role && (!portalUrl || portalLoading));
 
   return (
     <Card
