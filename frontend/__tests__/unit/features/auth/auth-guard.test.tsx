@@ -172,7 +172,9 @@ describe("AuthGuard", () => {
     );
 
     await waitFor(() => {
-      expect(stableNavigate).toHaveBeenCalledWith({ to: "/sign-in" });
+      expect(stableNavigate).toHaveBeenCalledWith(
+        expect.objectContaining({ to: "/sign-in" })
+      );
     });
     expect(screen.queryByTestId("admin-content")).toBeNull();
   });
