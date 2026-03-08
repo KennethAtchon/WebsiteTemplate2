@@ -40,7 +40,7 @@ jobs:
         run: bun test:unit 2>/dev/null || true
 
       - name: Build
-        run: bun build
+        run: bun run build
 
   backend:
     name: Backend
