@@ -634,8 +634,10 @@ mock.module("@/shared/utils/system/system-logger", () => ({
 // register their own mock.module calls in those files.
 // The real implementations safely use mocked loggers (debugLog, systemLogger).
 
-// Console (optional)
+// Console - completely suppress error/warn logs during tests to prevent CI noise
+// React error boundary tests intentionally throw errors that should be caught
 const noop = mock(() => {});
+
 (global as any).console = {
   ...console,
   error: noop,
