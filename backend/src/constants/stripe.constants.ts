@@ -55,49 +55,28 @@ export const STRIPE_MAP: StripeMap = {
     basic: {
       productId: "prod_TWTXj1UeJcW6vz",
       productName: "Tier 1",
-      gamma_hyperlink:
-        "https://dashboard.stripe.com/acct_1SZFe93qLZiOfTxs/test/products/prod_TWTXj1UeJcW6vz",
+      gamma_hyperlink: "https://dashboard.stripe.com/test/products/prod_TWTXj1UeJcW6vz",
       prices: {
-        monthly: {
-          priceId: "price_1SZQa63qLZiOfTxsQZkBift7",
-          amount: 10.0,
-        },
-        annual: {
-          priceId: "price_1SZQak3qLZiOfTxsM7kwhZwQ",
-          amount: 100.0,
-        },
+        monthly: { priceId: "price_1SZQa63qLZiOfTxsQZkBift7", amount: 10 },
+        annual:  { priceId: "price_1SZQak3qLZiOfTxsM7kwhZwQ",  amount: 100 },
       },
     },
     pro: {
       productId: "prod_TWTYPXmd7zh3kP",
       productName: "Tier 2",
-      gamma_hyperlink:
-        "https://dashboard.stripe.com/acct_1SZFe93qLZiOfTxs/test/products/prod_TWTYPXmd7zh3kP",
+      gamma_hyperlink: "https://dashboard.stripe.com/test/products/prod_TWTYPXmd7zh3kP",
       prices: {
-        monthly: {
-          priceId: "price_1SZQaz3qLZiOfTxs8Kg7ZsN8",
-          amount: 25.0,
-        },
-        annual: {
-          priceId: "price_1SZQbE3qLZiOfTxsx4kE2xqk",
-          amount: 200.0,
-        },
+        monthly: { priceId: "price_1SZQaz3qLZiOfTxs8Kg7ZsN8", amount: 25 },
+        annual:  { priceId: "price_1SZQbE3qLZiOfTxsx4kE2xqk",  amount: 200 },
       },
     },
     enterprise: {
       productId: "prod_TWTYPkmPHd8GF4",
       productName: "Tier 3",
-      gamma_hyperlink:
-        "https://dashboard.stripe.com/acct_1SZFe93qLZiOfTxs/test/products/prod_TWTYPkmPHd8GF4",
+      gamma_hyperlink: "https://dashboard.stripe.com/test/products/prod_TWTYPkmPHd8GF4",
       prices: {
-        monthly: {
-          priceId: "price_1SZQbQ3qLZiOfTxsIye7eUZm",
-          amount: 100,
-        },
-        annual: {
-          priceId: "price_1SZQbe3qLZiOfTxs7xApSWQY",
-          amount: 1000,
-        },
+        monthly: { priceId: "price_1SZQbQ3qLZiOfTxsIye7eUZm", amount: 100 },
+        annual:  { priceId: "price_1SZQbe3qLZiOfTxs7xApSWQY",  amount: 1000 },
       },
     },
   },
